@@ -31,9 +31,8 @@ export default function Router($container) {
         window.addEventListener("popstate", () => {
             route();
         });
-
-        route();
     }
 
-
+    setupEventListener();
+    route();
 }
