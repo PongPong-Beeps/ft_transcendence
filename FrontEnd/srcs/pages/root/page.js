@@ -4,13 +4,13 @@ export default function RootPage($container) {
 
     const render = () => {
         $container.innerHTML = `
-        <button id="next">페이지 이동</button>
-    `;
+            <button id="next">시작</button>
+        `;
     }
 
     const setupEventListener = () => {
         $container.querySelector('#next').addEventListener('click', () => {
-            navigate('/hello')
+           navigate('lobby')
         });
     }
 
