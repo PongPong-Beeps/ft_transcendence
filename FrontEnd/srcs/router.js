@@ -18,9 +18,9 @@ export default function Router($container) {
     const setupEventListener = () => {
         // 페이지 이동
         window.addEventListener("historyChanged", ({ detail }) => {
-            const { to, isReplace } = detail;
+            const { to } = detail;
 
-            if (isReplace || to === location.pathname) { // 같은 페이지로 이동 시 히스토리를 쌓지 않음
+            if (to === location.pathname) { // 같은 페이지로 이동 시 히스토리를 쌓지 않음
                 history.replaceState(null, "", to);
             } else {
                 history.pushState(null, "", to);
