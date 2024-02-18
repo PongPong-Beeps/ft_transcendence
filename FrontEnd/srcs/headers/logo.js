@@ -3,7 +3,7 @@
  */
 export default function Logo($container) {
     const render = () => {
-        $container.querySelector('#header').innerHTML = `
+        $container.querySelector('#page').innerHTML = `
             <div id="logo">
                 <img src="../../assets/image/logo.png" alt="logo">
             </div>

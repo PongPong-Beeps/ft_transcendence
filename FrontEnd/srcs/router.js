@@ -7,7 +7,7 @@ import Logo from "./headers/logo.js";
  * @description URL 변경을 감지하고 해당하는 페이지 컴포넌트를 렌더링
  */
 export default function Router($container) {
-    let currentHeader = undefined
+    let currentPage = undefined
     let currentMenu = undefined
     let currentProfile = undefined
     let currentMain = undefined
@@ -20,7 +20,7 @@ export default function Router($container) {
 
     const route = () => {
         const target = findMatchedTarget();
-        if (!(currentHeader instanceof target.header)) currentHeader = new target.header($container);
+        if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
         if (target.layout === "grid") {
             $container.querySelector('#components').style.display = "grid";
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);
