@@ -1,0 +1,94 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    /*height: 100vh;*/
+    background-color: #B7D768;
+}
+
+#app {
+    display: grid;
+    place-items: center; /* 가로와 세로 중앙 정렬을 간단히 처리 */
+    height: 100vh; /* 부모 컨테이너의 높이를 뷰포트 높이로 설정 */
+}
+
+#header {
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 2.5em;
+    width: 80vw;
+}
+
+#logo {
+    height: 10vh;
+    display: flex;
+    align-items: center;
+}
+
+#logo img {
+    height: 80%;
+}
+
+#components {
+    display: grid;
+    grid-template-areas:
+    'top-leading top-trailing'
+    'bottom-leading bottom-trailing';
+    grid-template-rows: 2fr 1fr;
+    grid-template-columns: 1fr 4fr;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 80vw;
+    height: 80vh;
+    border: 8px solid #5C7320;
+    border-radius: 30px;
+}
+
+#menu {
+    grid-area: top-leading;
+    background-color: white;
+}
+
+#main {
+    grid-area: top-trailing;
+    background-color: white;
+}
+
+#profile {
+    grid-area: bottom-leading;
+    background-color: white;
+}
+
+#footer {
+    grid-area: bottom-trailing;
+    background-color: white;
+}
+
+/*.header {*/
+/*    grid-area: header;*/
+/*    font-size: 3em;*/
+/*    flex-grow: 1;*/
+/*}*/
+
+/*.menu1 { grid-area: menu1; }*/
+/*.menu2 { grid-area: menu2; }*/
+/*.main { grid-area: main; }*/
+/*.footer { grid-area: footer; }*/
+
+/*.grid-container {*/
+/*    display: grid;*/
+/*    grid-template-areas:*/
+/*    'header .'*/
+/*    'menu1 main'*/
+/*    'menu2 footer';*/
+/*    gap: 10px;*/
+/*    padding: 10px;*/
+/*    grid-template-rows: 1fr 8fr 3fr; !* 세로 비율 조정 *!*/
+/*    grid-template-columns: 1fr 4fr; !* 가로 비율 조정 *!*/
+/*    width: 100%; !* 너비를 화면 너비에 맞춤 *!*/
+/*    height: 100vh; !* 높이를 뷰포트 높이에 맞춤 *!*/
+/*    box-sizing: border-box; !* 패딩을 포함한 박스 모델 적용 *!*/
+/*}*/
+
+/*.grid-container > div {*/
+/*    padding: 20px 0;*/
+/*}*/
