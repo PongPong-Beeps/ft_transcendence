@@ -7,7 +7,6 @@ export default function Logo($container) {
             <div id="logo">
                 <img src="../../assets/image/logo.png" alt="logo">
             </div>
-            
         `;
     }
 

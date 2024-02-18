@@ -11,9 +11,7 @@ html, body {
     height: 100vh; /* 부모 컨테이너의 높이를 뷰포트 높이로 설정 */
 }
 
-#header {
-    font-family: "DNF Bit Bit v2", serif;
-    font-size: 2.5em;
+#page {
     width: 80vw;
 }
 
