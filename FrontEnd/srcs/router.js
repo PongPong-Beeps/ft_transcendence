@@ -1,13 +1,13 @@
 import { routes } from "./constants/routeInfo.js";
 import MyProfile from "./components/my-profile.js";
-import LogoBackground from "./pages/logo-background.js";
+import Logo from "./headers/logo.js";
 
 /**
  * @param {HTMLElement} $container
  * @description URL 변경을 감지하고 해당하는 페이지 컴포넌트를 렌더링
  */
 export default function Router($container) {
-    let currentPage = undefined
+    let currentHeader = undefined
     let currentMenu = undefined
     let currentProfile = undefined
     let currentMain = undefined
@@ -20,7 +20,7 @@ export default function Router($container) {
 
     const route = () => {
         const target = findMatchedTarget();
-        if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
+        if (!(currentHeader instanceof target.header)) currentHeader = new target.header($container);
         if (target.layout === "grid") {
             $container.querySelector('#components').style.display = "grid";
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);

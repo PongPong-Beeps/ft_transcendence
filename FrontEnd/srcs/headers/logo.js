@@ -1,7 +1,7 @@
 /**
  * @param {HTMLElement} $container
  */
-export default function LogoBackground($container) {
+export default function Logo($container) {
     const render = () => {
         $container.querySelector('#header').innerHTML = `
             <div id="logo">
