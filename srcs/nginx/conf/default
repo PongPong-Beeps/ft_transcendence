@@ -1,0 +1,18 @@
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+
+	server_name jonchoi.42.fr localhost;
+
+	ssl_protocols TLSv1.2 TLSv1.3;
+	ssl_certificate /etc/ssl/certs/server.crt;
+	ssl_certificate_key /etc/ssl/private/server_pkey.pem;
+
+	root   /var/www/html;
+ 	index  index.html;
+
+	location / {
+		try_files $uri $uri/ /index.html;
+	}
+
+}
