@@ -1,0 +1,92 @@
+#game-settings-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background-color: #779630;
+    font-family: "DNF Bit Bit v2", serif;
+    /* 그리드 속성 */
+    display: grid;
+    grid-template-areas:
+    'title'
+    'option-container'
+    'button-container';
+    grid-template-rows: 1fr 3fr 1fr;
+}
+
+#game-settings-title {
+    grid-area: title;
+    /* 텍스트 위치 */
+    display: flex;
+    align-items: center;
+    margin-left: 30px;
+    /* 텍스트 속성 */
+    font-size: 2.5em;
+    color: white;
+}
+
+#game-settings-option-container {
+    grid-area: option-container;
+    display: flex;
+    justify-content: center;
+    gap: 150px;
+}
+
+.game-settings-option {
+    display: grid;
+    grid-template-areas:
+    'title'
+    'item-container';
+    grid-template-rows: 1fr 4fr;
+    align-items: center;
+    justify-items: center;
+}
+
+.game-settings-option-title {
+    grid-area: title;
+    font-size: 1.5em;
+    color: white;
+}
+
+.game-settings-option-item-container {
+    grid-area: item-container;
+    display: flex;
+    gap: 30px;
+}
+
+.game-settings-option-item {
+    height: 180px;
+    width: 180px;
+    background-color: #A8CB60;
+    border-radius: 20px;
+    border: none;
+}
+
+.game-settings-option-item.selected {
+    filter: brightness(50%);
+}
+
+.game-settings-option-item:hover {
+    filter: brightness(50%);
+}
+
+
+.game-settings-option-item img {
+    max-width: 80%;
+}
+
+#game-settings-button-container {
+    grid-area: button-container;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+}
+
+.game-settings-button {
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 1.5em;
+    width: 180px;
+    height: 60px;
+    border: 5px solid #5C7320;
+    border-radius: 10px;
+}

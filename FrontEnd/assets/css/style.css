@@ -61,32 +61,12 @@ html, body {
     background-color: white;
 }
 
-/*.header {*/
-/*    grid-area: header;*/
-/*    font-size: 3em;*/
-/*    flex-grow: 1;*/
-/*}*/
+.green-button {
+    background-color: #D3E95A;
+    color: #5C7320
+}
 
-/*.menu1 { grid-area: menu1; }*/
-/*.menu2 { grid-area: menu2; }*/
-/*.main { grid-area: main; }*/
-/*.footer { grid-area: footer; }*/
-
-/*.grid-container {*/
-/*    display: grid;*/
-/*    grid-template-areas:*/
-/*    'header .'*/
-/*    'menu1 main'*/
-/*    'menu2 footer';*/
-/*    gap: 10px;*/
-/*    padding: 10px;*/
-/*    grid-template-rows: 1fr 8fr 3fr; !* 세로 비율 조정 *!*/
-/*    grid-template-columns: 1fr 4fr; !* 가로 비율 조정 *!*/
-/*    width: 100%; !* 너비를 화면 너비에 맞춤 *!*/
-/*    height: 100vh; !* 높이를 뷰포트 높이에 맞춤 *!*/
-/*    box-sizing: border-box; !* 패딩을 포함한 박스 모델 적용 *!*/
-/*}*/
-
-/*.grid-container > div {*/
-/*    padding: 20px 0;*/
-/*}*/
+.red-button {
+    background-color: #E9855A;
+    color : white;
+}
