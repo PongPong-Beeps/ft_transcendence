@@ -1,0 +1,80 @@
+#user-list-container {
+    display: flex;
+    flex-direction: column;
+    width: 100% ;
+    height: 100%;
+    font-family: "DNF Bit Bit v2", serif;
+}
+
+#user-list-button-container {
+    flex: 1;
+    display: flex;
+}
+
+.user-list-button {
+    width: 50%;
+    border-radius: 10px 10px 0 0;
+    font-family: "DNF Bit Bit v2", serif;
+    border: 4px solid #5C7320;
+}
+
+.user-list-button.selected {
+    border-bottom: none;
+    color: white;
+    background-color: #A8CB60;
+}
+
+.user-list-button:not(.selected) {
+    background-color: #8DAA4E;
+    color: #C2C8B3;
+}
+
+#user-list-list-container {
+    flex: 11;
+    overflow-y: auto;
+    border-radius: 0 0 10px 10px;
+    background-color: #A8CB60;
+    padding: 10px;
+    border: 4px solid #5C7320;
+    border-top: none;
+}
+
+.friend-cell {
+    height: 50px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-indicator {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.online {
+    background-color: #E5FD63;
+}
+
+.offline {
+    background-color: #75787C;
+}
+
+.nickname {
+    flex-grow: 1;
+    color: white;
+    margin-left: 10px;
+    font-size: 1em;
+}
+
+.dm-btn {
+    height: 35px;
+    background-color: #D3E95A;
+    color : #5C7320;
+    border-radius: 10px;
+    border: 4px solid #5C7320;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 0.9em;
+}
