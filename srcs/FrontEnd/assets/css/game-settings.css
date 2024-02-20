@@ -54,8 +54,8 @@
 }
 
 .game-settings-option-item {
-    height: 180px;
-    width: 180px;
+    width: 10vw;
+    aspect-ratio: 1 / 1;
     background-color: #A8CB60;
     border-radius: 20px;
     border: none;
@@ -72,6 +72,7 @@
 
 .game-settings-option-item img {
     max-width: 80%;
+    max-height: 60%;
 }
 
 #game-settings-button-container {
@@ -85,8 +86,8 @@
 .game-settings-button {
     font-family: "DNF Bit Bit v2", serif;
     font-size: 1.5em;
-    width: 180px;
-    height: 60px;
+    width: 10vw;
+    aspect-ratio: 3 / 1;
     border: 5px solid #5C7320;
     border-radius: 10px;
 }
