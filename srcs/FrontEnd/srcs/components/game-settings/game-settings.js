@@ -1,3 +1,4 @@
+// GameSettings.js
 import { navigate } from "../../utils/navigate.js";
 import GameSettingsOption from "./game-settings-option.js";
 
@@ -30,40 +31,40 @@ export default function GameSettings($container) {
     };
 
     const setupEventListener = () => {
-        $container.querySelectorAll('.game-settings-option-item').forEach(button => {
-            button.addEventListener('click', () => {
-                const isSelected = button.getAttribute('data-selected') === 'true';
-                const category = button.getAttribute('data-category');
+        $container.querySelector('#game-settings-option-container').addEventListener('click', (event) => {
+            const target = event.target.closest('.game-settings-option-item');
+            if (!target) return;
 
-                // 같은 카테고리 내의 다른 아이템들의 선택 상태를 해제
-                const sameCategoryItems = $container.querySelectorAll(`.game-settings-option-item[data-category="${category}"]`);
-                sameCategoryItems.forEach(item => {
-                    item.setAttribute('data-selected', 'false');
-                    item.classList.remove('selected');
-                });
+            const isSelected = target.getAttribute('data-selected') === 'true';
+            const category = target.getAttribute('data-category');
 
-                // 현재 아이템의 선택 상태를 업데이트
-                button.setAttribute('data-selected', String(!isSelected));
-                button.classList.toggle('selected', !isSelected);
+            // 같은 카테고리 내의 다른 아이템들의 선택 상태를 해제
+            const sameCategoryItems = $container.querySelectorAll(`.game-settings-option-item[data-category="${category}"]`);
+            sameCategoryItems.forEach(item => {
+                item.setAttribute('data-selected', 'false');
+                item.classList.remove('selected');
             });
+
+            // 현재 아이템의 선택 상태를 업데이트
+            target.setAttribute('data-selected', String(!isSelected));
+            target.classList.toggle('selected', !isSelected);
         });
 
         $container.querySelectorAll('.game-settings-button').forEach(button => {
             button.addEventListener('click', () => {
                 const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
                 if (selectedOptions.length < 2) {
-                    alert("모든 옵션을 선택해야 합니다.");
+                    alert("모든 옵션을 정상적으로 선택해야 합니다 !") // alert보다 UI 내에 안내 문구로 넣는 게 더 좋을 것 같다
                     return;
                 }
 
-                const selectedMode = [...selectedOptions].find(option => option.dataset.category === "mode")
-                const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "difficulty")
+                const selectedMode = [...selectedOptions].find(option => option.dataset.category === "mode");
+                const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "difficulty");
 
-                navigate(selectedMode.dataset.label + "-room?difficulty=" + selectedDifficulty.dataset.label);
+                navigate(`${selectedMode.dataset.label}-room?difficulty=${selectedDifficulty.dataset.label}`);
             });
         });
-    }
-
+    };
 
     render();
     setupEventListener();
