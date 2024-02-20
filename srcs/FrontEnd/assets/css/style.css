@@ -1,7 +1,6 @@
 html, body {
     margin: 0;
     padding: 0;
-    /*height: 100vh;*/
     background-color: #B7D768;
 }
 
@@ -55,13 +54,12 @@ html, body {
 }
 
 #menu {
-    flex: 2;
+    flex: 3;
     overflow-y: auto;
 }
 
 #profile {
     flex: 1;
-    background-color: white;
 }
 
 #main {
@@ -73,12 +71,12 @@ html, body {
     background-color: white;
 }
 
-.green-button {
+.green-btn {
     background-color: #D3E95A;
     color: #5C7320
 }
 
-.red-button {
+.red-btn {
     background-color: #E9855A;
     color : white;
 }
