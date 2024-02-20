@@ -9,7 +9,15 @@ export default function UserList($container) {
         { nickname: "친구 1", isOnline: true },
         { nickname: "친구 2", isOnline: true },
         { nickname: "친구 3", isOnline: true },
-        { nickname: "친구 4", isOnline: false }
+        { nickname: "친구 4", isOnline: true },
+        { nickname: "친구 5", isOnline: true },
+        { nickname: "친구 6", isOnline: true },
+        { nickname: "친구 7", isOnline: true },
+        { nickname: "친구 8", isOnline: true },
+        { nickname: "친구 9", isOnline: true },
+        { nickname: "친구 10", isOnline: false },
+        { nickname: "친구 11", isOnline: false },
+        { nickname: "친구 12", isOnline: false }
     ];
 
     const render = () => {
