@@ -4,31 +4,19 @@ services:
   nginx:
     build: ./nginx
     container_name: nginx
-    volumes:
-      - web_volume:/var/www/html
-    networks:
-      intra:
-        ipv4_address: 192.168.0.12
     ports:
       - "443:443"
     tty: true
     stdin_open: true
-    restart: always
-#    env_file:
-#      - ./.env
+    restart: on-failure
+    volumes:
+      - ./FrontEnd:/var/www/html
 
-volumes:
-  web_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./srcs/FrontEnd/
-
-networks:
-  intra:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.0.0/16
+  django:
+    build: ./BackEnd
+    container_name: django
+    ports:
+      - "8000"
+    tty: true
+    stdin_open: true
+    restart: on-failure
