@@ -12,9 +12,9 @@ services:
     volumes:
       - ./FrontEnd:/var/www/html
 
-  app:
+  django:
     build: ./BackEnd
-    container_name: app
+    container_name: django
     ports:
       - "8000"
     tty: true

@@ -1,19 +1,18 @@
-FROM python:3.8
+FROM python:3.10
 
 WORKDIR /usr/src/app
 
-COPY ./app/requirements.txt ./
+COPY ./project/requirements.txt ./
+
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./app .
+COPY ./project .
 
 EXPOSE 8000
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
-#gunicorn --bind 0:8000 app.wsgi:application
-#CMD ["gunicorn", "--bind", "0:8000", "app.wsgi:application"]
-
-
-#gunicorn --bind unix:/tmp/gunicorn.sock app.wsgi:application
 #CMD ["gunicorn", "--bind", "unix:/tmp/gunicorn.sock", "app.wsgi:application"]
+
+#CMD ["gunicorn", "--bind", "0:8000", "project.wsgi:application"]
