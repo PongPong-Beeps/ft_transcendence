@@ -78,10 +78,12 @@ html, body {
 
 .green-btn {
     background-color: #D3E95A;
-    color: #5C7320
+    color: #5C7320;
+    font-family: "DNF Bit Bit v2", serif;
 }
 
 .red-btn {
     background-color: #E9855A;
     color : white;
+    font-family: "DNF Bit Bit v2", serif;
 }

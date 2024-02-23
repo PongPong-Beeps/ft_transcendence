@@ -25,8 +25,8 @@ export default function UserList($container) {
             <link rel="stylesheet" href="../../../assets/css/user-list.css">
             <div id="user-list-container">
                 <div id="user-list-button-container">
-                    <button class="user-list-button" id="friends-btn" data-selected="true">친구</button>
-                    <button class="user-list-button" id="all-btn" data-selected="false">전체</button>
+                    <button class="user-list-button" id="friends-btn">친구</button>
+                    <button class="user-list-button" id="all-btn">전체</button>
                 </div>
                 <div id="user-list-list-container">
                     <div id="friends-list" class="list"></div>
