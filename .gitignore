@@ -12,3 +12,6 @@
 
 # VSCode settings
 .vscode
+
+# Database
+srcs/BackEnd/database/

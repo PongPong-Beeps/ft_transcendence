@@ -68,7 +68,6 @@ html, body {
 
 #footer {
     grid-area: bottom-trailing;
-    background-color: white;
 }
 
 .green-btn {
