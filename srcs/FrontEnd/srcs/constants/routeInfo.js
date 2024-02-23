@@ -1,4 +1,5 @@
 import Chat from "../components/chat.js";
+import DisplayBoard from "../components/display-board.js";
 import GameSettings from "../components/game-settings/game-settings.js";
 import TournamentRoom from "../components/tournament-room.js";
 import UserList from "../components/user-list/user-list.js";
@@ -11,4 +12,5 @@ export const routes = [
     {path: /^\/lobby$/, layout: "grid", page: Logo, components: { menu: UserList, main: GameSettings, footer: Chat }},
     {path: /^\/tournament-room$/, layout: "grid", page: Logo, components: { menu: UserList, main: TournamentRoom, footer: Chat }},
     {path: /^\/vs-room$/, layout: "grid", page: Logo, components: { menu: UserList, main: VsRoom, footer: Chat }},
+    {path: /^\/vs-game$/, layout: "grid", page: Logo, components: { menu: UserList, main: VsRoom, footer: DisplayBoard }},
 ]
