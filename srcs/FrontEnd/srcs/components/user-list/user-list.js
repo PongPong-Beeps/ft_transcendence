@@ -1,4 +1,5 @@
 import FriendCell from "./friend-cell.js";
+import ProfileModal from "../../pages/profile-modal.js";
 
 /**
  * @param {HTMLElement} $container
@@ -25,8 +26,8 @@ export default function UserList($container) {
             <link rel="stylesheet" href="../../../assets/css/user-list.css">
             <div id="user-list-container">
                 <div id="user-list-button-container">
-                    <button class="user-list-button" id="friends-btn" data-selected="true">친구</button>
-                    <button class="user-list-button" id="all-btn" data-selected="false">전체</button>
+                    <button class="user-list-button non-outline-btn" id="friends-btn">친구</button>
+                    <button class="user-list-button non-outline-btn" id="all-btn">전체</button>
                 </div>
                 <div id="user-list-list-container">
                     <div id="friends-list" class="list"></div>
@@ -43,6 +44,21 @@ export default function UserList($container) {
         const friendsList = $container.querySelector('#friends-list');
         if (friendsList) {
             friendsList.innerHTML = friendListData.map(friend => FriendCell(friend.nickname, friend.isOnline)).join('');
+
+            friendListData.forEach(friend => {
+                const cell = $container.querySelector(`[data-nickname="${friend.nickname}"]`);
+                if (cell) {
+                    cell.addEventListener('click', () => {
+                        new ProfileModal($container, friend.nickname, false); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
+                        $container.querySelector('#page').style.display = 'block';
+                    });
+
+                    cell.querySelector('.dm-btn').addEventListener('click', (event) => {
+                        event.stopPropagation(); // 이벤트 전파를 막음
+                        alert(`${friend.nickname}에게 귓속말`);
+                    });
+                }
+            });
         }
     }
 

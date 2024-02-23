@@ -12,10 +12,11 @@ html, body {
 }
 
 #page {
-    z-index: 1;
+    position: absolute;
+    z-index: 1000;
     display: none;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 #header {
@@ -77,10 +78,18 @@ html, body {
 
 .green-btn {
     background-color: #D3E95A;
-    color: #5C7320
+    color: #5C7320;
+    font-family: "DNF Bit Bit v2", serif;
 }
 
 .red-btn {
     background-color: #E9855A;
     color : white;
+    font-family: "DNF Bit Bit v2", serif;
+}
+
+.non-outline-btn {}
+
+.non-outline-btn:focus {
+    outline: none;
 }

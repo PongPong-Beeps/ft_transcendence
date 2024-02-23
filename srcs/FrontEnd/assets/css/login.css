@@ -1,4 +1,4 @@
-#container {
+#profile-modal-container {
     background-color: #B7D768;
     display: flex;
     flex-direction: column;
@@ -16,7 +16,6 @@
 #login-btn {
     border-radius: 10px;
     border: 5px solid #5C7320;
-    font-family: "DNF Bit Bit v2", serif;
     font-size: 2em;
     padding: 15px;
 }

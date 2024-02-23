@@ -1,0 +1,94 @@
+#profile-modal-background {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#profile-modal-container {
+    width: 500px;
+    height: 650px;
+    background-color: #83A644;
+    border-radius: 10px;
+    display: grid;
+    grid-template-areas:
+    'title'
+    'tab-container'
+    'button-container';
+    grid-template-rows: 1fr 8fr 1fr;
+    gap: 20px;
+    padding: 30px;
+}
+
+#profile-modal-title {
+    grid-area: title;
+}
+
+#profile-modal-title img {
+    height: 40px;
+    width: auto;
+}
+
+#profile-modal-tab-container {
+    grid-area: tab-container;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    background-color: #38631D;
+    padding: 10px;
+}
+
+#profile-modal-tab-button-container {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 아이템들을 세로축 중앙에 정렬 */
+}
+
+#profile-modal-tab-button-container button {
+    flex: 1 1 33%; /* grow, shrink, basis */
+    height: 100%;
+    border-radius: 10px 10px 0 0;
+    background-color: #82A540;
+    border: none;
+    font-family: "DNF Bit Bit v2", serif;
+}
+
+#profile-modal-tab-button-container button.hidden {
+    visibility: hidden;
+}
+
+.profile-modal-tab-button.selected {
+    color: #EAF79C;
+}
+
+.profile-modal-tab-button:not(.selected) {
+    color: #3A611A;
+    filter: brightness(70%);
+}
+
+#profile-modal-tab {
+    flex: 10;
+    border-radius: 0 0 10px 10px;
+    background-color: #82A540;
+}
+
+#profile-modal-button-container {
+    grid-area: button-container;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+
+#profile-modal-button-container button {
+    border-radius: 10px;
+    width: 25%;
+    height: 70%;
+    font-family: "DNF Bit Bit v2", serif;
+    color: #5C7320;
+    background-color: #A9CE50;
+    border: 4px solid #588329;
+}
