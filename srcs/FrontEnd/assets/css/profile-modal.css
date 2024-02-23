@@ -48,12 +48,17 @@
 }
 
 #profile-modal-tab-button-container button {
+    flex: 1 1 33%; /* grow, shrink, basis */
     width: 33%;
     height: 100%;
     border-radius: 10px 10px 0 0;
     background-color: #82A540;
     border: none;
     font-family: "DNF Bit Bit v2", serif;
+}
+
+#profile-modal-tab-button-container button.hidden {
+    visibility: hidden;
 }
 
 .profile-modal-tab-button.selected {

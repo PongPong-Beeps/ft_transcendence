@@ -1,10 +1,9 @@
-import {navigate} from "../utils/navigate.js";
-
 /**
  * @param {HTMLElement} $container
  * @param {string} nickname
+ * @param {boolean} isMe
  */
-export default function ProfileModal($container, nickname) {
+export default function ProfileModal($container, nickname, isMe) {
     const render = () => {
         $container.querySelector('#page').innerHTML = `
             <link rel="stylesheet" href="../../assets/css/profile-modal.css">
@@ -15,16 +14,18 @@ export default function ProfileModal($container, nickname) {
                         <div id="profile-modal-tab-button-container">
                             <button class="profile-modal-tab-button non-outline-btn" id="info-btn">정보</button>
                             <button class="profile-modal-tab-button non-outline-btn" id="history-btn">전적</button>
-                            <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
+                            ${isMe ? '<button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>' : ''}
                         </div>
                         <div id="profile-modal-tab">
                             ${nickname}
                         </div>
                     </div>
                     <div id="profile-modal-button-container">
+                        ${isMe ? '<button class="non-outline-btn"id="ok-btn">확인</button>' : `
                         <button class="non-outline-btn" id="block-btn">차단</button>
                         <button class="non-outline-btn"id="add-friend-btn">친구 추가</button>
                         <button class="non-outline-btn"id="ok-btn">확인</button>
+                        `}
                     </div>
                 </div>
             </div>

@@ -49,8 +49,13 @@ export default function UserList($container) {
                 const cell = $container.querySelector(`[data-nickname="${friend.nickname}"]`);
                 if (cell) {
                     cell.addEventListener('click', () => {
-                        new ProfileModal($container, friend.nickname); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
+                        new ProfileModal($container, friend.nickname, false); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
                         $container.querySelector('#page').style.display = 'block';
+                    });
+
+                    cell.querySelector('.dm-btn').addEventListener('click', (event) => {
+                        event.stopPropagation(); // 이벤트 전파를 막음
+                        alert(`${friend.nickname}에게 귓속말`);
                     });
                 }
             });
