@@ -8,10 +8,8 @@ services:
       POSTGRES_DB: 'pong_db'
       POSTGRES_USER: 'admin'
       POSTGRES_PASSWORD: '1234'
-    ports:
-      - "5432:5432"
     volumes:
-      - ./BackEnd/db_volume:/var/lib/postgresql/data
+      - ./BackEnd/database:/var/lib/postgresql/data
     restart: on-failure
   
   django:
@@ -19,8 +17,6 @@ services:
       - db
     build: ./BackEnd
     container_name: django
-    ports:
-      - "8000"
     tty: true
     stdin_open: true
     restart: on-failure

@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.12
 
 WORKDIR /usr/src/app
 
@@ -9,12 +9,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./project .
 
-COPY ./tools/cmd.sh .
+COPY ./tools/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["bash", "cmd.sh"]
-
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
-#CMD ["gunicorn", "--bind", "0:8000", "project.wsgi:application"]
+ENTRYPOINT ["/entrypoint.sh"]

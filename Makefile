@@ -1,5 +1,5 @@
 DOCKER_COMPOSE_FILE = ./srcs/docker-compose.yml
-DB_VOLUME = ./srcs/BackEnd/db_volume
+DB_VOLUME = ./srcs/BackEnd/database
 
 all: up
 
@@ -13,7 +13,6 @@ down:
 
 clean:
 	docker-compose -f $(DOCKER_COMPOSE_FILE) down -v --rmi all --remove-orphans
-	rm -rf $(DB_VOLUME)/*
 
 fclean: clean
 	docker system prune --volumes --all --force
