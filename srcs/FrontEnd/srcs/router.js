@@ -1,6 +1,5 @@
 import { routes } from "./constants/routeInfo.js";
 import MyProfile from "./components/my-profile.js";
-import Logo from "./headers/logo.js";
 
 /**
  * @param {HTMLElement} $container
@@ -20,15 +19,15 @@ export default function Router($container) {
 
     const route = () => {
         const target = findMatchedTarget();
-        if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
-        if (target.layout === "grid") {
-            $container.querySelector('#components').style.display = "grid";
+        if (target.layout === "full") {
+            if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
+            $container.querySelector('#page').style.display = "block";
+        } else if (target.layout === "grid") {
+            $container.querySelector('#page').style.display = "none";
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);
             if (!(currentProfile instanceof MyProfile)) currentProfile = new MyProfile($container);
             if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container);
             if (!(currentFooter instanceof target.components.menu)) currentFooter = new target.components.footer($container);
-        } else {
-            $container.querySelector('#components').style.display = "none";
         }
     };
 
