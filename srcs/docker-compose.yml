@@ -1,7 +1,29 @@
 version: '3'
 
 services:
+  db:
+    image: postgres:latest
+    container_name: db
+    environment:
+      POSTGRES_DB: 'pong_db'
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: '1234'
+    volumes:
+      - ./BackEnd/database:/var/lib/postgresql/data
+    restart: on-failure
+  
+  django:
+    depends_on:
+      - db
+    build: ./BackEnd
+    container_name: django
+    tty: true
+    stdin_open: true
+    restart: on-failure
+
   nginx:
+    depends_on:
+      - django
     build: ./nginx
     container_name: nginx
     ports:
@@ -11,12 +33,3 @@ services:
     restart: on-failure
     volumes:
       - ./FrontEnd:/var/www/html
-
-  django:
-    build: ./BackEnd
-    container_name: django
-    ports:
-      - "8000"
-    tty: true
-    stdin_open: true
-    restart: on-failure
