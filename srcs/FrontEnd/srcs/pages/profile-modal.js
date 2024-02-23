@@ -2,8 +2,9 @@ import {navigate} from "../utils/navigate.js";
 
 /**
  * @param {HTMLElement} $container
+ * @param {string} nickname
  */
-export default function ProfileModal($container) {
+export default function ProfileModal($container, nickname) {
     const render = () => {
         $container.querySelector('#page').innerHTML = `
             <link rel="stylesheet" href="../../assets/css/profile-modal.css">
@@ -17,7 +18,7 @@ export default function ProfileModal($container) {
                             <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
                         </div>
                         <div id="profile-modal-tab">
-                        
+                            ${nickname}
                         </div>
                     </div>
                     <div id="profile-modal-button-container">

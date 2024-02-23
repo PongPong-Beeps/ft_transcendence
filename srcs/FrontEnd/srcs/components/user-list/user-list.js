@@ -1,4 +1,5 @@
 import FriendCell from "./friend-cell.js";
+import ProfileModal from "../../pages/profile-modal.js";
 
 /**
  * @param {HTMLElement} $container
@@ -43,6 +44,16 @@ export default function UserList($container) {
         const friendsList = $container.querySelector('#friends-list');
         if (friendsList) {
             friendsList.innerHTML = friendListData.map(friend => FriendCell(friend.nickname, friend.isOnline)).join('');
+
+            friendListData.forEach(friend => {
+                const cell = $container.querySelector(`[data-nickname="${friend.nickname}"]`);
+                if (cell) {
+                    cell.addEventListener('click', () => {
+                        new ProfileModal($container, friend.nickname); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
+                        $container.querySelector('#page').style.display = 'block';
+                    });
+                }
+            });
         }
     }
 
