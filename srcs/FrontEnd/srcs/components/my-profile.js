@@ -10,7 +10,7 @@ export default function MyProfile($container) {
             <div id="profile-container">
                 <div id="profile-image"></div>
                 <div id="nickname">닉네임</div>
-                <button class="green-btn" id="profile-btn">상세 정보</button>
+                <button class="green-btn non-outline-btn" id="profile-btn">상세 정보</button>
             </div>
         `;
     }

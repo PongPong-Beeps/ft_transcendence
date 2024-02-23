@@ -87,3 +87,9 @@ html, body {
     color : white;
     font-family: "DNF Bit Bit v2", serif;
 }
+
+.non-outline-btn {}
+
+.non-outline-btn:focus {
+    outline: none;
+}

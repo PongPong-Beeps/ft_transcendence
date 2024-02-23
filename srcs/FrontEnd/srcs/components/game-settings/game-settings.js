@@ -23,8 +23,8 @@ export default function GameSettings($container) {
                     ${GameSettingsOption("난이도", difficultyOptions, "difficulty")}
                 </div>
                 <div id="game-settings-button-container">
-                    <button class="game-settings-button green-btn">방 만들기</button>
-                    <button class="game-settings-button red-btn">빠른 시작</button>
+                    <button class="game-settings-button green-btn non-outline-btn">방 만들기</button>
+                    <button class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
                 </div>
             </div>
         `;
