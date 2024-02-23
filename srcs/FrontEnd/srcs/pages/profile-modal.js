@@ -14,17 +14,17 @@ export default function ProfileModal($container, nickname, isMe) {
                         <div id="profile-modal-tab-button-container">
                             <button class="profile-modal-tab-button non-outline-btn" id="info-btn">정보</button>
                             <button class="profile-modal-tab-button non-outline-btn" id="history-btn">전적</button>
-                            ${isMe ? '<button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>' : ''}
+                            <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
                         </div>
                         <div id="profile-modal-tab">
                             ${nickname}
                         </div>
                     </div>
                     <div id="profile-modal-button-container">
-                        ${isMe ? '<button class="non-outline-btn"id="ok-btn">확인</button>' : `
+                        ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
                         <button class="non-outline-btn" id="block-btn">차단</button>
-                        <button class="non-outline-btn"id="add-friend-btn">친구 추가</button>
-                        <button class="non-outline-btn"id="ok-btn">확인</button>
+                        <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
+                        <button class="non-outline-btn" id="ok-btn">확인</button>
                         `}
                     </div>
                 </div>
@@ -49,12 +49,21 @@ export default function ProfileModal($container, nickname, isMe) {
         });
     }
 
+    const init = () => { // 초기 선택 상태 설정
+        if (!isMe) {
+            const blacklistBtn = $container.querySelector('#blacklist-btn');
+            if (blacklistBtn) {
+                blacklistBtn.classList.add('hidden');
+            }
+        }
+
+        const infoBtn = $container.querySelector('#info-btn');
+        if (infoBtn) {
+            infoBtn.click();
+        }
+    }
+
     render()
     setupEventListener()
-
-    // 초기 선택 상태 설정
-    const infoBtn = $container.querySelector('#info-btn');
-    if (infoBtn) {
-        infoBtn.click();
-    }
+    init()
 }
