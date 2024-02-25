@@ -6,24 +6,41 @@
     height: 100vh; /* 화면 전체 높이에 맞추기 */
   }
   
-  .player {
-    width: 100px; /* 이미지의 너비에 맞게 조정 */
-    height: auto; /* 이미지의 비율을 유지하기 위해 높이를 자동으로 조정 */
-  }
+.card {
+    position: relative;
+    width: 30%; /* 카드의 너비를 조정할 수 있습니다. */
+    max-width: 200px; /* 최대 너비를 설정할 수 있습니다. */
+    background-color: #FFF;
+    border: 5px solid gold; /* 금색 프레임 설정 */
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    overflow: hidden;
+
+}
+
+.card::before {
+    content: "";
+    display: block;
+    /* padding-top: 150%; 카드의 높이를 가로의 1.5배로 설정하여 1:1.5 비율을 유지합니다. */
+}
   
-  .player1 {
-    margin-right: 0px; /* 나와 상대 이미지 사이의 간격 설정 */
-  }
-  
-  .vs-text {
-    font-size: 15rem;
+.card .user-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.profile-image {
+    width: 100%; /* 이미지 컨테이너의 너비를 100%로 설정합니다. */
+    height: 0; /* 높이를 0으로 설정하여 내용이 없는 경우 영역이 보이지 않도록 합니다. */
+    padding-top: 150%; /* 카드의 높이를 가로의 1.5배로 설정하여 1:1.5 비율을 유지합니다. */
+    position: relative; /* 포지션을 상대적으로 설정하여 내부 요소를 조정하기 위해 사용합니다. */
+}
+
+.vs-text {
+    font-size: calc(15vw + 1rem); /* "vs" 텍스트의 크기 화면  크기에  따라  설정 */
     margin: 0 100px; /* "vs" 텍스트 주변의 여백 설정 */
-  }
+}
   
-  /* 반응형 스타일 */
-  @media (max-width: 768px) {
-    .player,
-    .vs-text {
-      font-size: 1.5rem;
-    }
-  }
