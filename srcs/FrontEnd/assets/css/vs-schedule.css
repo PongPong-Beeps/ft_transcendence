@@ -1,5 +1,6 @@
 .vs-screen {
     display: flex;
+    background-color: #B7D768;
     justify-content: center;
     align-items: center;
     height: 100vh; /* 화면 전체 높이에 맞추기 */
@@ -11,12 +12,12 @@
   }
   
   .player1 {
-    margin-right: 20px; /* 나와 상대 이미지 사이의 간격 설정 */
+    margin-right: 0px; /* 나와 상대 이미지 사이의 간격 설정 */
   }
   
   .vs-text {
-    font-size: 2rem;
-    margin: 0 20px; /* "vs" 텍스트 주변의 여백 설정 */
+    font-size: 15rem;
+    margin: 0 100px; /* "vs" 텍스트 주변의 여백 설정 */
   }
   
   /* 반응형 스타일 */
