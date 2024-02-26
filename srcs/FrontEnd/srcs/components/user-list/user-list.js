@@ -1,5 +1,5 @@
 import FriendCell from "./friend-cell.js";
-import ProfileModal from "../../pages/profile-modal.js";
+import ProfileModal from "../../pages/profile-modal/profile-modal.js";
 
 /**
  * @param {HTMLElement} $container
