@@ -16,8 +16,7 @@ export default function Login($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#login-btn').addEventListener('click', () => {
-           navigate('lobby');
-           // window.location.href = ''; // 여기에 적어주세요
+		   window.location.href = `https://127.0.0.1/api/login/42`;
         });
     }
 
