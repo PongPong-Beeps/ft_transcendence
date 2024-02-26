@@ -143,6 +143,7 @@
     justify-content: space-between;
     height: 50px;
     align-items: center;
+    margin: 0 20px 0 20px;
 }
 
 .unblock-btn {
