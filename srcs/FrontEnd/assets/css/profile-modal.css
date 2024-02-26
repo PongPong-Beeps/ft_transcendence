@@ -74,6 +74,61 @@
     border-radius: 0 0 10px 10px;
     background-color: #82A540;
     font-family: "DNF Bit Bit v2", serif;
+    padding: 10px;
+}
+
+#history-tab-container {
+    overflow-y: auto;
+    width: 100%;
+    max-height: 360px;
+    background-color: #779630;
+    padding: 10px;
+    border-radius: 10px;
+    color: #D3E287;
+}
+
+/* 스크롤 막대 스타일 */
+#history-tab-container::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 4px;
+}
+
+/* 스크롤 바 스타일 */
+#history-tab-container::-webkit-scrollbar-thumb {
+    background-color: #5C7320;
+    border-radius: 4px;
+}
+
+/* 스크롤 바 배경 스타일 */
+#history-tab-container::-webkit-scrollbar-track {
+    background-color: #779630;
+    border-radius: 4px;
+}
+
+#history-tab-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#history-tab-container th {
+    border-bottom: 3px solid #D3E287;
+}
+
+#history-tab-container td:first-child {
+    border-right: 3px solid #D3E287;
+}
+
+#history-tab-container th, #history-tab-container td {
+    text-align: center;
+    padding: 8px;
+}
+
+#history-tab-container th {
+    font-size: 1.1em;
+}
+
+#history-tab-container td {
+    font-size: 0.8em;
 }
 
 #profile-modal-button-container {
