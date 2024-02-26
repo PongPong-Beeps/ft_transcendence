@@ -1,4 +1,6 @@
 import HistoryTable from "./history-table.js";
+import FriendCell from "../../components/user-list/friend-cell.js";
+import BlacklistCell from "./blacklist-cell.js";
 
 /**
  * @param {HTMLElement} $container
@@ -21,6 +23,21 @@ export default function ProfileModal($container, nickname, isMe) {
         { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "패" }
     ];
 
+    const blacklistDummyData = [
+        { nickname: "wooshin" },
+        { nickname: "jikoo" },
+        { nickname: "geonwule"},
+        { nickname: "jonchoi"},
+        { nickname: "wooshin" },
+        { nickname: "jikoo" },
+        { nickname: "geonwule"},
+        { nickname: "jonchoi"},
+        { nickname: "wooshin" },
+        { nickname: "jikoo" },
+        { nickname: "geonwule"},
+        { nickname: "jonchoi"}
+    ]
+
     const render = () => {
         $container.querySelector('#page').innerHTML = `
             <link rel="stylesheet" href="../../../assets/css/profile-modal.css">
@@ -36,7 +53,7 @@ export default function ProfileModal($container, nickname, isMe) {
                         <div id="profile-modal-tab">
                             <div id="info-tab-container">Info</div>
                             <div id="history-tab-container">${HistoryTable()}</div>
-                            <div id="blacklist-tab-container">Blacklist</div>
+                            <div id="blacklist-tab-container"></div>
                         </div>
                     </div>
                     <div id="profile-modal-button-container">
@@ -75,8 +92,8 @@ export default function ProfileModal($container, nickname, isMe) {
         });
     }
 
-    const fillTableWithData = () => {
-        const tableBody = document.querySelector('#history-tab-container tbody');
+    const updateHistory = () => {
+        const tableBody = $container.querySelector('#history-tab-container tbody');
         if (!tableBody) return; // tbody가 없으면 함수 종료
         tableBody.innerHTML = ''; // 기존의 테이블 내용을 클리어
 
@@ -103,6 +120,13 @@ export default function ProfileModal($container, nickname, isMe) {
         });
     }
 
+    const updateBlacklist = () => {
+        const blacklist = $container.querySelector('#blacklist-tab-container');
+        if (blacklist) {
+            blacklist.innerHTML = blacklistDummyData.map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+        }
+    }
+
     const init = () => {
         // 초기 선택 상태 설정
         if (!isMe) {
@@ -116,7 +140,8 @@ export default function ProfileModal($container, nickname, isMe) {
             infoBtn.click(); // 초기 탭으로 정보 탭 설정
         }
         // 데이터 채우기
-        fillTableWithData();
+        updateHistory();
+        updateBlacklist()
     }
 
     render();
