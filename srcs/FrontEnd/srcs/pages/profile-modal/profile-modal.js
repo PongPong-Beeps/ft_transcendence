@@ -108,12 +108,21 @@ export default function ProfileModal($container, nickname, isMe) {
             opponentCell.textContent = item.opponent;
             row.appendChild(opponentCell);
 
+            // matchType에 따른 이미지 삽입
             const matchTypeCell = document.createElement('td');
-            matchTypeCell.textContent = item.matchType;
+            let matchTypeImage = document.createElement('img');
+            if (item.matchType === "1vs1") {
+                matchTypeImage.src = "../../../assets/image/vs.png"; // 1vs1 매치 이미지 경로
+            } else if (item.matchType === "토너먼트") {
+                matchTypeImage.src = "../../../assets/image/tournament.png"; // 토너먼트 매치 이미지 경로
+            }
+            matchTypeCell.appendChild(matchTypeImage);
             row.appendChild(matchTypeCell);
 
+            // 결과에 따른 색상 적용
             const resultCell = document.createElement('td');
             resultCell.textContent = item.result;
+            resultCell.style.color = item.result === "승" ? "#2A46D9" : "#E73C3C"; // 승리는 파란색, 패배는 빨간색
             row.appendChild(resultCell);
 
             tableBody.appendChild(row);
