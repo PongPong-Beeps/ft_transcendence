@@ -12,26 +12,10 @@ export default function ProfileModal($container, nickname, isMe) {
         { date: "23.02.01", opponent: "wooshin", matchType: "1vs1", result: "승" },
         { date: "23.01.30", opponent: "jikoo", matchType: "토너먼트", result: "패" },
         { date: "23.01.30", opponent: "jonchoi", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "패" },
-        { date: "23.02.01", opponent: "wooshin", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "jikoo", matchType: "토너먼트", result: "패" },
-        { date: "23.01.30", opponent: "jonchoi", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "패" },
-        { date: "23.02.01", opponent: "wooshin", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "jikoo", matchType: "토너먼트", result: "패" },
-        { date: "23.01.30", opponent: "jonchoi", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "패" }
+        { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "승" }
     ];
 
     const blacklistDummyData = [
-        { nickname: "wooshin" },
-        { nickname: "jikoo" },
-        { nickname: "geonwule"},
-        { nickname: "jonchoi"},
-        { nickname: "wooshin" },
-        { nickname: "jikoo" },
-        { nickname: "geonwule"},
-        { nickname: "jonchoi"},
         { nickname: "wooshin" },
         { nickname: "jikoo" },
         { nickname: "geonwule"},
@@ -133,6 +117,16 @@ export default function ProfileModal($container, nickname, isMe) {
         const blacklist = $container.querySelector('#blacklist-tab-container');
         if (blacklist) {
             blacklist.innerHTML = blacklistDummyData.map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+
+            blacklistDummyData.forEach(blacklist => {
+                const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
+                if (cell) {
+                    cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
+                        event.stopPropagation(); // 이벤트 전파를 막음
+                        alert(`${blacklist.nickname} 차단해제`);
+                    });
+                }
+            });
         }
     }
 
