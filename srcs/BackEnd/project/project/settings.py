@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['13.209.222.162', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',	#cors
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',		#cors
+    'django.middleware.common.CommonMiddleware',	#cors
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,6 +51,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True	#cors
+
+CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1'] #csrf
 
 ROOT_URLCONF = 'project.urls'
 
