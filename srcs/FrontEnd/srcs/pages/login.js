@@ -16,10 +16,10 @@ export default function Login($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#login-btn').addEventListener('click', () => {
-		   window.location.href = `https://127.0.0.1/api/login/42`;
+		   window.location.href = ``;
         });
     }
 
-    render()
-    setupEventListener()
+    render();
+    setupEventListener();
 }

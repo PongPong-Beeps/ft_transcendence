@@ -8,5 +8,5 @@ export default function TournamentRoom($container) {
         `;
     }
 
-    render()
+    render();
 }

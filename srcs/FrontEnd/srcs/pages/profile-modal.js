@@ -63,7 +63,7 @@ export default function ProfileModal($container, nickname, isMe) {
         }
     }
 
-    render()
-    setupEventListener()
-    init()
+    render();
+    setupEventListener();
+    init();
 }

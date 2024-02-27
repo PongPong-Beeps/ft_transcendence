@@ -22,6 +22,6 @@ export default function MyProfile($container) {
         });
     }
 
-    render()
-    setupEventListener()
+    render();
+    setupEventListener();
 }
