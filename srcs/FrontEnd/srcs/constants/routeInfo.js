@@ -5,7 +5,7 @@ import TournamentRoom from "../components/tournament-room.js";
 import UserList from "../components/user-list/user-list.js";
 import Login from "../pages/login.js";
 import VsRoom from "../components/vs-room.js";
-import VsSchedule from "../pages/vs-schedule.js";
+import VsSchedule from "../pages/vs-schedule/vs-schedule.js";
 
 export const routes = [
     {path: /^\/$/, layout: "full", page: Login},

@@ -19,10 +19,12 @@ export default function Router($container) {
 
     const route = () => {
         const target = findMatchedTarget();
+        console.log("uri : " + location.pathname)
         if (target.layout === "full") {
             if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
             $container.querySelector('#page').style.display = "block";
         } else if (target.layout === "grid") {
+            if (currentPage) currentPage = undefined
             $container.querySelector('#page').style.display = "none";
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);
             if (!(currentProfile instanceof MyProfile)) currentProfile = new MyProfile($container);
