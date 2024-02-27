@@ -17,7 +17,7 @@ export default function Router($container) {
             route.path.test(location.pathname)
         );
 
-    const route = () => {
+    const route = (data) => {
         const target = findMatchedTarget();
         console.log("uri : " + location.pathname)
         if (target.layout === "full") {
@@ -28,7 +28,7 @@ export default function Router($container) {
             $container.querySelector('#page').style.display = "none";
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);
             if (!(currentProfile instanceof MyProfile)) currentProfile = new MyProfile($container);
-            if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container);
+            if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container, data);
             if (!(currentFooter instanceof target.components.menu)) currentFooter = new target.components.footer($container);
         }
     };
@@ -36,9 +36,9 @@ export default function Router($container) {
     const setupEventListener = () => {
         // navigate 함수를 통한 페이지 이동
         window.addEventListener("historyChanged", ({ detail }) => {
-            const { to } = detail;
+            const { to, data } = detail;
             history.pushState(null, "", to);
-            route();
+            route(data);
         });
         // 뒤로 가기
         window.addEventListener("popstate", () => {

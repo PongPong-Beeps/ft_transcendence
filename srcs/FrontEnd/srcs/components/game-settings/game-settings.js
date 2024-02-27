@@ -60,8 +60,7 @@ export default function GameSettings($container) {
 
                 const selectedMode = [...selectedOptions].find(option => option.dataset.category === "mode");
                 const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "difficulty");
-
-                navigate(`${selectedMode.dataset.label}-room`);
+                navigate(`${selectedMode.dataset.label}-room`, selectedDifficulty.dataset.label);
             });
         });
     };
