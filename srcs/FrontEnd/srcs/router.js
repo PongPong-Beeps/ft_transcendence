@@ -19,7 +19,6 @@ export default function Router($container) {
 
     const route = (data) => {
         const target = findMatchedTarget();
-        console.log("uri : " + location.pathname)
         if (target.layout === "full") {
             if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
             $container.querySelector('#page').style.display = "block";
