@@ -20,6 +20,6 @@ export default function VsSchedule($container) {
         `;
     };
 
-    importCss("../../assets/css/vs-schedule.css");
+    importCss("assets/css/vs-schedule.css");
     render();
 }

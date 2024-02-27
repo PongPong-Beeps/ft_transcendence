@@ -147,7 +147,7 @@ export default function ProfileModal($container, nickname, isMe) {
         updateBlacklist()
     }
 
-    importCss("../../../assets/css/profile-modal.css");
+    importCss("assets/css/profile-modal.css");
     render();
     setupEventListener();
     init();

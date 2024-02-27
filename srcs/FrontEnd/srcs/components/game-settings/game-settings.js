@@ -66,7 +66,7 @@ export default function GameSettings($container) {
         });
     };
 
-    importCss("../../../assets/css/game-settings.css");
+    importCss("assets/css/game-settings.css");
     render();
     setupEventListener();
 }

@@ -36,7 +36,7 @@ export default function DisplayBoard($container) {
         }
     };
 
-    importCss("../../../assets/css/display-board.css");
+    importCss("assets/css/display-board.css");
     render();
 }
 

@@ -82,7 +82,7 @@ export default function UserList($container) {
         });
     }
 
-    importCss("../../../assets/css/user-list.css");
+    importCss("assets/css/user-list.css");
     render();
     updateFriendList(); // 데이터 기반으로 친구 목록 업데이트
     setupEventListener();

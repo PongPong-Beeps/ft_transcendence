@@ -21,7 +21,7 @@ export default function Login($container) {
         });
     }
 
-    importCss("../../assets/css/login.css");
+    importCss("assets/css/login.css");
     render();
     setupEventListener();
 }

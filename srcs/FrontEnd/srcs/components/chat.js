@@ -30,6 +30,6 @@ export default function Chat($container) {
             `;
     };
 
-    importCss("../../../assets/css/chat.css");
+    importCss("assets/css/chat.css");
     render();
 }

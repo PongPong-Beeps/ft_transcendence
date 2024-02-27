@@ -1,5 +1,6 @@
 import ProfileModal from "../pages/profile-modal/profile-modal.js";
 import {importCss} from "../utils/import-css.js";
+import Router from "../router.js";
 
 /**
  * @param {HTMLElement} $container
@@ -22,7 +23,7 @@ export default function MyProfile($container) {
         });
     }
 
-    importCss("../../assets/css/my-profile.css");
+    importCss("assets/css/my-profile.css");
     render();
     setupEventListener();
 }
