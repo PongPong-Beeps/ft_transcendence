@@ -1,6 +1,7 @@
 // GameSettings.js
 import { navigate } from "../../utils/navigate.js";
 import GameSettingsOption from "./game-settings-option.js";
+import {importCss} from "../../utils/import-css.js";
 
 export default function GameSettings($container) {
     const modeOptions = [
@@ -15,7 +16,6 @@ export default function GameSettings($container) {
 
     const render = () => {
         $container.querySelector('#main').innerHTML = `
-            <link rel="stylesheet" href="../../../assets/css/game-settings.css">
             <div id="game-settings-container">
                 <div id="game-settings-title">게임 설정</div>
                 <div id="game-settings-option-container">
@@ -66,6 +66,7 @@ export default function GameSettings($container) {
         });
     };
 
+    importCss("../../../assets/css/game-settings.css");
     render();
     setupEventListener();
 }

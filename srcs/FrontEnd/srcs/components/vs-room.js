@@ -8,5 +8,5 @@ export default function VsRoom($container) {
         `;
     }
 
-    render()
+    render();
 }

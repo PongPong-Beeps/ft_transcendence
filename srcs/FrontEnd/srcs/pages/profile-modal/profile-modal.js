@@ -1,6 +1,7 @@
 import HistoryTable from "./history-table.js";
 import FriendCell from "../../components/user-list/friend-cell.js";
 import BlacklistCell from "./blacklist-cell.js";
+import {importCss} from "../../utils/import-css.js";
 
 /**
  * @param {HTMLElement} $container
@@ -24,7 +25,6 @@ export default function ProfileModal($container, nickname, isMe) {
 
     const render = () => {
         $container.querySelector('#page').innerHTML = `
-            <link rel="stylesheet" href="../../../assets/css/profile-modal.css">
             <div id="profile-modal-background">
                 <div id="profile-modal-container">
                     <div id="profile-modal-title"><img src="../../../assets/image/profile.png" alt="profile title"></div>
@@ -147,6 +147,7 @@ export default function ProfileModal($container, nickname, isMe) {
         updateBlacklist()
     }
 
+    importCss("../../../assets/css/profile-modal.css");
     render();
     setupEventListener();
     init();

@@ -1,5 +1,6 @@
 import FriendCell from "./friend-cell.js";
 import ProfileModal from "../../pages/profile-modal/profile-modal.js";
+import {importCss} from "../../utils/import-css.js";
 
 /**
  * @param {HTMLElement} $container
@@ -23,7 +24,6 @@ export default function UserList($container) {
 
     const render = () => {
         $container.querySelector('#menu').innerHTML = `
-            <link rel="stylesheet" href="../../../assets/css/user-list.css">
             <div id="user-list-container">
                 <div id="user-list-button-container">
                     <button class="user-list-button non-outline-btn" id="friends-btn">친구</button>
@@ -82,6 +82,7 @@ export default function UserList($container) {
         });
     }
 
+    importCss("../../../assets/css/user-list.css");
     render();
     updateFriendList(); // 데이터 기반으로 친구 목록 업데이트
     setupEventListener();
