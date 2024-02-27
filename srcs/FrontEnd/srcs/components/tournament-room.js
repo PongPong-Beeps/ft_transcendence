@@ -1,12 +1,13 @@
 /**
- * @param {HTMLElement} $container
+ * @param { HTMLElement } $container
+ * @param { Object } difficulty
  */
-export default function TournamentRoom($container) {
+export default function TournamentRoom($container, difficulty) {
     const render = () => {
         $container.querySelector('#main').innerHTML = `
-            <div>TournamentRoom</div>
+            <div>난이도 : ${difficulty}</div>
         `;
     }
 
-    render()
+    render();
 }
