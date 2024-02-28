@@ -39,7 +39,7 @@ export default function Error($container, errorCode) {
 
     const setupEventListener = () => {
         $container.querySelector('#home').addEventListener('click', () => {
-            navigate('lobby');
+            navigate('/');
         });
     }
 

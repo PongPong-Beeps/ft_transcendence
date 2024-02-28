@@ -17,9 +17,19 @@ export default function Router($container) {
             route.path.test(location.pathname)
         );
 
+    const clearCurrentState = () => {
+        currentPage = undefined
+        currentMenu = undefined
+        currentProfile = undefined
+        currentMain = undefined
+        currentFooter = undefined
+    }
+
     const route = (data) => {
+        if (location.pathname === "/") {
+            clearCurrentState();
+        }
         const target = findMatchedTarget();
-        console.log("uri : " + location.pathname)
         if (target.layout === "full") {
             if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
         } else if (target.layout === "grid") {
