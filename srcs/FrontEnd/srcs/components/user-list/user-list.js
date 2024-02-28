@@ -1,6 +1,7 @@
 import FriendCell from "./friend-cell.js";
 import ProfileModal from "../../pages/profile-modal/profile-modal.js";
 import {importCss} from "../../utils/import-css.js";
+import Error from "../../pages/error.js";
 
 /**
  * @param {HTMLElement} $container
@@ -32,8 +33,11 @@ export default function UserList($container) {
                 <div id="user-list-list-container">
                     <div id="friends-list" class="list"></div>
                     <div id="all-list" class="list" style="display: none;">
-                        <div class="user">사용자 1</div>
-                        <div class="user">사용자 2</div>
+<!--                        <div class="user">사용자 1</div>-->
+<!--                        <div class="user">사용자 2</div>-->
+                        <button id="four_zero_one">401</button>
+                        <button id="four_zero_four">404</button>
+                        <button id="five_zero_zero">500</button>
                     </div>
                 </div>
             </div>
@@ -79,6 +83,19 @@ export default function UserList($container) {
                 const listToShow = this.id === 'friends-btn' ? 'friends-list' : 'all-list';
                 toggleList(listToShow);
             });
+        });
+
+        // 테스트용
+        $container.querySelector('#four_zero_one').addEventListener('click', () => {
+            new Error($container, 401);
+        });
+
+        $container.querySelector('#four_zero_four').addEventListener('click', () => {
+            new Error($container, 404);
+        });
+
+        $container.querySelector('#five_zero_zero').addEventListener('click', () => {
+            new Error($container, 500);
         });
     }
 
