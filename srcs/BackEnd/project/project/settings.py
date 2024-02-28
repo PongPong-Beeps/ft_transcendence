@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['13.209.222.162', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'corsheaders',	#cors
+    'user',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
