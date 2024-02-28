@@ -1,10 +1,10 @@
 import Chat from "../components/chat.js";
 import DisplayBoard from "../components/display-board.js";
 import GameSettings from "../components/game-settings/game-settings.js";
-import TournamentRoom from "../components/tournament-room.js";
+import TournamentRoom from "../components/game-room/tournament-room.js";
 import UserList from "../components/user-list/user-list.js";
 import Login from "../pages/login.js";
-import VsRoom from "../components/vs-room.js";
+import VsRoom from "../components/game-room/vs-room.js";
 import VsSchedule from "../pages/vs-schedule/vs-schedule.js";
 
 export const routes = [

@@ -50,6 +50,7 @@ export default function UserList($container) {
                 if (cell) {
                     cell.addEventListener('click', () => {
                         new ProfileModal($container, friend.nickname, false); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
+                        $container.querySelector('#page').style.display = 'block';
                     });
 
                     cell.querySelector('.dm-btn').addEventListener('click', (event) => {

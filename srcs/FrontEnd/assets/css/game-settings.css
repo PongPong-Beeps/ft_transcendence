@@ -4,51 +4,53 @@
     border-radius: 20px;
     background-color: #779630;
     font-family: "DNF Bit Bit v2", serif;
-    /* 그리드 속성 */
-    display: grid;
-    grid-template-areas:
-    'title'
-    'option-container'
-    'button-container';
-    grid-template-rows: 1fr 3fr 1fr;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    gap: 30px;
+}
+
+#game-settings-title-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 #game-settings-title {
-    grid-area: title;
-    /* 텍스트 위치 */
     display: flex;
     align-items: center;
     margin-left: 30px;
-    /* 텍스트 속성 */
     font-size: 2.5em;
     color: white;
 }
 
+#game-settings-warning-message {
+    display: none;
+    color: #EAF79C;
+    font-size: 1.5em;
+}
+
 #game-settings-option-container {
-    grid-area: option-container;
+    flex-grow: 1;
     display: flex;
     justify-content: center;
     gap: 150px;
 }
 
 .game-settings-option {
-    display: grid;
-    grid-template-areas:
-    'title'
-    'item-container';
-    grid-template-rows: 1fr 4fr;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
     align-items: center;
     justify-items: center;
 }
 
 .game-settings-option-title {
-    grid-area: title;
     font-size: 1.5em;
     color: white;
 }
 
 .game-settings-option-item-container {
-    grid-area: item-container;
     display: flex;
     gap: 30px;
 }
@@ -76,7 +78,6 @@
 }
 
 #game-settings-button-container {
-    grid-area: button-container;
     display: flex;
     align-items: center;
     justify-content: center;
