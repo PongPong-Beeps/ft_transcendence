@@ -28,8 +28,7 @@ export default function TournamentRoom($container, difficulty) {
 
     const setupEventListener = () => {
         $container.querySelector('.game-room-back-btn').addEventListener('click', () => {
-           new ExitConfirmation($container)
-            $container.querySelector('#page').style.display = 'block'
+            new ExitConfirmation($container)
         });
     }
 

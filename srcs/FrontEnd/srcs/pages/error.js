@@ -5,7 +5,7 @@ import {navigate} from "../utils/navigate.js";
  * @param { HTMLElement } $container
  * @param { number } errorCode
  */
-export default function Error($container, errorCode) {
+export default function Error($container, errorCode = 0) {
     let errorMessage = ""
 
     const init = () => {
@@ -18,6 +18,9 @@ export default function Error($container, errorCode) {
                 break;
             case 500:
                 errorMessage = "서버 오류 (ㅠ ㅠ)";
+                break;
+            default:
+                errorMessage = "알 수 없는 오류입니다";
                 break;
         }
     }
