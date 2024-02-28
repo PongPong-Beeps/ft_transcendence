@@ -17,11 +17,21 @@ export default function Router($container) {
             route.path.test(location.pathname)
         );
 
+    const clearCurrentState = () => {
+        currentPage = undefined
+        currentMenu = undefined
+        currentProfile = undefined
+        currentMain = undefined
+        currentFooter = undefined
+    }
+
     const route = (data) => {
+        if (location.pathname === "/") {
+            clearCurrentState();
+        }
         const target = findMatchedTarget();
         if (target.layout === "full") {
             if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
-            $container.querySelector('#page').style.display = "block";
         } else if (target.layout === "grid") {
             if (currentPage) currentPage = undefined
             $container.querySelector('#page').style.display = "none";
