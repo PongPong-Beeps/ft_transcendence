@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import login42TestView, login42CallbackView
+from .views import Login42TestView, Login42CallbackView
 
 urlpatterns = [
-    path('42/', login42TestView.as_view(), name='42login'),
-    path('42/callback/', login42CallbackView.as_view(), name='42callback'),
+    path('42/', Login42TestView.as_view(), name='42login'),
+    path('42/callback/', Login42CallbackView.as_view(), name='42callback'),
 ]
