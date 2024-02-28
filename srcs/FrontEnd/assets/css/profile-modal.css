@@ -78,11 +78,11 @@
     padding: 10px;
 }
 
-#history-tab-container, #blacklist-tab-container {
+#history-tab-container, #blacklist-tab-container, #info-tab-container {
     overflow-y: auto;
     width: 100%;
     max-height: 360px;
-    /*background-color: #779630;*/
+    /* background-color: #779630; */
     padding: 10px;
     border-radius: 10px;
 }
@@ -172,3 +172,5 @@
     background-color: #A9CE50;
     border: 4px solid #588329;
 }
+
+/* ~~~~~~~~~info tab container~~~~~~~~~~ */

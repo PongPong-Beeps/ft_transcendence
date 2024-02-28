@@ -1,6 +1,7 @@
 import HistoryTable from "./history-table.js";
 import FriendCell from "../../components/user-list/friend-cell.js";
 import BlacklistCell from "./blacklist-cell.js";
+import InfoTab from "./info-tab.js";
 import {importCss} from "../../utils/import-css.js";
 
 /**
@@ -35,7 +36,7 @@ export default function ProfileModal($container, nickname, isMe) {
                             <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
                         </div>
                         <div id="profile-modal-tab">
-                            <div id="info-tab-container">Info</div>
+                            <div id="info-tab-container">${InfoTab('꺏뚫뛝', 1, 50, 34, 10)}</div>
                             <div id="history-tab-container">${HistoryTable()}</div>
                             <div id="blacklist-tab-container"></div>
                         </div>
