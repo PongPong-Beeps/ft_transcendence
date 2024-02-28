@@ -5,6 +5,9 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import jwt
+import datetime
+from django.conf import settings
 
 grant_type = 'authorization_code'
 client_id = 'u-s4t2ud-942fd4b0016fa5993b2a57b000789a0d9b6e6b05ef6a004724062905ea9dc440'
@@ -58,6 +61,32 @@ class Login42CallbackView(APIView):
             print(f"User ID: {user_id}")
             print(f"Email: {user_email}")
             print(f"Nickname: {user_nickname}")
-            return Response({"message": "POST 요청 처리 완료"}, status=status.HTTP_200_OK)
+            jwt_token = create_jwt_token(user_id, user_email)
+            # Response 객체 생성
+            response = Response({"message": "POST 요청 처리 완료"}, status=status.HTTP_200_OK)
+
+            # 쿠키에 jwt_token 저장
+            response.set_cookie(
+                key='jwt_token',
+                value=jwt_token,
+                httponly=False,  # JavaScript를 통한 접근 방지(True 라면)
+                expires=datetime.datetime.utcnow() + datetime.timedelta(days=1),  # 쿠키 만료 시간 설정
+                secure=True,  # HTTPS를 통해서만 쿠키 전송
+                samesite='Lax'  # CSRF 보호를 위한 설정
+            )
+
+            return response
+            # return Response({"message": "POST 요청 처리 완료", "jwt_token": jwt_token}, status=status.HTTP_200_OK)	#JWT 리턴
         else:
             return Response({"message": "POST 요청 실패"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def create_jwt_token(user_id, user_email):
+    payload = {
+        'id': user_id,
+        'email': user_email,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    }
+
+    jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+    return jwt_token
