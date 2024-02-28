@@ -1,6 +1,7 @@
 import {importCss} from "../../utils/import-css.js";
 import {navigate} from "../../utils/navigate.js";
 import ExitConfirmation from "../../pages/exit-confirmation.js";
+import PlayerInfo from "./player-info.js";
 
 /**
  * @param { HTMLElement } $container
@@ -16,7 +17,10 @@ export default function TournamentRoom($container, difficulty) {
                     <div class="game-room-difficulty">난이도 : ${difficulty === "easy" ? "쉬움" : "어려움"}</div>
                 </div>
                 <div class="game-room-player-container">
-                
+                    ${PlayerInfo()}
+                    ${PlayerInfo()}
+                    ${PlayerInfo()}
+                    ${PlayerInfo()}
                 </div>
             </div>
         `;
