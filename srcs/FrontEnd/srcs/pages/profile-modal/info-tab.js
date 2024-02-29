@@ -3,12 +3,10 @@ export default function InfoTab(nickname, isMe, infoDummyData) {
     const oneOnOneWinRateBar = createWinRateBar(infoDummyData.oneOnOneWinRate, '1vs1');
     const tournamentWinRateBar = createWinRateBar(infoDummyData.tournamentWinRate, '토너먼트');
     const nicknameBox = createNicknameBox(nickname, isMe);
+    const profilePicture = createProfilePicture(isMe);
     return `
         <div id="profile-picture-container">
-            <img src="../../../assets/image/cruiser.gif" alt="profile picture">
-            <div id="change-picture-container">
-                ${isMe ? '<button id="change-picture-button">*</button>' : ''}
-            </div>
+            ${profilePicture}
         </div>
         <div id="nickname-container">
             ${nicknameBox}
@@ -25,6 +23,21 @@ export default function InfoTab(nickname, isMe, infoDummyData) {
             </div>
         </div>
      `;
+}
+
+function createProfilePicture(isMe) {
+    if (isMe) {
+        return `
+            <label for="profile-picture-input" id="profile-picture-label">
+                <img src="../../../assets/image/cruiser.gif" alt="profile picture" id="profile-picture">
+            </label>
+            <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+        `;
+    } else {
+        return `
+            <img src="../../../assets/image/cruiser.gif" alt="profile picture" id="profile-picture-not-me">
+        `;
+    }
 }
 
 function createWinRateBar(winRate, type) {
