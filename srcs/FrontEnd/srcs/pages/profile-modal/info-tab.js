@@ -1,8 +1,8 @@
-export default function InfoTab(nickname, isMe, totalWinRate, oneOnOneWinRate, tournamentWinRate) {
-    const totalWinRateBar = createWinRateBar(totalWinRate, '전체');
-    const oneOnOneWinRateBar = createWinRateBar(oneOnOneWinRate, '1vs1');
-    const tournamentWinRateBar = createWinRateBar(tournamentWinRate, '토너먼트');
-    let nicknameBox = createNicknameBox(nickname, isMe);
+export default function InfoTab(nickname, isMe, infoDummyData) {
+    const totalWinRateBar = createWinRateBar(infoDummyData.totalWinRate, '전체');
+    const oneOnOneWinRateBar = createWinRateBar(infoDummyData.oneOnOneWinRate, '1vs1');
+    const tournamentWinRateBar = createWinRateBar(infoDummyData.tournamentWinRate, '토너먼트');
+    const nicknameBox = createNicknameBox(nickname, isMe);
     return `
         <div id="profile-picture-container">
             <img src="../../../assets/image/cruiser.gif" alt="profile picture">
@@ -34,16 +34,15 @@ function createWinRateBar(winRate, type) {
         <div class="win-rate-box">
             <div class="type-box">${type}</div>
             <div class="win-rate-gauge-box">
-                <div class="win-rate-gauge" style="width: ${barWidth};background-color: ${gaugeColor}; border-radius: 5px; overflow: hidden;"></div>
+                <div class="win-rate-gauge" style="width: ${barWidth}; background-color: ${gaugeColor};"></div>
             </div>
+            <div class="win-rate">${winRate}%</div>
         </div>`;
 }
 
-function createNicknameBox(nickname, isMe = true) {
+function createNicknameBox(nickname, isMe) {
     return `
-        <div id="nickname-Box">
-            ${nickname}
-        </div>
-        ${isMe ? '<button id="change-nickname-btn">변경</button>' : ''}
+            <input type="text" id="nickname-input" placeholder="${nickname}" ${isMe ? '' : 'disabled'}>
+        ${isMe ? '<input type="submit" id="nickname-submit-btn" value="변경">' : ''}
     `;
 }
