@@ -1,0 +1,74 @@
+.game-room-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background-color: #779630;
+    font-family: "DNF Bit Bit v2", serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-room-title-container {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.game-room-back-btn {
+    border: none;
+    background-color: transparent;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 2em;
+    color: white;
+}
+
+.game-room-title {
+    flex-grow: 1;
+    font-size: 2em;
+}
+
+.game-room-player-container {
+    flex: 3;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-room-difficulty {
+    font-size: 1.2em;
+    margin-right: 40px;
+}
+
+.game-room-player-thumbnail-container {
+    width: 10vw;
+    aspect-ratio: 1 / 1;
+    background-color: #A8CB60;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.game-room-player-thumbnail {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-room-player-thumbnail img {
+    border-radius: 10px;
+    max-height: 70%;
+    max-width: 70%;
+}
+
+.game-room-player-nickname {
+    font-size: 1.3em;
+    text-align: center;
+    margin-bottom: 50px;
+}

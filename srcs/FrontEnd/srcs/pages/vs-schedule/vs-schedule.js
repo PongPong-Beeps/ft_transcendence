@@ -11,13 +11,17 @@ export default function VsSchedule($container) {
     ];
 
     const render = () => {
-        $container.querySelector("#page").innerHTML = `
-            <div id="VsSchedule" class="vs-screen">
-                ${VsScheduleUserCard("me", profileImg)}
-                <div class="vs-text">vs</div>
-                ${VsScheduleUserCard("you", profileImg)}
-            </div>
-        `;
+        const page = $container.querySelector("#page");
+        if (page) {
+            page.innerHTML = `
+                <div id="VsSchedule" class="vs-screen">
+                    ${VsScheduleUserCard("me", profileImg)}
+                    <div class="vs-text">vs</div>
+                    ${VsScheduleUserCard("you", profileImg)}
+                </div>
+            `;
+            page.style.display = 'block';
+        }
     };
 
     importCss("assets/css/vs-schedule.css");

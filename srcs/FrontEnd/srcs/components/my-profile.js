@@ -19,7 +19,6 @@ export default function MyProfile($container) {
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
             new ProfileModal($container, "내 닉네임", true)
-            $container.querySelector('#page').style.display = 'block'
         });
     }
 

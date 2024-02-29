@@ -17,7 +17,10 @@ export default function GameSettings($container) {
     const render = () => {
         $container.querySelector('#main').innerHTML = `
             <div id="game-settings-container">
-                <div id="game-settings-title">게임 설정</div>
+                <div id="game-settings-title-container">
+                    <div id="game-settings-title">게임 설정</div>
+                    <div id="game-settings-warning-message">모든 옵션을 정상적으로 선택하세요 !</div>
+                </div>
                 <div id="game-settings-option-container">
                     ${GameSettingsOption("모드", modeOptions, "mode")}
                     ${GameSettingsOption("난이도", difficultyOptions, "difficulty")}
@@ -54,14 +57,13 @@ export default function GameSettings($container) {
             button.addEventListener('click', () => {
                 const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
                 if (selectedOptions.length < 2) {
-                    alert("모든 옵션을 정상적으로 선택해야 합니다 !") // alert보다 UI 내에 안내 문구로 넣는 게 더 좋을 것 같다
+                    $container.querySelector('#game-settings-warning-message').style.display = 'block';
                     return;
                 }
 
                 const selectedMode = [...selectedOptions].find(option => option.dataset.category === "mode");
                 const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "difficulty");
-
-                navigate(`${selectedMode.dataset.label}-room`);
+                navigate(`${selectedMode.dataset.label}-room`, selectedDifficulty.dataset.label);
             });
         });
     };

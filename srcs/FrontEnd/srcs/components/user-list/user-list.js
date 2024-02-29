@@ -1,6 +1,7 @@
 import FriendCell from "./friend-cell.js";
 import ProfileModal from "../../pages/profile-modal/profile-modal.js";
 import {importCss} from "../../utils/import-css.js";
+import Error from "../../pages/error.js";
 
 /**
  * @param {HTMLElement} $container
@@ -32,8 +33,10 @@ export default function UserList($container) {
                 <div id="user-list-list-container">
                     <div id="friends-list" class="list"></div>
                     <div id="all-list" class="list" style="display: none;">
-                        <div class="user">사용자 1</div>
-                        <div class="user">사용자 2</div>
+                        <!-- 테스트용 -->
+                        <button id="four_zero_one">401</button>
+                        <button id="four_zero_four">404</button>
+                        <button id="five_zero_zero">500</button>
                     </div>
                 </div>
             </div>
@@ -50,6 +53,7 @@ export default function UserList($container) {
                 if (cell) {
                     cell.addEventListener('click', () => {
                         new ProfileModal($container, friend.nickname, false); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
+                        $container.querySelector('#page').style.display = 'block';
                     });
 
                     cell.querySelector('.dm-btn').addEventListener('click', (event) => {
@@ -80,16 +84,30 @@ export default function UserList($container) {
                 toggleList(listToShow);
             });
         });
+
+        // 테스트용
+        $container.querySelector('#four_zero_one').addEventListener('click', () => {
+            new Error($container, 401);
+        });
+        $container.querySelector('#four_zero_four').addEventListener('click', () => {
+            new Error($container, 404);
+        });
+        $container.querySelector('#five_zero_zero').addEventListener('click', () => {
+            new Error($container, 500);
+        });
+    }
+
+    const init = () => {
+        // 초기 선택 상태 설정
+        const friendsBtn = $container.querySelector('#friends-btn');
+        if (friendsBtn) {
+            friendsBtn.click();
+        }
     }
 
     importCss("assets/css/user-list.css");
     render();
     updateFriendList(); // 데이터 기반으로 친구 목록 업데이트
     setupEventListener();
-
-    // 초기 선택 상태 설정
-    const friendsBtn = $container.querySelector('#friends-btn');
-    if (friendsBtn) {
-        friendsBtn.click();
-    }
+    init();
 }

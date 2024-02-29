@@ -1,0 +1,42 @@
+#exit-confirmation-background {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#exit-confirmation-container {
+    width: 400px;
+    height: 190px;
+    background-color: #83A644;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    gap: 30px;
+}
+
+#exit-confirmation-title {
+    flex: 3;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 1.3em;
+    text-align: center;
+    color: white;
+}
+
+#exit-confirmation-button-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+#exit-confirmation-button-container > button {
+    font-size: 1em;
+    border: 4px solid #5C7320;
+    border-radius: 10px;
+    width: 150px;
+    height: 45px;
+}
