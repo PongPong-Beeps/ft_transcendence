@@ -25,32 +25,37 @@ export default function ProfileModal($container, nickname, isMe) {
     ]
 
     const render = () => {
-        $container.querySelector('#page').innerHTML = `
-            <div id="profile-modal-background">
-                <div id="profile-modal-container">
-                    <div id="profile-modal-title"><img src="../../../assets/image/profile.png" alt="profile title"></div>
-                    <div id="profile-modal-tab-container">
-                        <div id="profile-modal-tab-button-container">
-                            <button class="profile-modal-tab-button non-outline-btn" id="info-btn">정보</button>
-                            <button class="profile-modal-tab-button non-outline-btn" id="history-btn">전적</button>
-                            <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
-                        </div>
-                        <div id="profile-modal-tab">
+        const page = $container.querySelector('#page');
+        if (page) {
+            page.innerHTML = `
+                <div id="profile-modal-background">
+                    <div id="profile-modal-container">
+                        <div id="profile-modal-title"><img src="../../../assets/image/profile.png" alt="profile title"></div>
+                        <div id="profile-modal-tab-container">
+                            <div id="profile-modal-tab-button-container">
+                                <button class="profile-modal-tab-button non-outline-btn" id="info-btn">정보</button>
+                                <button class="profile-modal-tab-button non-outline-btn" id="history-btn">전적</button>
+                                <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
+                            </div>
+                            <div id="profile-modal-tab">
                             <div id="info-tab-container">${InfoTab('꺏뚫뛝', 1, 50, 34, 10)}</div>
                             <div id="history-tab-container">${HistoryTable()}</div>
                             <div id="blacklist-tab-container"></div>
                         </div>
-                    </div>
-                    <div id="profile-modal-button-container">
-                        ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
-                        <button class="non-outline-btn" id="block-btn">차단</button>
-                        <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
-                        <button class="non-outline-btn" id="ok-btn">확인</button>
-                        `}
+                        </div>
+                        <div id="profile-modal-button-container">
+                            ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
+                            <button class="non-outline-btn" id="block-btn">차단</button>
+                            <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
+                            <button class="non-outline-btn" id="ok-btn">확인</button>
+                            `}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+            page.style.display = 'block';
+        }
+
     }
 
     const setupEventListener = () => {
