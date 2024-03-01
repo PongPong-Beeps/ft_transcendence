@@ -17,7 +17,8 @@
     - `make` = 서버실행
     - `control + C`, `make down` = 종료시킬 때
 * 클러스터 아이맥이 아닌 개인 컴퓨터 실행시 database폴더 권한 문제로 메이크파일이 실행 안될경우
-    - Makefile에 해당 문구 추가 `#sudo chmod -R 777 $(DB_VOLUME)`
+    - `Makefile`내 `up`에 다음 문구 첫줄에 추가
+    - `#sudo chmod -R 777 $(DB_VOLUME)`
 3. 웹페이지 접속 `https://127.0.0.1`
 4. 어드민 페이지 `http://127.0.0.1:8000/admin`
     - id = `admin`
