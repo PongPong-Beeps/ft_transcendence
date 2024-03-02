@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +40,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),    #access token 유효기간
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=14),      #refresh token 유효기간
+    'SIGNING_KEY': 'SECRET',                                    #토큰 서명에 사용할 키
+    'ALGORITHM': 'HS256',                                       #JWT를 설정하는데 사용되는 알고리즘
+    'AUTH_HEADER_TYPES': ('JWT',),                              #인증 헤더의 유형
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',		#cors
