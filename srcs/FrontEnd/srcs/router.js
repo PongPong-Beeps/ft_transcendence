@@ -1,5 +1,6 @@
 import { routes } from "./constants/routeInfo.js";
 import MyProfile from "./components/my-profile.js";
+import Header from "./components/header.js";
 
 /**
  * @param {HTMLElement} $container
@@ -7,6 +8,7 @@ import MyProfile from "./components/my-profile.js";
  */
 export default function Router($container) {
     let currentPage = undefined
+    let currentHeader = undefined
     let currentMenu = undefined
     let currentProfile = undefined
     let currentMain = undefined
@@ -17,16 +19,29 @@ export default function Router($container) {
             route.path.test(location.pathname)
         );
 
-    const route = () => {
+    const clearCurrentState = () => {
+        currentPage = undefined
+        currentHeader = undefined
+        currentMenu = undefined
+        currentProfile = undefined
+        currentMain = undefined
+        currentFooter = undefined
+    }
+
+    const route = (data) => {
+        if (location.pathname === "/") {
+            clearCurrentState();
+        }
         const target = findMatchedTarget();
         if (target.layout === "full") {
             if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
-            $container.querySelector('#page').style.display = "block";
         } else if (target.layout === "grid") {
+            if (currentPage) currentPage = undefined
             $container.querySelector('#page').style.display = "none";
+            if (!(currentHeader instanceof Header)) currentHeader = new Header($container);
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);
             if (!(currentProfile instanceof MyProfile)) currentProfile = new MyProfile($container);
-            if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container);
+            if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container, data);
             if (!(currentFooter instanceof target.components.menu)) currentFooter = new target.components.footer($container);
         }
     };
@@ -34,9 +49,9 @@ export default function Router($container) {
     const setupEventListener = () => {
         // navigate 함수를 통한 페이지 이동
         window.addEventListener("historyChanged", ({ detail }) => {
-            const { to } = detail;
+            const { to, data } = detail;
             history.pushState(null, "", to);
-            route();
+            route(data);
         });
         // 뒤로 가기
         window.addEventListener("popstate", () => {

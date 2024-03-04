@@ -1,3 +1,5 @@
+import {importCss} from "../utils/import-css.js";
+
 /**
  * @param {HTMLElement} $container
  */
@@ -5,7 +7,6 @@ export default function DisplayBoard($container) {
     const render = () => {
         let neonMessage = '겁나길게 한번 써보겠습니다. 이것보다 더 더 더 더 덛 더 덜 더더더ㅓ더 길면요얼마나 길어야 할까요 한줄로 길려면?'
         $container.querySelector("#footer").innerHTML = `
-            <link rel="stylesheet" href="../../../assets/css/display-board.css">
             <div id="DisplayBoard">
                 <div class="neon-text">
                     ${neonMessage}
@@ -35,6 +36,7 @@ export default function DisplayBoard($container) {
         }
     };
 
+    importCss("assets/css/display-board.css");
     render();
 }
 

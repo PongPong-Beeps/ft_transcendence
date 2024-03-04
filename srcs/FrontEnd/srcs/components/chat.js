@@ -1,10 +1,11 @@
+import {importCss} from "../utils/import-css.js";
+
 /**
  * @param {HTMLElement} $container
  */
 export default function Chat($container) {
     const render = () => {
         $container.querySelector("#footer").innerHTML = `
-            <link rel="stylesheet" href="../../../assets/css/chat.css">
             <div id="Chat">
                 <div class="container">
                     <div class="chat-box">
@@ -28,5 +29,7 @@ export default function Chat($container) {
             </div>
             `;
     };
+
+    importCss("assets/css/chat.css");
     render();
 }

@@ -1,6 +1,7 @@
 // GameSettings.js
 import { navigate } from "../../utils/navigate.js";
 import GameSettingsOption from "./game-settings-option.js";
+import {importCss} from "../../utils/import-css.js";
 
 export default function GameSettings($container) {
     const modeOptions = [
@@ -15,16 +16,18 @@ export default function GameSettings($container) {
 
     const render = () => {
         $container.querySelector('#main').innerHTML = `
-            <link rel="stylesheet" href="../../../assets/css/game-settings.css">
             <div id="game-settings-container">
-                <div id="game-settings-title">게임 설정</div>
+                <div id="game-settings-title-container">
+                    <div id="game-settings-title">게임 설정</div>
+                    <div id="game-settings-warning-message">모든 옵션을 정상적으로 선택하세요 !</div>
+                </div>
                 <div id="game-settings-option-container">
-                    ${GameSettingsOption("모드", modeOptions, "mode")}
-                    ${GameSettingsOption("난이도", difficultyOptions, "difficulty")}
+                    ${GameSettingsOption("모드", modeOptions)}
+                    ${GameSettingsOption("난이도", difficultyOptions)}
                 </div>
                 <div id="game-settings-button-container">
-                    <button class="game-settings-button green-btn non-outline-btn">방 만들기</button>
-                    <button class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
+                    <button id="create-room-btn" class="game-settings-button green-btn non-outline-btn">방 만들기</button>
+                    <button id="quick-start-btn" class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
                 </div>
             </div>
         `;
@@ -54,18 +57,23 @@ export default function GameSettings($container) {
             button.addEventListener('click', () => {
                 const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
                 if (selectedOptions.length < 2) {
-                    alert("모든 옵션을 정상적으로 선택해야 합니다 !") // alert보다 UI 내에 안내 문구로 넣는 게 더 좋을 것 같다
+                    $container.querySelector('#game-settings-warning-message').style.display = 'block';
                     return;
                 }
 
-                const selectedMode = [...selectedOptions].find(option => option.dataset.category === "mode");
-                const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "difficulty");
+                const selectedMode = [...selectedOptions].find(option => option.dataset.category === "모드");
+                const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "난이도");
 
-                navigate(`${selectedMode.dataset.label}-room`);
+                // 테스트용
+                if (button.id === 'create-room-btn') console.log("방 만들기");
+                else console.log("빠른 시작");
+
+                navigate(`${selectedMode.dataset.label}-room`, selectedDifficulty.dataset.label);
             });
         });
     };
 
+    importCss("assets/css/game-settings.css");
     render();
     setupEventListener();
 }

@@ -1,4 +1,6 @@
-import ProfileModal from "../pages/profile-modal.js";
+import ProfileModal from "../pages/profile-modal/profile-modal.js";
+import {importCss} from "../utils/import-css.js";
+import Router from "../router.js";
 
 /**
  * @param {HTMLElement} $container
@@ -6,7 +8,6 @@ import ProfileModal from "../pages/profile-modal.js";
 export default function MyProfile($container) {
     const render = () => {
         $container.querySelector('#profile').innerHTML = `
-            <link rel="stylesheet" href="../../assets/css/my-profile.css">
             <div id="profile-container">
                 <div id="profile-image"></div>
                 <div id="nickname">닉네임</div>
@@ -17,11 +18,11 @@ export default function MyProfile($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, "내 닉네임", true)
-            $container.querySelector('#page').style.display = 'block'
+            new ProfileModal($container, "내 닉네임", true);
         });
     }
 
+    importCss("assets/css/my-profile.css");
     render();
     setupEventListener();
 }

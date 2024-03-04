@@ -1,0 +1,21 @@
+#error-container {
+    width: 100%;
+    height: 100%;
+    background-color: #B7D768;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+#error_face {
+    width: 9vw;
+    cursor: pointer;
+}
+
+#error_message {
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 3em;
+    color: #5B7320;
+}
