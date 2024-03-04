@@ -2,6 +2,7 @@ import FriendCell from "./friend-cell.js";
 import ProfileModal from "../../pages/profile-modal/profile-modal.js";
 import {importCss} from "../../utils/import-css.js";
 import Error from "../../pages/error.js";
+import UserCell from "./user-cell.js";
 
 /**
  * @param {HTMLElement} $container
@@ -13,15 +14,24 @@ export default function UserList($container) {
         { nickname: "친구 2", isOnline: true },
         { nickname: "친구 3", isOnline: true },
         { nickname: "친구 4", isOnline: true },
-        { nickname: "친구 5", isOnline: true },
-        { nickname: "친구 6", isOnline: true },
-        { nickname: "친구 7", isOnline: true },
-        { nickname: "친구 8", isOnline: true },
-        { nickname: "친구 9", isOnline: true },
-        { nickname: "친구 10", isOnline: false },
-        { nickname: "친구 11", isOnline: false },
-        { nickname: "친구 12", isOnline: false }
+        { nickname: "친구 5", isOnline: false },
+        { nickname: "친구 6", isOnline: false }
     ];
+
+    const userListData = [
+        { nickname: "유저 1" },
+        { nickname: "유저 2" },
+        { nickname: "유저 3" },
+        { nickname: "유저 4" },
+        { nickname: "유저 5" },
+        { nickname: "유저 6" },
+        { nickname: "유저 7" },
+        { nickname: "유저 8" },
+        { nickname: "유저 9" },
+        { nickname: "유저 10" },
+        { nickname: "유저 11" },
+        { nickname: "유저 12" }
+    ]
 
     const render = () => {
         $container.querySelector('#menu').innerHTML = `
@@ -30,21 +40,16 @@ export default function UserList($container) {
                     <button class="user-list-button non-outline-btn" id="friends-btn">친구</button>
                     <button class="user-list-button non-outline-btn" id="all-btn">전체</button>
                 </div>
-                <div id="user-list-list-container">
-                    <div id="friends-list" class="list"></div>
-                    <div id="all-list" class="list" style="display: none;">
-                        <!-- 테스트용 -->
-                        <button id="four_zero_one">401</button>
-                        <button id="four_zero_four">404</button>
-                        <button id="five_zero_zero">500</button>
-                    </div>
+                <div id="user-list-tab-container">
+                    <div id="friend-list-tab" class="list-tab"></div>
+                    <div id="user-list-tab" class="list-tab"></div>
                 </div>
             </div>
         `;
     }
 
-    const updateFriendList = () => {
-        const friendsList = $container.querySelector('#friends-list');
+    const setupFriendList = () => {
+        const friendsList = $container.querySelector('#friend-list-tab');
         if (friendsList) {
             friendsList.innerHTML = friendListData.map(friend => FriendCell(friend.nickname, friend.isOnline)).join('');
 
@@ -52,12 +57,11 @@ export default function UserList($container) {
                 const cell = $container.querySelector(`[data-nickname="${friend.nickname}"]`);
                 if (cell) {
                     cell.addEventListener('click', () => {
-                        new ProfileModal($container, friend.nickname, false); // ProfileModal 호출할 때 nickname 정보를 넘깁니다.
-                        $container.querySelector('#page').style.display = 'block';
+                        new ProfileModal($container, friend.nickname, false);
                     });
 
                     cell.querySelector('.dm-btn').addEventListener('click', (event) => {
-                        event.stopPropagation(); // 이벤트 전파를 막음
+                        event.stopPropagation();
                         alert(`${friend.nickname}에게 귓속말`);
                     });
                 }
@@ -65,8 +69,24 @@ export default function UserList($container) {
         }
     }
 
+    const setupUserList = () => {
+        const userList = $container.querySelector('#user-list-tab');
+        if (userList) {
+            userList.innerHTML = userListData.map(user => UserCell(user.nickname)).join('');
+
+            userListData.forEach(user => {
+                const cell = $container.querySelector(`[data-nickname="${user.nickname}"]`);
+                if (cell) {
+                    cell.addEventListener('click', () => {
+                        new ProfileModal($container, user.nickname, false);
+                    });
+                }
+            })
+        }
+    }
+
     const toggleList = (showListId) => {
-        document.querySelectorAll('.list').forEach(list => {
+        document.querySelectorAll('.list-tab').forEach(list => {
             list.style.display = list.id === showListId ? 'block' : 'none';
         });
     }
@@ -80,20 +100,9 @@ export default function UserList($container) {
                 });
                 this.dataset.selected = 'true';
                 this.classList.add('selected');
-                const listToShow = this.id === 'friends-btn' ? 'friends-list' : 'all-list';
+                const listToShow = this.id === 'friends-btn' ? 'friend-list-tab' : 'user-list-tab';
                 toggleList(listToShow);
             });
-        });
-
-        // 테스트용
-        $container.querySelector('#four_zero_one').addEventListener('click', () => {
-            new Error($container, 401);
-        });
-        $container.querySelector('#four_zero_four').addEventListener('click', () => {
-            new Error($container, 404);
-        });
-        $container.querySelector('#five_zero_zero').addEventListener('click', () => {
-            new Error($container, 500);
         });
     }
 
@@ -107,7 +116,8 @@ export default function UserList($container) {
 
     importCss("assets/css/user-list.css");
     render();
-    updateFriendList(); // 데이터 기반으로 친구 목록 업데이트
+    setupFriendList();
+    setupUserList();
     setupEventListener();
     init();
 }
