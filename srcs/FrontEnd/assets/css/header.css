@@ -8,12 +8,12 @@
 
 #header-container img, #header-container button {
     height: 80%;
+    margin: 0 20px 0 20px;
 }
 
 #logout-btn {
     background-color: transparent;
     border: none;
-    margin-right: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
