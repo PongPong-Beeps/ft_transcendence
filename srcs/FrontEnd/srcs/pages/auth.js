@@ -1,17 +1,22 @@
 import {navigate} from "../utils/navigate.js";
+import {importCss} from "../utils/import-css.js";
+import getCookie from "../utils/cookie.js";
 
 /**
  * @param {HTMLElement} $container
  */
 export default function Auth($container) {
     const render = () => {
-        $container.querySelector('#page').innerHTML = `
-            <link rel="stylesheet" href="../../assets/css/auth.css">
-            <div id="auth-container">
+        const page = $container.querySelector('#page');
+        if (page) {
+            page.innerHTML = `
+                <div id="auth-container">
                 <div class="spinner-border text-light" style="width: 3em; height: 3em;" role="status">
                 </div>
             </div>
-        `;
+            `;
+            page.style.display = 'block';
+        }
     }
 
     const sendAuthorizationCode = () => {
@@ -36,23 +41,7 @@ export default function Auth($container) {
             .catch((error) => console.error('Error:', error));
     }
 
-	const getCookie = (name) => {
-		let cookieValue = null;
-		if (document.cookie && document.cookie !== '') {
-			const cookies = document.cookie.split(';');
-			for (let i = 0; i < cookies.length; i++) {
-				const cookie = cookies[i].trim();
-				if (cookie.substring(0, name.length + 1) === (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					break;
-				}
-			}
-		}
-		return cookieValue;
-	}
-
-
-
+    importCss("assets/css/auth.css");
     render();
     sendAuthorizationCode();
 }
