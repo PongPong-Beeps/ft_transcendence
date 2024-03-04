@@ -57,12 +57,18 @@
     border-radius: 4px;
 }
 
-.friend-cell {
+.friend-cell, .user-cell {
     height: 50px;
     margin-bottom: 5px;
     display: flex;
+    padding: 10px;
     justify-content: space-between;
     align-items: center;
+    border-radius: 10px;
+}
+
+.friend-cell:hover, .user-cell:hover {
+    background-color: #8DAA4E;
 }
 
 .status-indicator {
