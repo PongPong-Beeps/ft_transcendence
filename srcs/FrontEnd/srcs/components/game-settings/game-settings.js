@@ -26,8 +26,8 @@ export default function GameSettings($container) {
                     ${GameSettingsOption("난이도", difficultyOptions)}
                 </div>
                 <div id="game-settings-button-container">
-                    <button class="game-settings-button green-btn non-outline-btn">방 만들기</button>
-                    <button class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
+                    <button id="create-room-btn" class="game-settings-button green-btn non-outline-btn">방 만들기</button>
+                    <button id="quick-start-btn" class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
                 </div>
             </div>
         `;
@@ -63,6 +63,10 @@ export default function GameSettings($container) {
 
                 const selectedMode = [...selectedOptions].find(option => option.dataset.category === "모드");
                 const selectedDifficulty = [...selectedOptions].find(option => option.dataset.category === "난이도");
+
+                if (button.id === 'create-room-btn') console.log("방 만들기");
+                else console.log("빠른 시작");
+
                 navigate(`${selectedMode.dataset.label}-room`, selectedDifficulty.dataset.label);
             });
         });

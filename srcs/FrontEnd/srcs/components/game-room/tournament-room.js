@@ -38,7 +38,7 @@ export default function TournamentRoom($container, difficulty) {
         return;
     }
 
-    importCss("assets/css/game-room.css")
+    importCss("assets/css/game-room.css");
     render();
     setupEventListener();
 }
