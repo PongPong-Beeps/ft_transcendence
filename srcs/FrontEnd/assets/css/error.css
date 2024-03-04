@@ -11,6 +11,7 @@
 
 #error_face {
     width: 9vw;
+    cursor: pointer;
 }
 
 #error_message {
