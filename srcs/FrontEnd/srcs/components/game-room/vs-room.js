@@ -1,6 +1,7 @@
 import PlayerInfo from "./player-info.js";
 import ExitConfirmation from "../../pages/exit-confirmation.js";
 import {importCss} from "../../utils/import-css.js";
+import Error from "../../pages/error.js";
 
 /**
  * @param {HTMLElement} $container
@@ -25,9 +26,13 @@ export default function VsRoom($container, difficulty) {
 
     const setupEventListener = () => {
         $container.querySelector('.game-room-back-btn').addEventListener('click', () => {
-            new ExitConfirmation($container)
-            $container.querySelector('#page').style.display = 'block'
+            new ExitConfirmation($container);
         });
+    }
+
+    if (difficulty === undefined) {
+        new Error($container);
+        return;
     }
 
     importCss("assets/css/game-room.css")

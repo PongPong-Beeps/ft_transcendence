@@ -160,9 +160,9 @@ export default function ProfileModal($container, nickname, isMe) {
             infoBtn.click(); // 초기 탭으로 정보 탭 설정
         }
         // 데이터 채우기
+        updateInfo();
         updateHistory();
         updateBlacklist();
-        updateInfo();
     }
 
     importCss("assets/css/profile-modal.css");
