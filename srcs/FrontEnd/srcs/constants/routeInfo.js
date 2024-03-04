@@ -6,9 +6,11 @@ import UserList from "../components/user-list/user-list.js";
 import Login from "../pages/login.js";
 import VsRoom from "../components/game-room/vs-room.js";
 import VsSchedule from "../pages/vs-schedule/vs-schedule.js";
+import Auth from "../pages/auth.js";
 
 export const routes = [
     {path: /^\/$/, layout: "full", page: Login},
+    {path: /^\/auth$/, layout: "full", page: Auth},
     {path: /^\/lobby$/, layout: "grid", components: { menu: UserList, main: GameSettings, footer: Chat }},
     {path: /^\/tournament-room$/, layout: "grid", components: { menu: UserList, main: TournamentRoom, footer: Chat }},
     {path: /^\/vs-room$/, layout: "grid", components: { menu: UserList, main: VsRoom, footer: Chat }},
