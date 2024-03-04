@@ -1,5 +1,6 @@
 import { routes } from "./constants/routeInfo.js";
 import MyProfile from "./components/my-profile.js";
+import Header from "./components/header.js";
 
 /**
  * @param {HTMLElement} $container
@@ -7,6 +8,7 @@ import MyProfile from "./components/my-profile.js";
  */
 export default function Router($container) {
     let currentPage = undefined
+    let currentHeader = undefined
     let currentMenu = undefined
     let currentProfile = undefined
     let currentMain = undefined
@@ -19,6 +21,7 @@ export default function Router($container) {
 
     const clearCurrentState = () => {
         currentPage = undefined
+        currentHeader = undefined
         currentMenu = undefined
         currentProfile = undefined
         currentMain = undefined
@@ -35,6 +38,7 @@ export default function Router($container) {
         } else if (target.layout === "grid") {
             if (currentPage) currentPage = undefined
             $container.querySelector('#page').style.display = "none";
+            if (!(currentHeader instanceof Header)) currentHeader = new Header($container);
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container);
             if (!(currentProfile instanceof MyProfile)) currentProfile = new MyProfile($container);
             if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container, data);

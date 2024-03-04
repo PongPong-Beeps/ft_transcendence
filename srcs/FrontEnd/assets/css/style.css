@@ -26,10 +26,6 @@ html, body {
     align-items: center;
 }
 
-#header img {
-    height: 80%;
-}
-
 #components {
     display: grid;
     grid-template-areas:
