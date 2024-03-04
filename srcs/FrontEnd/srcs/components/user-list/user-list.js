@@ -40,16 +40,16 @@ export default function UserList($container) {
                     <button class="user-list-button non-outline-btn" id="friends-btn">친구</button>
                     <button class="user-list-button non-outline-btn" id="all-btn">전체</button>
                 </div>
-                <div id="user-list-list-container">
-                    <div id="friends-list" class="list"></div>
-                    <div id="user-list" class="list"></div>
+                <div id="user-list-tab-container">
+                    <div id="friend-list-tab" class="list-tab"></div>
+                    <div id="user-list-tab" class="list-tab"></div>
                 </div>
             </div>
         `;
     }
 
-    const updateFriendList = () => {
-        const friendsList = $container.querySelector('#friends-list');
+    const setupFriendList = () => {
+        const friendsList = $container.querySelector('#friend-list-tab');
         if (friendsList) {
             friendsList.innerHTML = friendListData.map(friend => FriendCell(friend.nickname, friend.isOnline)).join('');
 
@@ -69,8 +69,8 @@ export default function UserList($container) {
         }
     }
 
-    const updateUserList = () => {
-        const userList = $container.querySelector('#user-list');
+    const setupUserList = () => {
+        const userList = $container.querySelector('#user-list-tab');
         if (userList) {
             userList.innerHTML = userListData.map(user => UserCell(user.nickname)).join('');
 
@@ -86,7 +86,7 @@ export default function UserList($container) {
     }
 
     const toggleList = (showListId) => {
-        document.querySelectorAll('.list').forEach(list => {
+        document.querySelectorAll('.list-tab').forEach(list => {
             list.style.display = list.id === showListId ? 'block' : 'none';
         });
     }
@@ -100,7 +100,7 @@ export default function UserList($container) {
                 });
                 this.dataset.selected = 'true';
                 this.classList.add('selected');
-                const listToShow = this.id === 'friends-btn' ? 'friends-list' : 'user-list';
+                const listToShow = this.id === 'friends-btn' ? 'friend-list-tab' : 'user-list-tab';
                 toggleList(listToShow);
             });
         });
@@ -116,8 +116,8 @@ export default function UserList($container) {
 
     importCss("assets/css/user-list.css");
     render();
-    updateFriendList();
-    updateUserList();
+    setupFriendList();
+    setupUserList();
     setupEventListener();
     init();
 }

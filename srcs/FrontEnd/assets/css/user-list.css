@@ -29,7 +29,7 @@
     color: #C2C8B3;
 }
 
-#user-list-list-container {
+#user-list-tab-container {
     flex: 11;
     overflow-y: auto;
     border-radius: 0 0 10px 10px;
@@ -40,19 +40,19 @@
 }
 
 /* 스크롤 막대 스타일 */
-#user-list-list-container::-webkit-scrollbar {
+#user-list-tab-container::-webkit-scrollbar {
     width: 8px;
     border-radius: 4px;
 }
 
 /* 스크롤 바 스타일 */
-#user-list-list-container::-webkit-scrollbar-thumb {
+#user-list-tab-container::-webkit-scrollbar-thumb {
     background-color: #5C7320;
     border-radius: 4px;
 }
 
 /* 스크롤 바 배경 스타일 */
-#user-list-list-container::-webkit-scrollbar-track {
+#user-list-tab-container::-webkit-scrollbar-track {
     background-color: #A8CB60;
     border-radius: 4px;
 }
