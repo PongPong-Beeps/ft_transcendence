@@ -27,6 +27,7 @@ export default function ExitConfirmation($container) {
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
             navigate("lobby");
         });
+
         $container.querySelector('#exit-confirmation-stay-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
         });

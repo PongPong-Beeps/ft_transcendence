@@ -149,7 +149,7 @@ export default function ProfileModal($container, nickname, isMe) {
         }
         // 데이터 채우기
         updateHistory();
-        updateBlacklist()
+        updateBlacklist();
     }
 
     importCss("assets/css/profile-modal.css");
