@@ -2,6 +2,7 @@ import {importCss} from "../../utils/import-css.js";
 import {navigate} from "../../utils/navigate.js";
 import ExitConfirmation from "../../pages/exit-confirmation.js";
 import PlayerInfo from "./player-info.js";
+import Error from "../../pages/error.js";
 
 /**
  * @param { HTMLElement } $container
@@ -30,6 +31,11 @@ export default function TournamentRoom($container, difficulty) {
         $container.querySelector('.game-room-back-btn').addEventListener('click', () => {
             new ExitConfirmation($container)
         });
+    }
+
+    if (difficulty === undefined) {
+        new Error($container);
+        return;
     }
 
     importCss("assets/css/game-room.css")
