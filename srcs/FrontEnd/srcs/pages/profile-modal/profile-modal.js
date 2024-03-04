@@ -1,6 +1,7 @@
 import HistoryTable from "./history-table.js";
 import FriendCell from "../../components/user-list/friend-cell.js";
 import BlacklistCell from "./blacklist-cell.js";
+import InfoTab from "./info-tab.js";
 import {importCss} from "../../utils/import-css.js";
 
 /**
@@ -23,6 +24,10 @@ export default function ProfileModal($container, nickname, isMe) {
         { nickname: "jonchoi"}
     ]
 
+    const infoDummyData = [
+        { totalWinRate: 50, oneOnOneWinRate: 34, tournamentWinRate: 100 }
+    ]
+
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -37,7 +42,7 @@ export default function ProfileModal($container, nickname, isMe) {
                                 <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
                             </div>
                             <div id="profile-modal-tab">
-                                <div id="info-tab-container">Info</div>
+                                <div id="info-tab-container"></div>
                                 <div id="history-tab-container">${HistoryTable()}</div>
                                 <div id="blacklist-tab-container"></div>
                             </div>
@@ -79,6 +84,13 @@ export default function ProfileModal($container, nickname, isMe) {
         $container.querySelector('#ok-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
         });
+    }
+
+    const updateInfo = () => {
+        const infoTabContainer = $container.querySelector('#info-tab-container');
+        if (infoTabContainer) {
+            infoTabContainer.innerHTML = InfoTab(nickname, isMe, infoDummyData[0]);
+        }
     }
 
     const updateHistory = () => {
@@ -148,6 +160,7 @@ export default function ProfileModal($container, nickname, isMe) {
             infoBtn.click(); // 초기 탭으로 정보 탭 설정
         }
         // 데이터 채우기
+        updateInfo();
         updateHistory();
         updateBlacklist();
     }
