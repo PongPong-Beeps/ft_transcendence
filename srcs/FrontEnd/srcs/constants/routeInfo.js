@@ -6,6 +6,7 @@ import UserList from "../components/user-list/user-list.js";
 import Login from "../pages/login.js";
 import VsRoom from "../components/game-room/vs-room.js";
 import VsSchedule from "../pages/vs-schedule/vs-schedule.js";
+import Auth from "../pages/auth.js";
 
 export const routes = [
     {path: /^\/$/, layout: "full", page: Login},
