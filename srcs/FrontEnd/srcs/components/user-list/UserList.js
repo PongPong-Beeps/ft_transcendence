@@ -4,6 +4,7 @@ import {importCss} from "../../utils/importCss.js";
 import Error from "../../pages/Error.js";
 import UserCell from "./UserCell.js";
 import useState from "../../utils/useState.js";
+import getCookie from "../../utils/cookie.js";
 
 /**
  * @param {HTMLElement} $container
@@ -24,7 +25,6 @@ export default function UserList($container) {
     const render = () => {
         $container.querySelector('#menu').innerHTML = `
             <div id="user-list-container">
-                <button id="use-state-test">테스트</button>
                 <div id="user-list-button-container">
                     <button class="user-list-button non-outline-btn" id="friends-btn">친구</button>
                     <button class="user-list-button non-outline-btn" id="all-user-btn">전체</button>
@@ -35,7 +35,6 @@ export default function UserList($container) {
                 </div>
             </div>
         `;
-        this.renderAllUserList();
     }
 
     const setupFriendList = () => {
@@ -97,13 +96,6 @@ export default function UserList($container) {
                 toggleList(listToShow);
             });
         });
-
-        // 테스트
-        $container.querySelector('#use-state-test').addEventListener('click', () => {
-            let userList = [...getAllUserList()]; // 현재 상태 복사
-            userList.push({ nickname: "유저" }); // 새 유저 추가
-            setAllUserList(userList); // 상태 업데이트
-        });
     }
 
     const init = () => {
@@ -114,9 +106,64 @@ export default function UserList($container) {
         }
     }
 
+    // // 웹소켓으로 변경해야 합니다 !!!
+    // fetchUserList를 async 함수로 선언
+    async function fetchUserList() {
+        try {
+            let response = await fetch("https://127.0.0.1/api/user/list", {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${getCookie("access_token")}`,
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+            });
+
+            // 액세스 토큰 만료 처리
+            if (response.status === 401) {
+                const refreshTokenResponse = await fetch('https://127.0.0.1/api/token/refresh/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie("csrftoken")
+                    },
+                    body: JSON.stringify({'refresh': getCookie("refresh_token")})
+                });
+
+                if (!refreshTokenResponse.ok) throw new Error(response.status);
+
+                // 새 토큰으로 원본 요청 재시도
+                response = await fetch("https://127.0.0.1/api/user/list", {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${getCookie("access_token")}`,
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                });
+            }
+
+            if (!response.ok) throw new Error(response.status);
+
+             // 데이터 파싱
+            return await response.json(); // 최종 데이터 반환
+        } catch (error) {
+            throw error; // 오류 발생시 상위로 전파
+        }
+    }
+
     importCss("assets/css/user-list.css");
     render();
-    setupFriendList();
     setupEventListener();
     init();
+    setupFriendList();
+    fetchUserList()
+        .then(data => {
+            setAllUserList(data.userList); // 사용자 목록 설정
+        })
+        .catch(error => {
+            console.error("Failed to fetch user list: ", error.errorCode);
+            // 오류 처리 로직, 예: 사용자에게 오류 메시지 표시
+            new Error($container, error.errorCode);
+        });
 }
