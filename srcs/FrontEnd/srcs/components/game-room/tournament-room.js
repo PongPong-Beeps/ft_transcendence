@@ -9,6 +9,12 @@ import Error from "../../pages/error.js";
  * @param { Object } difficulty
  */
 export default function TournamentRoom($container, difficulty) {
+    const init = () => {
+        $container.querySelectorAll('.invite-btn').forEach(button => {
+           button.style.display = 'block';
+        });
+    }
+
     const render = () => {
         $container.querySelector('#main').innerHTML = `
             <div class="game-room-container">
@@ -39,6 +45,7 @@ export default function TournamentRoom($container, difficulty) {
     }
 
     importCss("assets/css/game-room.css");
+    init();
     render();
     setupEventListener();
 }
