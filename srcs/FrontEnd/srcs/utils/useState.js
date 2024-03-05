@@ -33,13 +33,13 @@ function compare(a, b) {
 
 /**
  * @description useState 훅 구현
- * @param { array | number | string | boolean | Object } stateInput 초기값
+ * @param { array | number | string | boolean | Object } initialState 초기값
  * @param { object } component 전달된 컴포넌트
  * @param { string } render 렌더링 함수 명
  * @returns [getState, setState] 반환
  */
-export default function useState(stateInput, component, render) {
-    let state = cloneState(stateInput);
+export default function useState(initialState, component, render) {
+    let state = cloneState(initialState);
     const getState = () => state;
     const setState = (newState) => {
         if (deepEqual(state, newState)) return;
