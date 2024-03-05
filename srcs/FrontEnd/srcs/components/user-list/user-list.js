@@ -91,10 +91,12 @@ export default function UserList($container) {
         `;
   };
 
-    const setupFriendList = () => {
-        const friendsList = $container.querySelector('#friend-list-tab');
-        if (friendsList) {
-            friendsList.innerHTML = friendListData.map(friend => FriendCell({ nickname: friend.nickname, isOnline: friend.isOnline })).join('');
+  const setupFriendList = () => {
+    const friendsList = $container.querySelector("#friend-list-tab");
+    if (friendsList) {
+      friendsList.innerHTML = friendListData
+        .map((friend) => FriendCell(friend.nickname, friend.isOnline))
+        .join("");
 
       friendListData.forEach((friend) => {
         const cell = $container.querySelector(
@@ -105,27 +107,21 @@ export default function UserList($container) {
             new ProfileModal($container, friend.nickname, false);
           });
 
-                    cell.querySelector('.dm-btn').addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        alert(`${friend.nickname}에게 귓속말`);
-                    });
-
-                    const inviteBtn = cell.querySelector('.invite-btn');
-                    if (inviteBtn) {
-                        inviteBtn.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            alert(`${friend.nickname} 초대`);
-                        });
-                    }
-                }
-            });
+          cell.querySelector(".dm-btn").addEventListener("click", (event) => {
+            event.stopPropagation();
+            alert(`${friend.nickname}에게 귓속말`);
+          });
         }
+      });
     }
+  };
 
-    const setupUserList = () => {
-        const userList = $container.querySelector('#user-list-tab');
-        if (userList) {
-            userList.innerHTML = userListData.map(user => UserCell({ nickname: user.nickname })).join('');
+  const setupUserList = () => {
+    const userList = $container.querySelector("#user-list-tab");
+    if (userList) {
+      userList.innerHTML = userListData
+        .map((user) => UserCell(user.nickname))
+        .join("");
 
       userListData.forEach((user) => {
         const cell = $container.querySelector(
