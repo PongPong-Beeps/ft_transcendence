@@ -1,7 +1,7 @@
 // GameSettings.js
 import { navigate } from "../../utils/navigate.js";
-import GameSettingsOption from "./game-settings-option.js";
-import {importCss} from "../../utils/import-css.js";
+import GameSettingsOption from "./GameSettingsOption.js";
+import {importCss} from "../../utils/importCss.js";
 
 export default function GameSettings($container) {
     const modeOptions = [

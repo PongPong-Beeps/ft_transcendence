@@ -1,8 +1,8 @@
-import HistoryTable from "./history-table.js";
-import FriendCell from "../../components/user-list/friend-cell.js";
-import BlacklistCell from "./blacklist-cell.js";
-import InfoTab from "./info-tab.js";
-import {importCss} from "../../utils/import-css.js";
+import HistoryTable from "./HistoryTable.js";
+import FriendCell from "../../components/user-list/FriendCell.js";
+import BlacklistCell from "./BlacklistCell.js";
+import InfoTab from "./InfoTab.js";
+import {importCss} from "../../utils/importCss.js";
 
 /**
  * @param {HTMLElement} $container

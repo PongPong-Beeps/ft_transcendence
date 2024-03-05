@@ -1,8 +1,8 @@
-import FriendCell from "./friend-cell.js";
-import ProfileModal from "../../pages/profile-modal/profile-modal.js";
-import {importCss} from "../../utils/import-css.js";
-import Error from "../../pages/error.js";
-import UserCell from "./user-cell.js";
+import FriendCell from "./FriendCell.js";
+import ProfileModal from "../../pages/profile-modal/ProfileModal.js";
+import {importCss} from "../../utils/importCss.js";
+import Error from "../../pages/Error.js";
+import UserCell from "./UserCell.js";
 
 /**
  * @param {HTMLElement} $container

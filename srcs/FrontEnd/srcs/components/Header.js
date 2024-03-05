@@ -1,4 +1,4 @@
-import {importCss} from "../utils/import-css.js";
+import {importCss} from "../utils/importCss.js";
 
 export default function Header($container) {
     const render = () => {

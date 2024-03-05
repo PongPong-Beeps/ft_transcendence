@@ -2,8 +2,8 @@
  * @param {HTMLElement} $container
  */
 
-import VsScheduleUserCard from "./vs-schedule-user-card.js";
-import {importCss} from "../../utils/import-css.js";
+import VsScheduleUserCard from "./VsScheduleUserCard.js";
+import {importCss} from "../../utils/importCss.js";
 
 export default function VsSchedule($container) {
     let profileImg = [

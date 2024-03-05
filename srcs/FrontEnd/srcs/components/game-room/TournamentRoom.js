@@ -1,8 +1,8 @@
-import {importCss} from "../../utils/import-css.js";
+import {importCss} from "../../utils/importCss.js";
 import {navigate} from "../../utils/navigate.js";
-import ExitConfirmation from "../../pages/exit-confirmation.js";
-import PlayerInfo from "./player-info.js";
-import Error from "../../pages/error.js";
+import ExitConfirmation from "../../pages/ExitConfirmation.js";
+import PlayerInfo from "./PlayerInfo.js";
+import Error from "../../pages/Error.js";
 
 /**
  * @param { HTMLElement } $container

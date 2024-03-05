@@ -1,5 +1,5 @@
-import ProfileModal from "../pages/profile-modal/profile-modal.js";
-import {importCss} from "../utils/import-css.js";
+import ProfileModal from "../pages/profile-modal/ProfileModal.js";
+import {importCss} from "../utils/importCss.js";
 import Router from "../router.js";
 
 /**
