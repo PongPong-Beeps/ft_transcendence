@@ -1,5 +1,5 @@
 import {navigate} from "../utils/navigate.js";
-import {importCss} from "../utils/import-css.js";
+import {importCss} from "../utils/importCss.js";
 
 /**
  * @param {HTMLElement} $container

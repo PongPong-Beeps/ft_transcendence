@@ -1,3 +1,7 @@
+/**
+ * @param { string } nickname
+ * @param { boolean } isOnline
+ */
 export default function FriendCell({ nickname, isOnline }) {
     return `
         <div class="friend-cell" data-nickname="${nickname}">

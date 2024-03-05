@@ -1,4 +1,4 @@
-import {importCss} from "../utils/import-css.js";
+import {importCss} from "../utils/importCss.js";
 import {navigate} from "../utils/navigate.js";
 
 /**
@@ -10,11 +10,11 @@ export default function Error($container, errorCode = 0) {
 
     const init = () => {
         switch (errorCode) {
+            case 400:
+                errorMessage = "잘못된 요청입니다";
+                break;
             case 401:
                 errorMessage = "권한이 없습니다";
-                break;
-            case 404:
-                errorMessage = "페이지를 찾을 수 없습니다";
                 break;
             case 500:
                 errorMessage = "서버 오류 (ㅠ ㅠ)";

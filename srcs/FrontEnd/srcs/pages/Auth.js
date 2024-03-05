@@ -1,5 +1,5 @@
 import {navigate} from "../utils/navigate.js";
-import {importCss} from "../utils/import-css.js";
+import {importCss} from "../utils/importCss.js";
 import getCookie from "../utils/cookie.js";
 
 /**
@@ -23,7 +23,7 @@ export default function Auth($container) {
         // authorization_code 추출
         const urlParams = new URLSearchParams(window.location.search);
         const authorization_code = urlParams.get('code');
-        console.log(authorization_code)
+        console.log("인증 코드 : " + authorization_code);
         // 백엔드로 전송
         fetch('https://127.0.0.1/api/login/42/callback/', {
             method: 'POST',
@@ -35,7 +35,6 @@ export default function Auth($container) {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 navigate('lobby')
             })
             .catch((error) => console.error('Error:', error));

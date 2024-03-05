@@ -1,6 +1,6 @@
 import { routes } from "./constants/routeInfo.js";
-import MyProfile from "./components/my-profile.js";
-import Header from "./components/header.js";
+import MyProfile from "./components/MyProfile.js";
+import Header from "./components/Header.js";
 
 /**
  * @param {HTMLElement} $container
