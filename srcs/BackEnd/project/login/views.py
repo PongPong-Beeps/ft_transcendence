@@ -54,17 +54,15 @@ class Login42CallbackView(APIView):
             return Response({"message": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
         user_info = get_user_info(access_token)
         if user_info['success']:
-#            print(user_info.get('data', {}))
-            user_id = user_info.get('data', {}).get('id')
-            user_email = user_info.get('data', {}).get('email')
+            # print(user_info.get('data', {}))
             user_nickname = user_info.get('data', {}).get('login')
+            user_email = user_info.get('data', {}).get('email')
             ## Print test
-            print(f"User ID: {user_id}")
             print(f"Email: {user_email}")
             print(f"Nickname: {user_nickname}")
-            save_user_to_db(user_id, user_email, user_nickname)
+            save_user_to_db(user_email, user_nickname)
             
-            user = User.objects.get(user_id=user_id)
+            user = User.objects.get(nickname=user_nickname)
             print("user: ", user)
             jwt_token = create_jwt_token(user)
             print("jwt_token: ", jwt_token)
@@ -105,18 +103,17 @@ def create_jwt_token(user):
     }
 
 
-def save_user_to_db(_user_id, _user_email, _user_nickname):
+def save_user_to_db(_user_email, _user_nickname):
      # user_id와 email이 모두 이미 존재하는지 확인
-    existing_user = User.objects.filter(user_id=_user_id, email=_user_email).exists()
+    existing_user = User.objects.filter(email=_user_email).exists()
     if not existing_user : 
         User.objects.create(
-            user_id = _user_id,
             email = _user_email,
             nickname = _user_nickname,
         )
-        print(_user_id, _user_email, " saved to db")
+        print(_user_email, " saved to db")
     else :
-        print(_user_id, _user_email, " aleady saved db")
+        print(_user_email, " aleady saved db")
         
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod

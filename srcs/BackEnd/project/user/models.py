@@ -1,9 +1,8 @@
 from django.db import models
 
 class User(models.Model) :
-    user_id = models.CharField(max_length=20)
     nickname = models.CharField(max_length=20)
-    email = models.EmailField(unique=True) 
+    email = models.EmailField(unique=True)
     # is_online = models.BooleanField(default=False)
     # login_type = models.CharField(max_length=50)
 
