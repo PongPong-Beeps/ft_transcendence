@@ -73,7 +73,14 @@ export default function GameSettings($container) {
         });
     };
 
+    const init = () => {
+        $container.querySelectorAll('.invite-btn').forEach(button => {
+            button.style.display = 'none';
+        });
+    }
+
     importCss("assets/css/game-settings.css");
+    init();
     render();
     setupEventListener();
 }
