@@ -58,7 +58,6 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',                                       #JWT를 설정하는데 사용되는 알고리즘
     'AUTH_HEADER_TYPES': ('Bearer',),                              #인증 헤더의 유형
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'ROTATE_REFRESH_TOKENS': True,
 }
 
 MIDDLEWARE = [

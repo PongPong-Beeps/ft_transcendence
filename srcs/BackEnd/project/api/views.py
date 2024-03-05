@@ -9,7 +9,7 @@ class Index(APIView):
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated] # 있어야 하나?
 
-    def post(self, request):
+    def get(self, request):
         print("I'm post func in Index")
         print(request)
         # 인증된 사용자만 접근 가능한 API 뷰
@@ -36,14 +36,6 @@ class CustomTokenRefreshView(TokenRefreshView):
             response.set_cookie(
                 key="access_token",
                 value=access_token,
-                expires=datetime.datetime.utcnow() + datetime.timedelta(days=1),
-                httponly=False,
-                secure=True,
-                samesite='Lax'
-            )
-            response.set_cookie(
-                key="refresh_token",
-                value=refresh_token,
                 expires=datetime.datetime.utcnow() + datetime.timedelta(days=1),
                 httponly=False,
                 secure=True,
