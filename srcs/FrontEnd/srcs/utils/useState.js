@@ -1,6 +1,6 @@
 /**
- * @description object, array, primitive 타입을 비교하는 deepEqual 함수
- * @returns {boolean}
+ * @description 타입을 비교하는 함수
+ * @returns { boolean }
  */
 function deepEqual(a, b) {
     // 두 인자의 타입이 다르거나, 하나가 null이면 바로 false 반환
@@ -31,10 +31,9 @@ function compare(a, b) {
     return true;
 }
 
-
 /**
  * @description useState 훅 구현
- * @param { array | number | string | boolean | Object } stateInput 상태
+ * @param { array | number | string | boolean | Object } stateInput 초기값
  * @param { object } component 전달된 컴포넌트
  * @param { string } render 렌더링 함수 명
  * @returns [getState, setState] 반환
@@ -43,10 +42,9 @@ export default function useState(stateInput, component, render) {
     let state = cloneState(stateInput);
     const getState = () => state;
     const setState = (newState) => {
-        if (!deepEqual(state, newState)) {
-            state = cloneState(newState);
-            component[render]();
-        }
+        if (deepEqual(state, newState)) return;
+        state = cloneState(newState);
+        component[render]();
     };
     return [getState, setState];
 }
