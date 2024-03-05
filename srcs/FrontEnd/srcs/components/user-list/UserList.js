@@ -39,48 +39,41 @@ export default function UserList($container) {
     }
 
     const setupFriendList = () => {
-        const friendsList = $container.querySelector('#friend-list-tab');
-        if (friendsList) {
-            friendsList.innerHTML = friendListData.map(friend => FriendCell(friend)).join('');
+        const friendsListTab = $container.querySelector('#friend-list-tab');
+        if (friendsListTab) {
+            friendsListTab.innerHTML = friendListData
+                .map(friend => FriendCell(friend))
+                .join('');
 
-            friendListData.forEach(friend => {
-                const cell = $container.querySelector(`[data-nickname="${friend.nickname}"]`);
-                if (cell) {
-                    cell.addEventListener('click', () => {
-                        new ProfileModal($container, friend.nickname, false);
-                    });
+            friendsListTab.addEventListener('click', (event) => {
+                const friendCell = event.target.closest('[data-nickname]');
+                if (!friendCell) return;
 
-                    cell.querySelector('.dm-btn').addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        alert(`${friend.nickname}에게 귓속말`);
-                    });
-
-                    const inviteBtn = cell.querySelector('.invite-btn');
-                    if (inviteBtn) {
-                        inviteBtn.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            alert(`${friend.nickname} 초대`);
-                        });
-                    }
+                const nickname = friendCell.getAttribute('data-nickname');
+                if (event.target.matches('.dm-btn')) {
+                    alert(`${nickname}에게 귓속말`);
+                } else if (event.target.matches('.invite-btn')) {
+                    alert(`${nickname} 초대`);
+                } else {
+                    new ProfileModal($container, nickname, false);
                 }
             });
         }
-    }
+    };
 
     this.renderAllUserList = () => {
         const userListTab = $container.querySelector('#all-user-list-tab');
         if (userListTab) {
-            console.log(getAllUserList());
             userListTab.innerHTML = getAllUserList()
-                .map(user => UserCell({ nickname: user.nickname }))
+                .map(user => UserCell(user))
                 .join('');
-            // 이벤트 위임 사용
+
             userListTab.addEventListener('click', (event) => {
                 const userCell = event.target.closest('[data-nickname]');
-                if (userCell) {
-                    const nickname = userCell.getAttribute('data-nickname');
-                    new ProfileModal($container, nickname, false);
-                }
+                if (!userCell) return;
+
+                const nickname = userCell.getAttribute('data-nickname');
+                new ProfileModal($container, nickname, false);
             });
         }
     };
