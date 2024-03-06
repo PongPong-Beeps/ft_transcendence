@@ -2,7 +2,7 @@ import {importCss} from "../../utils/importCss.js";
 import {navigate} from "../../utils/navigate.js";
 import ExitConfirmation from "../../pages/ExitConfirmation.js";
 import PlayerInfo from "./PlayerInfo.js";
-import Error from "../../pages/Error.js";
+import ErrorPage from "../../pages/ErrorPage.js";
 
 /**
  * @param { HTMLElement } $container
@@ -40,7 +40,7 @@ export default function TournamentRoom($container, difficulty) {
     }
 
     if (difficulty === undefined) {
-        new Error($container);
+        new ErrorPage($container);
         return;
     }
 
