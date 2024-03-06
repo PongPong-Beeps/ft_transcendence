@@ -16,7 +16,8 @@ class UserListView(APIView):
         # 'userList' 키 아래에 사용자 리스트를 포함하는 JSON 객체로 응답 구성
         response_data = {"userList": user_list}
         return Response(response_data)
-    
+ 
+ #/api/user/blacklist
 class BlackListView(APIView):
     def get(self, request):
         user_id = request.user.id
@@ -25,6 +26,7 @@ class BlackListView(APIView):
         serializer = BlackListSerializer(blacklist_list, many=True)
         return Response(serializer.data, status=200)
 
+#/api/user/block
 class BlockUserView(APIView):
     def post(self, request):
         try:
@@ -38,6 +40,7 @@ class BlockUserView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
+#/api/user/unblock
 class UnblockUserView(APIView):
     def post(self, request):
         try :
