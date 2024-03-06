@@ -1,10 +1,11 @@
 import FriendCell from "./FriendCell.js";
 import ProfileModal from "../../pages/profile-modal/ProfileModal.js";
 import {importCss} from "../../utils/importCss.js";
-import Error from "../../pages/Error.js";
+import ErrorPage from "../../pages/ErrorPage.js";
 import UserCell from "./UserCell.js";
 import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
+import {BACKEND, fetchWithAuth} from "../../api.js";
 
 /**
  * @param {HTMLElement} $container
@@ -26,144 +27,87 @@ export default function UserList($container) {
         $container.querySelector('#menu').innerHTML = `
             <div id="user-list-container">
                 <div id="user-list-button-container">
-                    <button class="user-list-button non-outline-btn" id="friends-btn">친구</button>
+                    <button class="user-list-button non-outline-btn" id="friend-btn">친구</button>
                     <button class="user-list-button non-outline-btn" id="all-user-btn">전체</button>
                 </div>
                 <div id="user-list-tab-container">
-                    <div id="friend-list-tab" class="list-tab"></div>
-                    <div id="all-user-list-tab" class="list-tab"></div>
+                    <div class="user-list-tab" id="friend-list-tab"></div>
+                    <div class="user-list-tab" id="all-user-list-tab"></div>
                 </div>
             </div>
         `;
+        const friendButton = $container.querySelector('#friend-btn');
+        toggleUserListByButton(friendButton); // 초기 설정
     }
 
-    const setupFriendList = () => {
+    this.renderFriendList = () => {
         const friendsListTab = $container.querySelector('#friend-list-tab');
-        if (friendsListTab) {
-            friendsListTab.innerHTML = friendListData
-                .map(friend => FriendCell(friend))
-                .join('');
-
-            friendsListTab.addEventListener('click', (event) => {
-                const friendCell = event.target.closest('[data-nickname]');
-                if (!friendCell) return;
-
-                const nickname = friendCell.getAttribute('data-nickname');
-                if (event.target.matches('.dm-btn')) {
-                    alert(`${nickname}에게 귓속말`);
-                } else if (event.target.matches('.invite-btn')) {
-                    alert(`${nickname} 초대`);
-                } else {
-                    new ProfileModal($container, nickname, false);
-                }
-            });
-        }
+        friendsListTab.innerHTML = friendListData
+            .map(friend => FriendCell(friend))
+            .join('');
     };
 
     this.renderAllUserList = () => {
         const userListTab = $container.querySelector('#all-user-list-tab');
-        if (userListTab) {
-            userListTab.innerHTML = getAllUserList()
-                .map(user => UserCell(user))
-                .join('');
+        userListTab.innerHTML = getAllUserList()
+            .map(user => UserCell(user))
+            .join('');
+    };
 
-            userListTab.addEventListener('click', (event) => {
-                const userCell = event.target.closest('[data-nickname]');
-                if (!userCell) return;
+    const setupEventListener = () => {
+        const userListContainer = $container.querySelector('#user-list-container');
+        userListContainer.addEventListener('click', (event) => {
+            if (event.target.closest('.user-list-button')) {
+                handleUserListButtonClick(event);
+            } else if (event.target.closest('.user-list-tab')) {
+                handleUserListCellClick(event);
+            }
+        });
+    };
 
-                const nickname = userCell.getAttribute('data-nickname');
-                new ProfileModal($container, nickname, false);
-            });
+    const handleUserListButtonClick = (event) => {
+        const button = event.target;
+        $container.querySelectorAll('.user-list-button').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        toggleUserListByButton(button);
+    };
+
+    const handleUserListCellClick = (event) => {
+        const userCell = event.target.closest('[data-nickname]');
+        const nickname = userCell.getAttribute('data-nickname');
+        if (event.target.matches('.dm-btn')) {
+            alert(`${nickname}에게 귓속말`);
+        } else if (event.target.matches('.invite-btn')) {
+            alert(`${nickname} 초대`);
+        } else {
+            new ProfileModal($container, nickname, false);
         }
     };
 
-    const toggleList = (showListId) => {
-        document.querySelectorAll('.list-tab').forEach(list => {
+    const toggleUserListByButton = (selectedButton) => {
+        selectedButton.classList.add('selected');
+        const showListId = selectedButton.id === 'friend-btn' ? 'friend-list-tab' : 'all-user-list-tab';
+        $container.querySelectorAll('.user-list-tab').forEach(list => {
             list.style.display = list.id === showListId ? 'block' : 'none';
         });
-    }
+    };
 
-    const setupEventListener = () => {
-        $container.querySelectorAll('.user-list-button').forEach(button => {
-            button.addEventListener('click', function() {
-                $container.querySelectorAll('.user-list-button').forEach(btn => {
-                    btn.dataset.selected = 'false';
-                    btn.classList.remove('selected');
-                });
-                this.dataset.selected = 'true';
-                this.classList.add('selected');
-                const listToShow = this.id === 'friends-btn' ? 'friend-list-tab' : 'all-user-list-tab';
-                toggleList(listToShow);
+    const fetchUserListData = () => { // 🌟 웹소켓으로 변경 필요
+        this.renderFriendList(); // 임시
+        fetchWithAuth(`${BACKEND}/user/list/`)
+            .then(data => {
+                console.log("[ fetchUserListData ] 유저 리스트 패치 완료");
+                setAllUserList(data.userList);
+            })
+            .catch(error => {
+                console.error("[ fetchUserListData ] " + error.message);
+                new ErrorPage($container, error.status);
             });
-        });
-    }
-
-    const init = () => {
-        // 초기 선택 상태 설정
-        const friendsBtn = $container.querySelector('#friends-btn');
-        if (friendsBtn) {
-            friendsBtn.click();
-        }
-    }
-
-    // // 웹소켓으로 변경해야 합니다 !!!
-    // fetchUserList를 async 함수로 선언
-    async function fetchUserList() {
-        try {
-            let response = await fetch("https://127.0.0.1/api/user/list", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${getCookie("access_token")}`,
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken"),
-                },
-            });
-
-            // 액세스 토큰 만료 처리
-            if (response.status === 401) {
-                const refreshTokenResponse = await fetch('https://127.0.0.1/api/token/refresh/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie("csrftoken")
-                    },
-                    body: JSON.stringify({'refresh': getCookie("refresh_token")})
-                });
-
-                if (!refreshTokenResponse.ok) throw new Error(response.status);
-
-                // 새 토큰으로 원본 요청 재시도
-                response = await fetch("https://127.0.0.1/api/user/list", {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${getCookie("access_token")}`,
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken"),
-                    },
-                });
-            }
-
-            if (!response.ok) throw new Error(response.status);
-
-             // 데이터 파싱
-            return await response.json(); // 최종 데이터 반환
-        } catch (error) {
-            throw error; // 오류 발생시 상위로 전파
-        }
     }
 
     importCss("assets/css/user-list.css");
     render();
     setupEventListener();
-    init();
-    setupFriendList();
-    fetchUserList()
-        .then(data => {
-            setAllUserList(data.userList); // 사용자 목록 설정
-        })
-        .catch(error => {
-            console.error("Failed to fetch user list: ", error.errorCode);
-            // 오류 처리 로직, 예: 사용자에게 오류 메시지 표시
-            new Error($container, error.errorCode);
-        });
+    fetchUserListData();
 }

@@ -1,6 +1,7 @@
 import { routes } from "./constants/routeInfo.js";
 import MyProfile from "./components/MyProfile.js";
 import Header from "./components/Header.js";
+import ErrorPage from "./pages/ErrorPage.js";
 
 /**
  * @param {HTMLElement} $container
@@ -33,7 +34,9 @@ export default function Router($container) {
             clearCurrentState();
         }
         const target = findMatchedTarget();
-        if (target.layout === "full") {
+        if (!target) {
+            new ErrorPage($container, 404);
+        } else if (target.layout === "full") {
             if (!(currentPage instanceof target.page)) currentPage = new target.page($container);
         } else if (target.layout === "grid") {
             if (currentPage) currentPage = undefined
