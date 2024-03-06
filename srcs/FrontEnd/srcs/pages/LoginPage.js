@@ -1,10 +1,11 @@
 import {navigate} from "../utils/navigate.js";
 import {importCss} from "../utils/importCss.js";
+import {BACKEND} from "../global.js";
 
 /**
  * @param {HTMLElement} $container
  */
-export default function Login($container) {
+export default function LoginPage($container) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -20,7 +21,7 @@ export default function Login($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#login-btn').addEventListener('click', () => {
-		   window.location.href = `https://127.0.0.1/api/login/42`;
+		   window.location.href = `${BACKEND}/login/42/`;
         });
     }
 

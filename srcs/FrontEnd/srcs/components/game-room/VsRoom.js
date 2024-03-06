@@ -1,7 +1,7 @@
 import PlayerInfo from "./PlayerInfo.js";
 import ExitConfirmation from "../../pages/ExitConfirmation.js";
 import {importCss} from "../../utils/importCss.js";
-import Error from "../../pages/Error.js";
+import ErrorPage from "../../pages/ErrorPage.js";
 
 /**
  * @param {HTMLElement} $container
@@ -37,7 +37,7 @@ export default function VsRoom($container, difficulty) {
     }
 
     if (difficulty === undefined) {
-        new Error($container);
+        new ErrorPage($container);
         return;
     }
 

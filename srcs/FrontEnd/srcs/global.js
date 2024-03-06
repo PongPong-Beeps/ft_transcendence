@@ -1,0 +1,1 @@
+export const BACKEND = "https://127.0.0.1/api"

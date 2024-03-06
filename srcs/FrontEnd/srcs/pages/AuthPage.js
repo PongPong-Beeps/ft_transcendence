@@ -5,7 +5,7 @@ import getCookie from "../utils/cookie.js";
 /**
  * @param {HTMLElement} $container
  */
-export default function Auth($container) {
+export default function AuthPage($container) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {

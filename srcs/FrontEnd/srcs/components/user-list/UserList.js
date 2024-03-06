@@ -1,7 +1,7 @@
 import FriendCell from "./FriendCell.js";
 import ProfileModal from "../../pages/profile-modal/ProfileModal.js";
 import { importCss } from "../../utils/importCss.js";
-import Error from "../../pages/Error.js";
+import ErrorPage from "../../pages/ErrorPage.js";
 import UserCell from "./UserCell.js";
 import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
@@ -147,6 +147,6 @@ export default function UserList($container) {
         })
         .catch(error => {
             console.error("Failed to fetch user list: ", error.errorCode);
-            new Error($container, error.errorCode);
+            new ErrorPage($container, error.errorCode);
         });
 }

@@ -5,7 +5,7 @@ import {navigate} from "../utils/navigate.js";
  * @param { HTMLElement } $container
  * @param { number } errorCode
  */
-export default function Error($container, errorCode = 0) {
+export default function ErrorPage($container, errorCode = 0) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
