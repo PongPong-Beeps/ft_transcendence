@@ -11,14 +11,13 @@ async function refreshToken() {
         },
         body: JSON.stringify({'refresh': getCookie("refresh_token")}),
     });
-
+    // 토큰 재발급 실패(리프레시 토큰도 만료) 시 재로그인 유도
     if (!refreshTokenResponse.ok) {
         const error = new Error("[ refreshToken ] 토큰 재발급 실패");
-        error.status = refreshTokenResponse.status;
+        error.status = 401;
         throw error;
     }
 
-    const data = await refreshTokenResponse.json();
     console.log("[ refreshToken ] 토큰 재발급 완료");
 }
 
