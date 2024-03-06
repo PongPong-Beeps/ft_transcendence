@@ -1,6 +1,8 @@
 import {navigate} from "../utils/navigate.js";
 import {importCss} from "../utils/importCss.js";
 import getCookie from "../utils/cookie.js";
+import {BACKEND, fetchWithAuth} from "../api.js";
+import ErrorPage from "./ErrorPage.js";
 
 /**
  * @param {HTMLElement} $container
@@ -19,25 +21,32 @@ export default function AuthPage($container) {
         }
     }
 
-    const sendAuthorizationCode = () => {
+    function sendAuthorizationCode() {
         // authorization_code 추출
         const urlParams = new URLSearchParams(window.location.search);
         const authorization_code = urlParams.get('code');
-        console.log("인증 코드 : " + authorization_code);
+        console.log("[ sendAuthorizationCode ] 인증 코드 추출 : ", authorization_code);
+
         // 백엔드로 전송
-        fetch('https://127.0.0.1/api/login/42/callback/', {
+        fetch(`${BACKEND}/login/42/callback/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-				'X-CSRFToken': getCookie("csrftoken")
+                'X-CSRFToken': getCookie("csrftoken")
             },
             body: JSON.stringify({ code: authorization_code }),
         })
-            .then(response => response.json())
-            .then(data => {
-                navigate('lobby')
+            .then(response => {
+                if (!response.ok) {
+                    new ErrorPage($container, response.status);
+                } else {
+                    console.log("[ sendAuthorizationCode ] 토큰 발급 성공");
+                    navigate('lobby');
+                }
             })
-            .catch((error) => console.error('Error:', error));
+            .catch(error => {
+                console.error("[ sendAuthorizationCode ] ", error);
+            });
     }
 
     importCss("assets/css/auth.css");

@@ -1,6 +1,6 @@
 import {navigate} from "../utils/navigate.js";
 import {importCss} from "../utils/importCss.js";
-import {BACKEND} from "../global.js";
+import {BACKEND} from "../api.js";
 
 /**
  * @param {HTMLElement} $container

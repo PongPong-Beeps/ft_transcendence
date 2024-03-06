@@ -1,10 +1,11 @@
 import FriendCell from "./FriendCell.js";
 import ProfileModal from "../../pages/profile-modal/ProfileModal.js";
-import { importCss } from "../../utils/importCss.js";
+import {importCss} from "../../utils/importCss.js";
 import ErrorPage from "../../pages/ErrorPage.js";
 import UserCell from "./UserCell.js";
 import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
+import {BACKEND, fetchWithAuth} from "../../api.js";
 
 /**
  * @param {HTMLElement} $container
@@ -92,61 +93,21 @@ export default function UserList($container) {
         });
     };
 
-    // // 웹소켓으로 변경해야 합니다 !!!
-    async function fetchUserList() {
-        try {
-            let response = await fetch("https://127.0.0.1/api/user/list", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${getCookie("access_token")}`,
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken"),
-                },
+    const fetchUserListData = () => { // 🌟 웹소켓으로 변경 필요
+        this.renderFriendList(); // 임시
+        fetchWithAuth(`${BACKEND}/user/list/`)
+            .then(data => {
+                console.log("[ fetchUserListData ] 유저 리스트 패치 완료");
+                setAllUserList(data.userList);
+            })
+            .catch(error => {
+                console.error("[ fetchUserListData ] " + error.message);
+                new ErrorPage($container, error.status);
             });
-
-            // 액세스 토큰 만료 처리
-            if (response.status === 401) {
-                const refreshTokenResponse = await fetch('https://127.0.0.1/api/token/refresh/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie("csrftoken")
-                    },
-                    body: JSON.stringify({'refresh': getCookie("refresh_token")})
-                });
-
-                if (!refreshTokenResponse.ok) throw new Error(response.status);
-
-                // 새 토큰으로 원본 요청 재시도
-                response = await fetch("https://127.0.0.1/api/user/list", {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${getCookie("access_token")}`,
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken"),
-                    },
-                });
-            }
-
-            if (!response.ok) throw new Error(response.status);
-
-             // 데이터 파싱
-            return await response.json(); // 최종 데이터 반환
-        } catch (error) {
-            throw error; // 오류 발생시 상위로 전파
-        }
     }
 
     importCss("assets/css/user-list.css");
     render();
     setupEventListener();
-    this.renderFriendList(); // 임시
-    fetchUserList()
-        .then(data => {
-            setAllUserList(data.userList); // 사용자 목록 설정
-        })
-        .catch(error => {
-            console.error("Failed to fetch user list: ", error.errorCode);
-            new ErrorPage($container, error.errorCode);
-        });
+    fetchUserListData();
 }
