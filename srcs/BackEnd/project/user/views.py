@@ -31,7 +31,7 @@ class CurrentUserView(APIView):
     
 #프로필 정보 탭
 #/api/user/info
-class UserMatchHistorySummaryView(APIView):
+class UserInfoView(APIView):
     # permission_classes = [IsAuthenticated]
     
     def calculate_user_info(self, user):
