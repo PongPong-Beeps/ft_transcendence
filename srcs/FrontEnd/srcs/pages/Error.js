@@ -8,7 +8,7 @@ import {navigate} from "../utils/navigate.js";
 export default function Error($container, errorCode = 0) {
     let errorMessage = ""
 
-    const init = () => {
+    const initErrorMessage = () => {
         switch (errorCode) {
             case 400:
                 errorMessage = "잘못된 요청입니다";
@@ -47,7 +47,7 @@ export default function Error($container, errorCode = 0) {
     }
 
     importCss("assets/css/error.css");
-    init();
+    initErrorMessage();
     render();
     setupEventListener();
 }
