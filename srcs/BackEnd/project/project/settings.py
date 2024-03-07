@@ -52,7 +52,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=10),    #access token 유효기간
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=10),    #access token 유효기간
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=14),      #refresh token 유효기간
     'SIGNING_KEY': SECRET_KEY,                                    #토큰 서명에 사용할 키
     'ALGORITHM': 'HS256',                                       #JWT를 설정하는데 사용되는 알고리즘
