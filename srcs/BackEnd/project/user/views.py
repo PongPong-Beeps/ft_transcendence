@@ -120,14 +120,14 @@ class UserInfoView(APIView):
     def get(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
-        response_data = self.calculate_user_info(user, 'get')
         
         #친구여부, 블랙여부 데이터, 본인 자신이니 친구도 블랙도 아님
         data = {
             'is_friend' : False,
             'is_blocked' : False,
         }
-        return Response(response_data, data)
+        response_data = self.calculate_user_info(user, data)
+        return Response(response_data)
     
     # get 이면 나의 프로필 정보 리턴
     def post(self, request):
@@ -145,11 +145,11 @@ class UserInfoView(APIView):
         }
         
         #친구인지 여부, 블랙리스트에 있는지 여부
-        if user_me.friends.filter(nickname=target).exists():
+        if user_me.friendlist.filter(nickname=target).exists():
             data['is_friend'] = True
         if user_me.blacklist.filter(nickname=target).exists():
             data['is_blocked'] = True
             
-        response_data = self.calculate_user_info(user_target, 'post')
-        return Response(response_data, data)
+        response_data = self.calculate_user_info(user_target, data)
+        return Response(response_data)
     
