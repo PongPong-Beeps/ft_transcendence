@@ -23,7 +23,8 @@ class BlackListView(APIView):
         me = User.objects.get(id=user_id)
         blacklist_list = me.blacklist.all()
         serializer = BlackListSerializer(blacklist_list, many=True)
-        return Response(serializer.data, status=200)
+        response_data = {"blacklist": serializer.data}
+        return Response(response_data, status=200)
 
 #/api/user/block
 class BlockUserView(APIView):
