@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User, MatchHistory
 from rest_framework.permissions import IsAuthenticated
-from .serializer import BlackListSerializer #가정한 시리얼라이저 임포트 경로
+from .serializer import BlackListSerializer, MatchHistorySerializer #가정한 시리얼라이저 임포트 경로
 
 #/api/user/list
 class UserListView(APIView):
@@ -153,3 +153,23 @@ class UserInfoView(APIView):
         response_data = self.calculate_user_info(user_target, data)
         return Response(response_data)
     
+#/api/user/history
+#[ GET ](나의 전적 보기)
+#[ POST ](다른 유저 전적 보기)
+class MatchHistoryView(APIView):
+    def get(self, request): #내 프로필 - 전적
+        user_id = request.user.id
+        user_me = User.objects.get(id=user_id)
+        my_match = MatchHistory.objects.filter(user=user_me)
+        serializer = MatchHistorySerializer(my_match, many=True) #many=True : 하나가 아닌 여러개의 데이터를 직렬화
+        response_data = {"history" : serializer.data}
+        return Response(response_data, status=200)
+        
+        
+    def post(self, request): #상대 프로필 - 전적
+        target_nickname = request.data.get('nickname')
+        target_user = User.objects.get(nickname=target_nickname)
+        target_match = MatchHistory.objects.filter(user=target_user)
+        serializer = MatchHistorySerializer(target_match, many=True)
+        response_data = {"history" : serializer.data}
+        return Response(response_data, status=200)

@@ -9,4 +9,5 @@ urlpatterns = [
     path('blacklist/', views.BlackListView.as_view(), name='blacklist'), # 내 프로필 - 블랙리스트
     path('me/', views.CurrentUserView.as_view(), name='current_user'),
     path('info/', views.UserInfoView.as_view(), name='info'),
+    path('history/', views.MatchHistoryView.as_view(), name='history'), # 프로필 전적탭
 ]
