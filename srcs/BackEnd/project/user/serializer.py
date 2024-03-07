@@ -6,3 +6,8 @@ class BlackListSerializer(serializers.ModelSerializer):
     class Meta:
         model = views.User
         fields = ['nickname']
+        
+class FriendListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = views.User
+        fields = ['nickname']

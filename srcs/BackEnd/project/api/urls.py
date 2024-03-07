@@ -9,4 +9,5 @@ urlpatterns = [
     path('user/', include('user.urls')),
     
     path('logout/', views.Logout.as_view(), name='logout'), #로그아웃
+    path('friend/', include('friend.urls'), name='friend'), #친구
 ]
