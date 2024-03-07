@@ -3,6 +3,9 @@ import FriendCell from "../../components/user-list/FriendCell.js";
 import BlacklistCell from "./BlacklistCell.js";
 import InfoTab from "./InfoTab.js";
 import {importCss} from "../../utils/importCss.js";
+import {BACKEND,fetchWithAuth} from "../../api.js";
+import useState from "../../utils/useState.js";
+import ErrorPage from "../ErrorPage.js";
 
 /**
  * @param {HTMLElement} $container
@@ -17,12 +20,7 @@ export default function ProfileModal($container, nickname, isMe) {
         { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "승" }
     ];
 
-    const blacklistDummyData = [
-        { nickname: "wooshin" },
-        { nickname: "jikoo" },
-        { nickname: "geonwule"},
-        { nickname: "jonchoi"}
-    ]
+    let blacklistData = [];
 
     const infoDummyData = [
         { totalWinRate: 50, oneOnOneWinRate: 34, tournamentWinRate: 100 }
@@ -81,8 +79,45 @@ export default function ProfileModal($container, nickname, isMe) {
             });
         });
 
+        if (!isMe) {
+            $container.querySelector('#block-btn').addEventListener('click', () => {
+                handleBlockButtonClick();
+                $container.querySelector('#page').style.display = 'none';
+            });
+        }
+
         $container.querySelector('#ok-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
+        });
+    }
+
+    const handleBlockButtonClick = () => {
+        const toBlock = { "nickname": nickname };
+        fetchWithAuth(`${BACKEND}/user/block/`, {
+            method: 'POST',
+            body: JSON.stringify(toBlock),
+        })
+        .then(data => {
+            alert(`"${nickname}" 을 블랙리스트에 추가하였습니다.`);
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    const handleUnBlockButtonClick = (unblockNickname) => {
+        const toUnBlock = { "nickname": unblockNickname };
+        fetchWithAuth(`${BACKEND}/user/unblock/`, {
+            method: 'POST',
+            body: JSON.stringify(toUnBlock),
+        })
+        .then(data => {
+            alert(`"${unblockNickname}" 을 블랙리스트에서 제거하였습니다.`);
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
     }
 
@@ -130,17 +165,30 @@ export default function ProfileModal($container, nickname, isMe) {
         });
     }
 
-    const updateBlacklist = () => {
-        const blacklist = $container.querySelector('#blacklist-tab-container');
-        if (blacklist) {
-            blacklist.innerHTML = blacklistDummyData.map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+    const getAllBlackList = async () => {
+        try {
+            const data = await fetchWithAuth(`${BACKEND}/user/blacklist/`);
+            console.log("[ fetchBlacklistData ] 블랙리스트 패치 완료");
+            return data.blacklist;
+        } catch (error) {
+            console.error("[ fetchBlacklistData ] " + error.message);
+            new ErrorPage($container, error.status);
+        }
+    }
 
-            blacklistDummyData.forEach(blacklist => {
+    const updateBlacklist = async() => {
+        const blacklist = $container.querySelector('#blacklist-tab-container');
+        blacklistData = await getAllBlackList();
+        if (blacklist) {
+            blacklist.innerHTML = blacklistData.map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+
+            blacklistData.forEach(blacklist => {
                 const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
                 if (cell) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
+                        handleUnBlockButtonClick(blacklist.nickname);
                         event.stopPropagation(); // 이벤트 전파를 막음
-                        alert(`${blacklist.nickname} 차단해제`);
+                        $container.querySelector('#page').style.display = 'none';
                     });
                 }
             });
