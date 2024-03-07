@@ -75,7 +75,7 @@ class CurrentUserView(APIView):
 class UserInfoView(APIView):
     # permission_classes = [IsAuthenticated]
     
-    def calculate_user_info(self, user):
+    def calculate_user_info(self, user, data):
         nickname = user.nickname
 
         total_matches = MatchHistory.objects.filter(user=user).count()
@@ -104,13 +104,15 @@ class UserInfoView(APIView):
     
         hard_winning_percentage = hard_match_win / hard_total_matches * 100 if hard_total_matches != 0 else 0
         print("hard_winning_percentage: ", hard_winning_percentage)
-    
+                    
         response_data = {
             #image : user.image, #추후 이미지도 추가해야함
             "nickname": nickname,
             "total": total_winning_percentage,
             "easy": easy_winning_percentage,
             "hard": hard_winning_percentage,
+            "freind": data['is_friend'], #친구인지 여부
+            "block": data['is_blocked'], #블랙리스트에 있는지 여부
         }
         return response_data
 
@@ -118,14 +120,36 @@ class UserInfoView(APIView):
     def get(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
-        response_data = self.calculate_user_info(user)
-        return Response(response_data)    
+        response_data = self.calculate_user_info(user, 'get')
+        
+        #친구여부, 블랙여부 데이터, 본인 자신이니 친구도 블랙도 아님
+        data = {
+            'is_friend' : False,
+            'is_blocked' : False,
+        }
+        return Response(response_data, data)
     
     # get 이면 나의 프로필 정보 리턴
     def post(self, request):
         target = request.data.get('nickname')
         user_target = User.objects.get(nickname=target)
         
-        response_data = self.calculate_user_info(user_target)
-        return Response(response_data)
+        # 현재 로그인한 나의 정보
+        user_id = request.user.id
+        user_me = User.objects.get(id=user_id)
+        
+        #친구여부, 블랙여부 데이터
+        data = {
+            'is_friend' : False,
+            'is_blocked' : False,
+        }
+        
+        #친구인지 여부, 블랙리스트에 있는지 여부
+        if user_me.friends.filter(nickname=target).exists():
+            data['is_friend'] = True
+        if user_me.blacklist.filter(nickname=target).exists():
+            data['is_blocked'] = True
+            
+        response_data = self.calculate_user_info(user_target, 'post')
+        return Response(response_data, data)
     
