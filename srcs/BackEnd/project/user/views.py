@@ -68,7 +68,22 @@ class CurrentUserView(APIView):
                  #추후 이미지도 추가해야함
         }
         return Response(response_data)
+
+#내 닉네임 변경
+#/api/user/me/nickname
+class ChangeNicknameView(APIView):
+    # permission_classes = [IsAuthenticated]
     
+    def post(self, request):
+        user_id = request.user.id
+        user = User.objects.get(id=user_id)
+        new_nickname = request.data.get('nickname')
+        if User.objects.filter(nickname=new_nickname).exists():
+            return Response({"error": f"닉네임({new_nickname})이 이미 존재합니다."}, status=400)
+        user.nickname = new_nickname
+        user.save()
+        return Response({"message": f"닉네임이 {new_nickname}으로 변경되었습니다."}, status=200)
+
 #프로필 정보 탭
 #/api/user/info
 class UserInfoView(APIView):
