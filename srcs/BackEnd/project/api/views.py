@@ -4,7 +4,14 @@ from rest_framework_simplejwt.views import TokenRefreshView
 import json
 import datetime
 
-
+#api/logout/
+class Logout(APIView):
+    def post(self, request):
+        response = Response({"message": "로그아웃이 완료되었습니다."})
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response
+    
 class Index(APIView):
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated] # 있어야 하나?
