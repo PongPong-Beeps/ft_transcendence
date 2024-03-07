@@ -10,8 +10,9 @@ class UserListView(APIView):
 
     def get(self, request):
         users = User.objects.all()
-        # 각 사용자의 닉네임을 'nickname' 키를 가진 딕셔너리로 변환
-        user_list = [{"nickname": user.nickname} for user in users]
+        my_nickname = request.user.nickname #내 닉네임 추출
+        # 각 사용자의 닉네임을 'nickname' 키를 가진 딕셔너리로 변환            # 내 닉네임은 제외
+        user_list = [{"nickname": user.nickname} for user in users if user.nickname != my_nickname]
         # 'userList' 키 아래에 사용자 리스트를 포함하는 JSON 객체로 응답 구성
         response_data = {"userList": user_list}
         return Response(response_data)
