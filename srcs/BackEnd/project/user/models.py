@@ -8,7 +8,10 @@ class User(models.Model):
     #'self' = 같은 모델의 인스턴스를 가리킨다.
     #'blank=True' = 블랙리스트에 아무것도 넣지 않아도 된다.
     #symmetrical=False = 블랙리스트에 상대방이 나를 블랙리스트에 넣었을 때, 나도 상대방을 블랙리스트에 넣지 않아도 된다.
-    blacklist = models.ManyToManyField('self', blank=True, symmetrical=False)
+    #related_name = 이부분이 없으면 blacklist와 firendlist가 같은 이름을 가지게 되어서 충돌이 일어난다.
+    #또한 필드이름과 related_name이 같으면 충돌이 일어난다. ex) blacklist = models.ManyToManyField(related_name='blacklist')
+    blacklist = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='_blacklist') # 블랙리스트
+    friendlist = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='_friendlist') # 친구 목록
     
     # is_online = models.BooleanField(default=False)
     # login_type = models.CharField(max_length=50)
