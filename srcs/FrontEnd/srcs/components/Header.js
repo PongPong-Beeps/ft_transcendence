@@ -1,5 +1,8 @@
 import {importCss} from "../utils/importCss.js";
 import TestButton from "./test.js";
+import {BACKEND, fetchWithAuth} from "../api.js";
+import ErrorPage from "../pages/ErrorPage.js";
+import {navigate} from "../utils/navigate.js";
 
 export default function Header($container) {
     const render = () => {
@@ -20,7 +23,15 @@ export default function Header($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#logout-btn').addEventListener('click', () => {
-           console.log("logout");
+           fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
+               .then(data => {
+                   console.log("[ logout ] 완료");
+                   navigate('/');
+               })
+               .catch(error => {
+                   console.error("[ logout ] " + error.message);
+                   new ErrorPage($container, error.status);
+               });
         });
     }
 
