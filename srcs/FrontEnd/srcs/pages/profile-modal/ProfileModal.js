@@ -115,6 +115,7 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toUnBlock),
         })
         .then(data => {
+            updateBlacklist();
             console.log('Success:', data);
         })
         .catch(error => {
