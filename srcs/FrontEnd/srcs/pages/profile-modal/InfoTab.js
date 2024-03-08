@@ -55,7 +55,7 @@ function createWinRateBar(winRate, type) {
 
 function createNicknameBox(nickname, isMe) {
     return `
-            <input type="text" id="nickname-input" value="${nickname}" placeholder="${nickname}" ${isMe ? '' : 'disabled'}>
+        <input type="text" id="nickname-input" value="${nickname}" placeholder="${nickname}" ${isMe ? '' : 'disabled'}>
         ${isMe ? '<input type="submit" id="nickname-submit-btn" value="변경">' : ''}
     `;
 }
