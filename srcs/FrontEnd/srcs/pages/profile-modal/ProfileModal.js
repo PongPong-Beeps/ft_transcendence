@@ -72,7 +72,6 @@ export default function ProfileModal($container, nickname, isMe) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
                         event.stopPropagation(); // 이벤트 전파를 막음
                         handleUnBlockButtonClick(blacklist.nickname);
-                        alert(`${blacklist.nickname} 차단해제`);
                     });
                 }
             }
@@ -89,7 +88,6 @@ export default function ProfileModal($container, nickname, isMe) {
                 $container.querySelector('#page').style.display = 'none';
             } else if (event.target.closest('#block-btn')) {
                 handleBlockButtonClick();
-                // alert(`${nickname} 차단`);
             }
         });
     };
