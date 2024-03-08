@@ -11,4 +11,5 @@ urlpatterns = [
     path('info/', views.UserInfoView.as_view(), name='info'),
     path('me/nickname/', views.ChangeNicknameView.as_view(), name='change_nickname'), # 내 프로필 - 닉네임 변경
     path('history/', views.MatchHistoryView.as_view(), name='history'), # 프로필 전적탭
+    path('dummy/', tests.MakeUserAndMatchHistory.as_view(), name='dummy'), #더미데이터 생성
 ]
