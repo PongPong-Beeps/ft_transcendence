@@ -62,7 +62,7 @@ class Login42CallbackView(APIView):
             print(f"Nickname: {user_nickname}")
             save_user_to_db(user_email, user_nickname)
             
-            user = User.objects.get(nickname=user_nickname)
+            user = User.objects.get(email=user_email)
             print("user: ", user)
             jwt_token = create_jwt_token(user)
             print("jwt_token: ", jwt_token)
