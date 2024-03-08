@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User, MatchHistory
 from rest_framework.permissions import IsAuthenticated
-from .serializer import BlackListSerializer #가정한 시리얼라이저 임포트 경로
+from .serializer import BlackListSerializer, MatchHistorySerializer #가정한 시리얼라이저 임포트 경로
 
 #/api/user/list
 class UserListView(APIView):
@@ -10,8 +10,9 @@ class UserListView(APIView):
 
     def get(self, request):
         users = User.objects.all()
-        # 각 사용자의 닉네임을 'nickname' 키를 가진 딕셔너리로 변환
-        user_list = [{"nickname": user.nickname} for user in users]
+        my_nickname = request.user.nickname #내 닉네임 추출
+        # 각 사용자의 닉네임을 'nickname' 키를 가진 딕셔너리로 변환            # 내 닉네임은 제외
+        user_list = [{"nickname": user.nickname} for user in users if user.nickname != my_nickname]
         # 'userList' 키 아래에 사용자 리스트를 포함하는 JSON 객체로 응답 구성
         response_data = {"userList": user_list}
         return Response(response_data)
@@ -96,7 +97,7 @@ class ChangeNicknameView(APIView):
 class UserInfoView(APIView):
     # permission_classes = [IsAuthenticated]
     
-    def calculate_user_info(self, user):
+    def calculate_user_info(self, user, data):
         nickname = user.nickname
 
         total_matches = MatchHistory.objects.filter(user=user).count()
@@ -125,13 +126,15 @@ class UserInfoView(APIView):
     
         hard_winning_percentage = hard_match_win / hard_total_matches * 100 if hard_total_matches != 0 else 0
         print("hard_winning_percentage: ", hard_winning_percentage)
-    
+                    
         response_data = {
             #image : user.image, #추후 이미지도 추가해야함
             "nickname": nickname,
             "total": total_winning_percentage,
             "easy": easy_winning_percentage,
             "hard": hard_winning_percentage,
+            "freind": data['is_friend'], #친구인지 여부
+            "block": data['is_blocked'], #블랙리스트에 있는지 여부
         }
         return response_data
 
@@ -139,14 +142,56 @@ class UserInfoView(APIView):
     def get(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
-        response_data = self.calculate_user_info(user)
-        return Response(response_data)    
+        
+        #친구여부, 블랙여부 데이터, 본인 자신이니 친구도 블랙도 아님
+        data = {
+            'is_friend' : False,
+            'is_blocked' : False,
+        }
+        response_data = self.calculate_user_info(user, data)
+        return Response(response_data)
     
     # get 이면 나의 프로필 정보 리턴
     def post(self, request):
         target = request.data.get('nickname')
         user_target = User.objects.get(nickname=target)
         
-        response_data = self.calculate_user_info(user_target)
+        # 현재 로그인한 나의 정보
+        user_id = request.user.id
+        user_me = User.objects.get(id=user_id)
+        
+        #친구여부, 블랙여부 데이터
+        data = {
+            'is_friend' : False,
+            'is_blocked' : False,
+        }
+        
+        #친구인지 여부, 블랙리스트에 있는지 여부
+        if user_me.friendlist.filter(nickname=target).exists():
+            data['is_friend'] = True
+        if user_me.blacklist.filter(nickname=target).exists():
+            data['is_blocked'] = True
+            
+        response_data = self.calculate_user_info(user_target, data)
         return Response(response_data)
     
+#/api/user/history
+#[ GET ](나의 전적 보기)
+#[ POST ](다른 유저 전적 보기)
+class MatchHistoryView(APIView):
+    def get(self, request): #내 프로필 - 전적
+        user_id = request.user.id
+        user_me = User.objects.get(id=user_id)
+        my_match = MatchHistory.objects.filter(user=user_me)
+        serializer = MatchHistorySerializer(my_match, many=True) #many=True : 하나가 아닌 여러개의 데이터를 직렬화
+        response_data = {"history" : serializer.data}
+        return Response(response_data, status=200)
+        
+        
+    def post(self, request): #상대 프로필 - 전적
+        target_nickname = request.data.get('nickname')
+        target_user = User.objects.get(nickname=target_nickname)
+        target_match = MatchHistory.objects.filter(user=target_user)
+        serializer = MatchHistorySerializer(target_match, many=True)
+        response_data = {"history" : serializer.data}
+        return Response(response_data, status=200)
