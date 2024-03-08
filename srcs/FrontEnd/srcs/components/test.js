@@ -8,8 +8,8 @@ export default function TestButton($container) {
 
     button.addEventListener('click', () => {
         alert('테스트 버튼이 클릭되었습니다!');
-        
-        fetch('https://127.0.0.1/api/', {
+
+        fetch('https://127.0.0.1/api/user/dummy/', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${getCookie("access_token")}`,

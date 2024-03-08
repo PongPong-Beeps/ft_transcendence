@@ -3,6 +3,9 @@ import FriendCell from "../../components/user-list/FriendCell.js";
 import BlacklistCell from "./BlacklistCell.js";
 import InfoTab from "./InfoTab.js";
 import {importCss} from "../../utils/importCss.js";
+import useState from "../../utils/useState.js";
+import {BACKEND, fetchWithAuth} from "../../api.js";
+import ErrorPage from "../ErrorPage.js";
 
 /**
  * @param {HTMLElement} $container
@@ -10,12 +13,7 @@ import {importCss} from "../../utils/importCss.js";
  * @param {boolean} isMe
  */
 export default function ProfileModal($container, nickname, isMe) {
-    const historyDummyData = [
-        { date: "23.02.01", opponent: "wooshin", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "jikoo", matchType: "토너먼트", result: "패" },
-        { date: "23.01.30", opponent: "jonchoi", matchType: "1vs1", result: "승" },
-        { date: "23.01.30", opponent: "geonwule", matchType: "1vs1", result: "승" }
-    ];
+    let [getHistory, setHistory] = useState([], this, 'renderHistory');
 
     const blacklistDummyData = [
         { nickname: "wooshin" },
@@ -62,6 +60,42 @@ export default function ProfileModal($container, nickname, isMe) {
 
     }
 
+    this.renderHistory = () => {
+        const tableBody = $container.querySelector('#history-tab-container tbody');
+        tableBody.innerHTML = ''; // 기존의 테이블 내용을 클리어
+
+        getHistory().forEach(item => {
+            const row = document.createElement('tr');
+
+            const dateCell = document.createElement('td');
+            dateCell.textContent = item.date;
+            row.appendChild(dateCell);
+
+            const opponentCell = document.createElement('td');
+            opponentCell.textContent = item.opponent;
+            row.appendChild(opponentCell);
+
+            // matchType에 따른 이미지 삽입
+            const matchTypeCell = document.createElement('td');
+            let matchTypeImage = document.createElement('img');
+            if (item.matchType === "1vs1") {
+                matchTypeImage.src = "../../../assets/image/vs.png"; // 1vs1 매치 이미지 경로
+            } else if (item.matchType === "T") {
+                matchTypeImage.src = "../../../assets/image/tournament.png"; // 토너먼트 매치 이미지 경로
+            }
+            matchTypeCell.appendChild(matchTypeImage);
+            row.appendChild(matchTypeCell);
+
+            // 결과에 따른 색상 적용
+            const resultCell = document.createElement('td');
+            resultCell.textContent = item.result;
+            resultCell.style.color = item.result === "승" ? "#2A46D9" : "#E73C3C"; // 승리는 파란색, 패배는 빨간색
+            row.appendChild(resultCell);
+
+            tableBody.appendChild(row);
+        });
+    }
+
     const setupEventListener = () => {
         $container.querySelectorAll('.profile-modal-tab-button').forEach(button => {
             button.addEventListener('click', function() {
@@ -93,43 +127,6 @@ export default function ProfileModal($container, nickname, isMe) {
         }
     }
 
-    const updateHistory = () => {
-        const tableBody = $container.querySelector('#history-tab-container tbody');
-        if (!tableBody) return; // tbody가 없으면 함수 종료
-        tableBody.innerHTML = ''; // 기존의 테이블 내용을 클리어
-
-        historyDummyData.forEach(item => {
-            const row = document.createElement('tr');
-
-            const dateCell = document.createElement('td');
-            dateCell.textContent = item.date;
-            row.appendChild(dateCell);
-
-            const opponentCell = document.createElement('td');
-            opponentCell.textContent = item.opponent;
-            row.appendChild(opponentCell);
-
-            // matchType에 따른 이미지 삽입
-            const matchTypeCell = document.createElement('td');
-            let matchTypeImage = document.createElement('img');
-            if (item.matchType === "1vs1") {
-                matchTypeImage.src = "../../../assets/image/vs.png"; // 1vs1 매치 이미지 경로
-            } else if (item.matchType === "토너먼트") {
-                matchTypeImage.src = "../../../assets/image/tournament.png"; // 토너먼트 매치 이미지 경로
-            }
-            matchTypeCell.appendChild(matchTypeImage);
-            row.appendChild(matchTypeCell);
-
-            // 결과에 따른 색상 적용
-            const resultCell = document.createElement('td');
-            resultCell.textContent = item.result;
-            resultCell.style.color = item.result === "승" ? "#2A46D9" : "#E73C3C"; // 승리는 파란색, 패배는 빨간색
-            row.appendChild(resultCell);
-
-            tableBody.appendChild(row);
-        });
-    }
-
     const updateBlacklist = () => {
         const blacklist = $container.querySelector('#blacklist-tab-container');
         if (blacklist) {
@@ -148,21 +145,32 @@ export default function ProfileModal($container, nickname, isMe) {
     }
 
     const init = () => {
-        // 초기 선택 상태 설정
-        if (!isMe) {
-            const blacklistBtn = $container.querySelector('#blacklist-btn');
-            if (blacklistBtn) {
-                blacklistBtn.classList.add('hidden');
-            }
+        let option = {};
+        if (isMe) {
+            updateBlacklist();
+        } else {
+            option = {
+                method: 'POST',
+                body: JSON.stringify({ nickname: nickname }),
+            };
+            $container.querySelector('#blacklist-btn').classList.add('hidden');
         }
+        // 데이터 채우기
+        fetchWithAuth(`${BACKEND}/user/history/`, option)
+            .then(data => {
+                console.log("[ fetchHistoryData ] 전적 리스트 패치 완료");
+                setHistory(data.history);
+            })
+            .catch(error => {
+                console.error("[ fetchHistoryData ] " + error.message);
+                new ErrorPage($container, error.status);
+            })
+        updateInfo();
+        // 초기 선택 상태 설정
         const infoBtn = $container.querySelector('#info-btn');
         if (infoBtn) {
             infoBtn.click(); // 초기 탭으로 정보 탭 설정
         }
-        // 데이터 채우기
-        updateInfo();
-        updateHistory();
-        updateBlacklist();
     }
 
     importCss("assets/css/profile-modal.css");
