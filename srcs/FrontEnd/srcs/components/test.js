@@ -3,12 +3,11 @@ import getCookie from "../utils/cookie.js";
 export default function TestButton($container) {
     const button = document.createElement('button');
     button.id = 'back-test-btn';
-    button.textContent = '테스트';
+    button.textContent = '더미';
     $container.appendChild(button);
 
     button.addEventListener('click', () => {
-        alert('테스트 버튼이 클릭되었습니다!');
-
+        alert('더미 데이터가 생성 되었을겁니다!ㅎㅎ');
         fetch('https://127.0.0.1/api/user/dummy/', {
             method: 'GET',
             headers: {
