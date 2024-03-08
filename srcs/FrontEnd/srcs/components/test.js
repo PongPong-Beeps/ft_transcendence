@@ -8,7 +8,6 @@ export default function TestButton($container) {
 
     button.addEventListener('click', () => {
         alert('더미 데이터가 생성 되었을겁니다!ㅎㅎ');
-        
         fetch('https://127.0.0.1/api/user/dummy/', {
             method: 'GET',
             headers: {

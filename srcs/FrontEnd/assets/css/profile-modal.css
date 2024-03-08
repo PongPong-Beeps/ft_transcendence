@@ -69,7 +69,7 @@
     filter: brightness(70%);
 }
 
-#profile-modal-tab {
+#profile-modal-tab-content-container {
     flex: 10;
     border-radius: 0 0 10px 10px;
     background-color: #82A540;
@@ -78,62 +78,67 @@
     padding: 10px;
 }
 
-#history-tab-container, #blacklist-tab-container {
+#history-content, #blacklist-content {
     overflow-y: auto;
     width: 100%;
     max-height: 360px;
-    /* background-color: #779630; */
     padding: 10px;
     border-radius: 10px;
 }
 
 /* 스크롤 막대 스타일 */
-#history-tab-container::-webkit-scrollbar, #blacklist-tab-container::-webkit-scrollbar {
+#history-content::-webkit-scrollbar, #blacklist-content::-webkit-scrollbar {
     width: 8px;
     border-radius: 4px;
 }
 
 /* 스크롤 바 스타일 */
-#history-tab-container::-webkit-scrollbar-thumb, #blacklist-tab-container::-webkit-scrollbar-thumb {
+#history-content::-webkit-scrollbar-thumb, #blacklist-content::-webkit-scrollbar-thumb {
     background-color: #5C7320;
     border-radius: 4px;
 }
 
 /* 스크롤 바 배경 스타일 */
-#history-tab-container::-webkit-scrollbar-track, #blacklist-tab-container::-webkit-scrollbar-track {
+#history-content::-webkit-scrollbar-track, #blacklist-content::-webkit-scrollbar-track {
     background-color: #779630;
     border-radius: 4px;
 }
 
-#history-tab-container table {
+#history-message {
+    font-size: 1.1em;
+    text-align: center;
+    margin: 20px;
+}
+
+#history-content table {
     width: 100%;
     border-collapse: collapse;
 }
 
-#history-tab-container th {
+#history-content th {
     border-bottom: 3px solid #D3E287;
 }
 
-#history-tab-container td:first-child {
+#history-content td:first-child {
     border-right: 3px solid #D3E287;
 }
 
-#history-tab-container th, #history-tab-container td {
+#history-content th, #history-content td {
     height: 40px;
     text-align: center;
     padding: 8px;
     vertical-align: middle;
 }
 
-#history-tab-container th {
+#history-content th {
     font-size: 1.1em;
 }
 
-#history-tab-container td {
+#history-content td {
     font-size: 0.9em;
 }
 
-#history-tab-container td img{
+#history-content td img{
     height: 25px;
     width: auto;
 }
@@ -174,7 +179,7 @@
 }
 
 /* ~~~~~~~~~info tab container below~~~~~~~~~~ */
-#info-tab-container {
+#info-content {
     display: flex; 
     flex-direction: column;
     width: 100%;
@@ -306,8 +311,6 @@
     justify-content: center;
     align-items: center;
     width: 20%;
-    gap: none;
-    padding: none;
     border-radius: 10px;
 }
 
