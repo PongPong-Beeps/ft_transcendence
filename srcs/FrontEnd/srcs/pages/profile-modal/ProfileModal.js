@@ -72,7 +72,6 @@ export default function ProfileModal($container, nickname, isMe) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
                         event.stopPropagation(); // 이벤트 전파를 막음
                         handleUnBlockButtonClick(blacklist.nickname);
-                        alert(`${blacklist.nickname} 차단해제`);
                     });
                 }
             }
@@ -116,6 +115,7 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toUnBlock),
         })
         .then(data => {
+            updateBlacklist();
             console.log('Success:', data);
         })
         .catch(error => {
