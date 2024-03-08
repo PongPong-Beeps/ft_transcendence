@@ -87,9 +87,10 @@ export default function ProfileModal($container, nickname, isMe) {
                 handleProfileModalTabButtonClick(event);
             } else if (event.target.closest('#ok-btn')) {
                 $container.querySelector('#page').style.display = 'none';
+            } else if (event.target.closest('#nickname-submit-btn')) {
+                handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
                 handleBlockButtonClick();
-                // alert(`${nickname} 차단`);
             }
         });
     };
@@ -136,6 +137,36 @@ export default function ProfileModal($container, nickname, isMe) {
         $container.querySelectorAll('.profile-modal-tab-content').forEach(tab => {
             tab.style.display = tab.id === selectedTabId ? 'block' : 'none';
         });
+    };
+
+    const handleUpdateNicknameButtonClick = (button) => {
+        const nicknameInput = $container.querySelector('#nickname-input');
+        if (nicknameInput) {
+            fetchWithAuth(`${BACKEND}/user/me/nickname/`, {
+                method: 'POST',
+                body: JSON.stringify({ nickname: nicknameInput.value }),
+            })
+                .then(() => {
+                    nicknameInput.placeholder = nicknameInput.value;
+                    console.log("[ fetchNickname ] 닉네임 변경 완료");
+                })
+                .catch(error => {
+                    if (error.status === 400) {
+                        shakeButton(button);
+                    } else {
+                        console.error("[ fetchNickname ] " + error.message);
+                        new ErrorPage($container, error.status);
+                    }
+                })
+        }
+    };
+
+    const shakeButton = (button) => {
+        button.classList.add('shake-animation');
+
+        setTimeout(() => {
+            button.classList.remove('shake-animation');
+        }, 500);
     };
 
     const updateInfo = () => {
