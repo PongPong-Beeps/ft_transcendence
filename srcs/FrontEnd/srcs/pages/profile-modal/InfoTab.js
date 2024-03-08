@@ -1,7 +1,7 @@
 export default function InfoTab(nickname, isMe, infoDummyData) {
-    const totalWinRateBar = createWinRateBar(infoDummyData.totalWinRate, '승률');
-    const oneOnOneWinRateBar = createWinRateBar(infoDummyData.oneOnOneWinRate, '1vs1');
-    const tournamentWinRateBar = createWinRateBar(infoDummyData.tournamentWinRate, '토너먼트');
+    const totalWinRateBar = createWinRateBar(infoDummyData.totalWinRate, 'Total');
+    const easyWinRateBar = createWinRateBar(infoDummyData.easyWinRate, 'Easy');
+    const hardWinRateBar = createWinRateBar(infoDummyData.hardWinRate, 'Hard');
     const nicknameBox = createNicknameBox(nickname, isMe);
     const profilePicture = createProfilePicture(isMe);
     return `
@@ -15,11 +15,11 @@ export default function InfoTab(nickname, isMe, infoDummyData) {
             <div id="total-win-rate-container">
                 ${totalWinRateBar}
             </div>
-            <div id="one-on-one-win-rate-container">
-                ${oneOnOneWinRateBar}
+            <div id="easy-win-rate-container">
+                ${easyWinRateBar}
             </div>
-            <div id="tournament-win-rate-container">
-                ${tournamentWinRateBar}
+            <div id="hard-win-rate-container">
+                ${hardWinRateBar}
             </div>
         </div>
      `;

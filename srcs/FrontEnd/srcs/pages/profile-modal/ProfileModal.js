@@ -23,7 +23,7 @@ export default function ProfileModal($container, nickname, isMe) {
     let blacklistData = [];
 
     const infoDummyData = [
-        { totalWinRate: 50, oneOnOneWinRate: 34, tournamentWinRate: 100 }
+        { totalWinRate: 50, easyWinRate: 34, hardWinRate: 100 }
     ]
 
     const render = () => {
