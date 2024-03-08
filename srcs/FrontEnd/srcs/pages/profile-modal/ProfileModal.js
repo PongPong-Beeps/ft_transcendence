@@ -12,7 +12,7 @@ import HistoryTab from "./HistoryTab.js";
  * @param {boolean} isMe
  */
 export default function ProfileModal($container, nickname, isMe) {
-    let [getHistory, setHistory] = useState([], this, 'renderHistory');
+    let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
 
     const blacklistDummyData = [
         { nickname: "wooshin" },
@@ -39,9 +39,9 @@ export default function ProfileModal($container, nickname, isMe) {
                                 <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
                             </div>
                             <div id="profile-modal-tab">
-                                <div id="info-tab-container"></div>
-                                <div id="history-tab-container">${HistoryTab()}</div>
-                                <div id="blacklist-tab-container"></div>
+                                <div class="profile-modal-tab-content" id="info-tab-container"></div>
+                                <div class="profile-modal-tab-content" id="history-tab-container"></div>
+                                <div class="profile-modal-tab-content" id="blacklist-tab-container"></div>
                             </div>
                         </div>
                         <div id="profile-modal-button-container">
@@ -60,62 +60,32 @@ export default function ProfileModal($container, nickname, isMe) {
     }
 
     this.renderHistory = () => {
-        const tableBody = $container.querySelector('#history-tab-container tbody');
-        tableBody.innerHTML = ''; // 기존의 테이블 내용을 클리어
-
-        getHistory().forEach(item => {
-            const row = document.createElement('tr');
-
-            const dateCell = document.createElement('td');
-            dateCell.textContent = item.date;
-            row.appendChild(dateCell);
-
-            const opponentCell = document.createElement('td');
-            opponentCell.textContent = item.opponent;
-            row.appendChild(opponentCell);
-
-            // matchType에 따른 이미지 삽입
-            const matchTypeCell = document.createElement('td');
-            let matchTypeImage = document.createElement('img');
-            if (item.matchType === "1vs1") {
-                matchTypeImage.src = "../../../assets/image/vs.png"; // 1vs1 매치 이미지 경로
-            } else if (item.matchType === "T") {
-                matchTypeImage.src = "../../../assets/image/tournament.png"; // 토너먼트 매치 이미지 경로
-            }
-            matchTypeCell.appendChild(matchTypeImage);
-            row.appendChild(matchTypeCell);
-
-            // 결과에 따른 색상 적용
-            const resultCell = document.createElement('td');
-            resultCell.textContent = item.result;
-            resultCell.style.color = item.result === "승" ? "#2A46D9" : "#E73C3C"; // 승리는 파란색, 패배는 빨간색
-            row.appendChild(resultCell);
-
-            tableBody.appendChild(row);
-        });
+        const historyTabContainer = $container.querySelector('#history-tab-container');
+        if (historyTabContainer) {
+            historyTabContainer.innerHTML = HistoryTab(getHistory());
+        }
     }
 
     const setupEventListener = () => {
-        $container.querySelectorAll('.profile-modal-tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                let selectedTabId = this.id.replace('-btn', '-tab-container'); // 버튼 ID에서 탭 컨테이너 ID로 변환
-                $container.querySelectorAll('.profile-modal-tab-button').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                this.classList.add('selected');
-
-                // 모든 탭 컨텐츠 숨기기
-                $container.querySelectorAll('#profile-modal-tab > div').forEach(tab => {
-                    tab.style.display = 'none';
-                });
-
-                // 선택된 탭 컨텐츠만 표시
-                $container.querySelector(`#${selectedTabId}`).style.display = 'block';
-            });
+        const profileModalContainer = $container.querySelector('#profile-modal-container');
+        profileModalContainer.addEventListener('click', (event) => {
+            if (event.target.closest('.profile-modal-tab-button')) {
+                handleProfileModalTabButtonClick(event);
+            } else if (event.target.closest('#ok-btn')) {
+                $container.querySelector('#page').style.display = 'none';
+            }
         });
+    }
 
-        $container.querySelector('#ok-btn').addEventListener('click', () => {
-            $container.querySelector('#page').style.display = 'none';
+    const handleProfileModalTabButtonClick = (event) => {
+        const button = event.target;
+        $container.querySelectorAll('.profile-modal-tab-button').forEach(btn => {
+            btn.classList.remove('selected')
+        });
+        button.classList.add('selected');
+        const selectedTabId = button.id.replace('-btn', '-tab-container');
+        $container.querySelectorAll('.profile-modal-tab-content').forEach(tab => {
+            tab.style.display = tab.id === selectedTabId ? 'block' : 'none';
         });
     }
 
@@ -157,14 +127,8 @@ export default function ProfileModal($container, nickname, isMe) {
         // 데이터 채우기
         fetchWithAuth(`${BACKEND}/user/history/`, option)
             .then(data => {
-                if (data.history.length) {
-                    setHistory(data.history);
-                } else {
-                    $container.querySelector('#history-message').style.display = 'block';
-                    $container.querySelector('#history-table').style.display = 'none';
-                }
+                setHistory(data.history);
                 console.log("[ fetchHistoryData ] 전적 리스트 패치 완료");
-
             })
             .catch(error => {
                 console.error("[ fetchHistoryData ] " + error.message);

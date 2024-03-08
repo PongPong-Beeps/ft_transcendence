@@ -1,19 +1,30 @@
-export default function HistoryTab() {
+export default function HistoryTab(historyData) {
+    if (historyData.length === 0) {
+        return `<div id="history-message">데이터가 없습니다</div>`;
+    }
+
+    let tableRows = historyData.map(item => `
+        <tr>
+            <td>${item.date}</td>
+            <td>${item.opponent}</td>
+            <td>${item.matchType === "1vs1" ? '<img src="../../../assets/image/vs.png" alt="vs">' : '<img src="../../../assets/image/tournament.png" alt="tournament">'}</td>
+            <td style="color: ${item.result === "승" ? '#2A46D9' : '#E73C3C'}">${item.result}</td>
+        </tr>
+    `).join('');
+
     return `
-        <div id="history-message">데이터가 없습니다</div>
-        <div id="history-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>날짜</th>
-                        <th>상대</th>
-                        <th>매치 종류</th>
-                        <th>결과</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>상대</th>
+                    <th>매치 종류</th>
+                    <th>결과</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
     `;
 }
