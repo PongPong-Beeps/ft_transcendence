@@ -34,6 +34,9 @@ ALLOWED_HOSTS = ['13.209.222.162', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'corsheaders',	#cors
+	'channels',
+	'daphne',
+	'chat',
     'user',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -96,6 +99,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
+ASGI_APPLICATION= 'project.asgi.application' #Websocket
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
