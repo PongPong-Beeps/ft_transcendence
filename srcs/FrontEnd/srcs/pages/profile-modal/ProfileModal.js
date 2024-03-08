@@ -38,10 +38,10 @@ export default function ProfileModal($container, nickname, isMe) {
                                 <button class="profile-modal-tab-button non-outline-btn" id="history-btn">전적</button>
                                 <button class="profile-modal-tab-button non-outline-btn" id="blacklist-btn">블랙리스트</button>
                             </div>
-                            <div id="profile-modal-tab">
-                                <div class="profile-modal-tab-content" id="info-tab-container"></div>
-                                <div class="profile-modal-tab-content" id="history-tab-container"></div>
-                                <div class="profile-modal-tab-content" id="blacklist-tab-container"></div>
+                            <div id="profile-modal-tab-content-container">
+                                <div class="profile-modal-tab-content" id="info-content"></div>
+                                <div class="profile-modal-tab-content" id="history-content"></div>
+                                <div class="profile-modal-tab-content" id="blacklist-content"></div>
                             </div>
                         </div>
                         <div id="profile-modal-button-container">
@@ -55,16 +55,18 @@ export default function ProfileModal($container, nickname, isMe) {
                 </div>
             `;
             page.style.display = 'block';
+            const infoButton = $container.querySelector('#info-btn');
+            toggleProfileModalTabContentByButton(infoButton); // 초기 설정
         }
 
-    }
+    };
 
     this.renderHistory = () => {
-        const historyTabContainer = $container.querySelector('#history-tab-container');
+        const historyTabContainer = $container.querySelector('#history-content');
         if (historyTabContainer) {
             historyTabContainer.innerHTML = HistoryTab(getHistory());
         }
-    }
+    };
 
     const setupEventListener = () => {
         const profileModalContainer = $container.querySelector('#profile-modal-container');
@@ -75,29 +77,33 @@ export default function ProfileModal($container, nickname, isMe) {
                 $container.querySelector('#page').style.display = 'none';
             }
         });
-    }
+    };
 
     const handleProfileModalTabButtonClick = (event) => {
         const button = event.target;
         $container.querySelectorAll('.profile-modal-tab-button').forEach(btn => {
             btn.classList.remove('selected')
         });
-        button.classList.add('selected');
-        const selectedTabId = button.id.replace('-btn', '-tab-container');
+        toggleProfileModalTabContentByButton(button);
+    };
+
+    const toggleProfileModalTabContentByButton = (selectedButton) => {
+        selectedButton.classList.add('selected');
+        const selectedTabId = selectedButton.id.replace('-btn', '-content');
         $container.querySelectorAll('.profile-modal-tab-content').forEach(tab => {
             tab.style.display = tab.id === selectedTabId ? 'block' : 'none';
         });
-    }
+    };
 
     const updateInfo = () => {
-        const infoTabContainer = $container.querySelector('#info-tab-container');
+        const infoTabContainer = $container.querySelector('#info-content');
         if (infoTabContainer) {
             infoTabContainer.innerHTML = InfoTab(nickname, isMe, infoDummyData[0]);
         }
     }
 
     const updateBlacklist = () => {
-        const blacklist = $container.querySelector('#blacklist-tab-container');
+        const blacklist = $container.querySelector('#blacklist-content');
         if (blacklist) {
             blacklist.innerHTML = blacklistDummyData.map(blacklist => BlacklistCell(blacklist.nickname)).join('');
 
@@ -113,7 +119,7 @@ export default function ProfileModal($container, nickname, isMe) {
         }
     }
 
-    const init = () => {
+    const fetchProfileModalData = () => {
         let option = {};
         if (isMe) {
             updateBlacklist();
@@ -135,15 +141,10 @@ export default function ProfileModal($container, nickname, isMe) {
                 new ErrorPage($container, error.status);
             })
         updateInfo();
-        // 초기 선택 상태 설정
-        const infoBtn = $container.querySelector('#info-btn');
-        if (infoBtn) {
-            infoBtn.click(); // 초기 탭으로 정보 탭 설정
-        }
-    }
+    };
 
     importCss("assets/css/profile-modal.css");
     render();
     setupEventListener();
-    init();
+    fetchProfileModalData();
 }
