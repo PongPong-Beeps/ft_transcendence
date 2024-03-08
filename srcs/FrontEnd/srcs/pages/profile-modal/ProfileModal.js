@@ -1,11 +1,10 @@
-import HistoryTable from "./HistoryTable.js";
-import FriendCell from "../../components/user-list/FriendCell.js";
 import BlacklistCell from "./BlacklistCell.js";
 import InfoTab from "./InfoTab.js";
 import {importCss} from "../../utils/importCss.js";
 import useState from "../../utils/useState.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
 import ErrorPage from "../ErrorPage.js";
+import HistoryTab from "./HistoryTab.js";
 
 /**
  * @param {HTMLElement} $container
@@ -41,7 +40,7 @@ export default function ProfileModal($container, nickname, isMe) {
                             </div>
                             <div id="profile-modal-tab">
                                 <div id="info-tab-container"></div>
-                                <div id="history-tab-container">${HistoryTable()}</div>
+                                <div id="history-tab-container">${HistoryTab()}</div>
                                 <div id="blacklist-tab-container"></div>
                             </div>
                         </div>
@@ -158,8 +157,14 @@ export default function ProfileModal($container, nickname, isMe) {
         // 데이터 채우기
         fetchWithAuth(`${BACKEND}/user/history/`, option)
             .then(data => {
+                if (data.history.length) {
+                    setHistory(data.history);
+                } else {
+                    $container.querySelector('#history-message').style.display = 'block';
+                    $container.querySelector('#history-table').style.display = 'none';
+                }
                 console.log("[ fetchHistoryData ] 전적 리스트 패치 완료");
-                setHistory(data.history);
+
             })
             .catch(error => {
                 console.error("[ fetchHistoryData ] " + error.message);
