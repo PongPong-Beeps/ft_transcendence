@@ -13,6 +13,12 @@ class User(models.Model):
     blacklist = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='_blacklist') # 블랙리스트
     friendlist = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='_friendlist') # 친구 목록
     
+    #upload_to : 파일이 저장될 경로를 지정하는 매개변수 , 
+    #하지만 views에서 default_storage.save()를 사용하여 'user_images/ + user.nickname + /'로 저장할 예정
+    #blank=True : 폼에서 빈칸으로 제출해도 되는지 여부
+    #null=True : 데이터베이스에 NULL값을 저장할 수 있는지 여부
+    image_file = models.ImageField(upload_to='user_images/', blank=True, null=True) # 프로필 사진
+    
     # is_online = models.BooleanField(default=False)
     # login_type = models.CharField(max_length=50)
 
