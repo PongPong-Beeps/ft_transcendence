@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from .models import User, MatchHistory
 from rest_framework.permissions import IsAuthenticated
 from .serializer import BlackListSerializer, MatchHistorySerializer #가정한 시리얼라이저 임포트 경로
+from django.core.files.storage import default_storage #파일을 저장하기 위한 모듈
+from django.core.files.base import ContentFile #파일을 읽고 쓰기 위한 모듈
+import base64 #base64 인코딩을 위한 모듈
 
 #/api/user/list
 class UserListView(APIView):
@@ -195,3 +198,50 @@ class MatchHistoryView(APIView):
         serializer = MatchHistorySerializer(target_match, many=True)
         response_data = {"history" : serializer.data}
         return Response(response_data, status=200)
+
+
+#/api/user/me/image/ 내 프로필 이미지 변경
+#[ POST ] 이미지 변경하기
+#[ GET ]  이미지 가져오기(임시) -> 추후에 함수로 빼서 내 프로필, 프로필 모달에서 사용할 예정
+class ChangeImageView(APIView):
+    #permission_classes = [IsAuthenticated]
+    def post(self, request):
+        try :
+            user_id = request.user.id
+            user = User.objects.get(id=user_id)
+            image = request.data.get('image') # body내 key값이 'image'인 value를 가져옴
+            # resize_image(image, 150, 150) # 이미지 리사이징 (150x150으로 리사이징) 추후 필요 # django-imagekit 라이브러리 활용
+            if ('user_images/' + user.nickname + '/') in user.image_file.name:
+                default_storage.delete(user.image_file.name) # 기존 이미지 삭제
+            #django컨테이너 내부 WORKDIR / user_images/geonwule/ 에 이미지 저장
+            file_path = default_storage.save('user_images/' + user.nickname + '/' + image.name, ContentFile(image.read()))
+            # ImageField에 파일 경로 저장
+            user.image_file = file_path
+            user.save()
+            return Response({"message": "프로필 이미지가 정상적으로 변경되었습니다"}, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+    
+    def get(self, request):
+        try :
+            user_id = request.user.id
+            user = User.objects.get(id=user_id)
+            # 이미지 파일을 읽어옵니다.
+            image_file = user.image_file
+            #with는 파일을 안전하게 열고 닫는다.
+            with open(image_file.path, "rb") as f: # "rb" : 이미지 파일을 바이너리 읽기 모드로 엽니다.
+                image_data = f.read()
+
+            # 이미지를 Base64로 인코딩합니다.
+            # image -> base64로 인코딩 -> FrontEnd에서 다시 디코딩하여 이미지로 사용 (<img src="data:image/png;base64, <base64 code>" alt="이미지">)
+            image_base64 = base64.b64encode(image_data)
+            print("image_base64: ", image_base64)
+
+            # 응답 데이터에 이미지 Base64 문자열을 포함시킵니다.
+            response_data = {
+                "message": "프로필 이미지가 정상적으로 가져와졌습니다",
+                "image": image_base64,
+            }
+            return Response(response_data, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
