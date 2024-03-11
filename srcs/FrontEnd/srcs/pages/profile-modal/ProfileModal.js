@@ -13,13 +13,7 @@ import HistoryTab from "./HistoryTab.js";
  */
 export default function ProfileModal($container, nickname, isMe) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
-
-    const blacklistDummyData = [
-        { nickname: "wooshin" },
-        { nickname: "jikoo" },
-        { nickname: "geonwule"},
-        { nickname: "jonchoi"}
-    ]
+    let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
 
     const infoDummyData = [
         { totalWinRate: 50, oneOnOneWinRate: 34, tournamentWinRate: 100 }
@@ -68,6 +62,23 @@ export default function ProfileModal($container, nickname, isMe) {
         }
     };
 
+    this.renderBlacklist = () => {
+        const blacklist = $container.querySelector('#blacklist-content');
+        if (blacklist) {
+            blacklist.innerHTML = getBlacklist().map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+            getBlacklist().forEach(blacklist => {
+                const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
+                if (cell) {
+                    cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
+                        event.stopPropagation(); // 이벤트 전파를 막음
+                        handleUnBlockButtonClick(blacklist.nickname);
+                    });
+                }
+            }
+            );
+        }
+    }           
+
     const setupEventListener = () => {
         const profileModalContainer = $container.querySelector('#profile-modal-container');
         profileModalContainer.addEventListener('click', (event) => {
@@ -77,9 +88,40 @@ export default function ProfileModal($container, nickname, isMe) {
                 $container.querySelector('#page').style.display = 'none';
             } else if (event.target.closest('#nickname-submit-btn')) {
                 handleUpdateNicknameButtonClick(event.target);
+            } else if (event.target.closest('#block-btn')) {
+                handleBlockButtonClick();
             }
         });
     };
+    
+    const handleBlockButtonClick = () => {
+        const toBlock = { "nickname": nickname };
+        fetchWithAuth(`${BACKEND}/user/block/`, {
+            method: 'POST',
+            body: JSON.stringify(toBlock),
+        })
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    const handleUnBlockButtonClick = (unblockNickname) => {
+        const toUnBlock = { "nickname": unblockNickname };
+        fetchWithAuth(`${BACKEND}/user/unblock/`, {
+            method: 'POST',
+            body: JSON.stringify(toUnBlock),
+        })
+        .then(data => {
+            updateBlacklist();
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
     const handleProfileModalTabButtonClick = (event) => {
         const button = event.target;
@@ -149,20 +191,15 @@ export default function ProfileModal($container, nickname, isMe) {
     }
 
     const updateBlacklist = () => {
-        const blacklist = $container.querySelector('#blacklist-content');
-        if (blacklist) {
-            blacklist.innerHTML = blacklistDummyData.map(blacklist => BlacklistCell(blacklist.nickname)).join('');
-
-            blacklistDummyData.forEach(blacklist => {
-                const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
-                if (cell) {
-                    cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
-                        event.stopPropagation(); // 이벤트 전파를 막음
-                        alert(`${blacklist.nickname} 차단해제`);
-                    });
-                }
+        fetchWithAuth(`${BACKEND}/user/blacklist/`)
+            .then(data => {
+                setBlacklist(data.blacklist);
+                console.log("[ updateBlacklist ] 블랙리스트 패치 완료");
+            })
+            .catch(error => {
+                console.error("[ updateBlacklist ] " + error.message);
+                new ErrorPage($container, error.status);
             });
-        }
     }
 
     const fetchProfileModalData = () => {
