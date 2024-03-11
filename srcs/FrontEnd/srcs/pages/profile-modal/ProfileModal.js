@@ -163,7 +163,7 @@ export default function ProfileModal($container, nickname, isMe) {
                             nicknameInput.placeholder = "2~8글자 사이로 입력";
                             break;
                         case 403:
-                            nicknameInput.placeholder = "숫자, 영어, 한글만 가능";
+                            nicknameInput.placeholder = "숫자, 영어, 한글만 입력";
                             break;
                         default:
                             console.error("[ fetchNickname ] " + error.message);
