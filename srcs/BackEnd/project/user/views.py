@@ -83,13 +83,13 @@ class ChangeNicknameView(APIView):
         user = User.objects.get(id=user_id)
         new_nickname = request.data.get('nickname')
         if new_nickname == user.nickname:
-            return Response({"error": "기존 닉네임과 동일합니다."}, status=400)
+            return Response({"error": "기존 닉네임과 동일"}, status=400)
         elif User.objects.filter(nickname=new_nickname).exists():
-            return Response({"error": f"닉네임({new_nickname})이 이미 존재합니다."}, status=400)
-        elif len(new_nickname) < 3 or len(new_nickname) > 8:
-            return Response({"error": "닉네임은 3자 이상 8자 이하여야 합니다."}, status=400)
+            return Response({"error": f"닉네임({new_nickname}) 이미 존재"}, status=401)
+        elif len(new_nickname) < 2 or len(new_nickname) > 8:
+            return Response({"error": "닉네임은 2자 이상 8자 이하"}, status=402)
         elif not new_nickname.isalnum(): #isalnum 숫자, 알파벳으로만 이루어졌는지 확인하는 파이썬 내장함수
-            return Response({"error": "닉네임은 숫자와 알파벳으로만 이루어져야 합니다."}, status=400)
+            return Response({"error": "닉네임은 숫자와 알파벳만 사용"}, status=403)
         
         user.nickname = new_nickname
         user.save()
