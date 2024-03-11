@@ -99,7 +99,7 @@ export default function ProfileModal($container, nickname, isMe) {
 
     const handleUpdateNicknameButtonClick = (button) => {
         const nicknameInput = $container.querySelector('#nickname-input');
-        if (nicknameInput) {
+        if (nicknameInput/* && nicknameInput.value !== nickname*/) {
             fetchWithAuth(`${BACKEND}/user/me/nickname/`, {
                 method: 'POST',
                 body: JSON.stringify({ nickname: nicknameInput.value }),
@@ -109,12 +109,26 @@ export default function ProfileModal($container, nickname, isMe) {
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
                 })
                 .catch(error => {
-                    if (error.status === 400) {
-                        shakeButton(button);
-                    } else {
-                        console.error("[ fetchNickname ] " + error.message);
-                        new ErrorPage($container, error.status);
+                    switch (error.status) {
+                        case 400:
+                            nicknameInput.placeholder = "기존 닉네임과 동일";
+                            break;
+                        case 401:
+                            nicknameInput.placeholder = "이미 있는 닉네임";
+                            break;
+                        case 402:
+                            nicknameInput.placeholder = "2~8글자 사이로 입력";
+                            break;
+                        case 403:
+                            nicknameInput.placeholder = "숫자, 영어, 한글만 가능";
+                            break;
+                        default:
+                            console.error("[ fetchNickname ] " + error.message);
+                            new ErrorPage($container, error.status);
+                            return;
                     }
+                    shakeButton(button);
+                    nicknameInput.value = "";
                 })
         }
     };
