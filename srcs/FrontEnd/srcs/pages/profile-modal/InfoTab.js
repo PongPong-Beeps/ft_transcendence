@@ -1,9 +1,11 @@
-export default function InfoTab(nickname, isMe, infoDummyData) {
-    const totalWinRateBar = createWinRateBar(infoDummyData.totalWinRate, '승률');
-    const oneOnOneWinRateBar = createWinRateBar(infoDummyData.oneOnOneWinRate, '1vs1');
-    const tournamentWinRateBar = createWinRateBar(infoDummyData.tournamentWinRate, '토너먼트');
+export default function InfoTab(nickname, isMe, data, fromdjangoImg) {
+    const totalWinRateBar = createWinRateBar(data.total, 'TOTAL');
+    const oneOnOneWinRateBar = createWinRateBar(data.easy, 'EASY');
+    const tournamentWinRateBar = createWinRateBar(data.hard, 'HARD');
     const nicknameBox = createNicknameBox(nickname, isMe);
-    const profilePicture = createProfilePicture(isMe);
+    const profilePicture = createProfilePicture(isMe, fromdjangoImg);
+
+    console.log(data);
     return `
         <div id="profile-picture-container">
             ${profilePicture}
@@ -25,17 +27,17 @@ export default function InfoTab(nickname, isMe, infoDummyData) {
      `;
 }
 
-function createProfilePicture(isMe) {
+function createProfilePicture(isMe, fromdjangoImg) {
     if (isMe) {
         return `
             <label for="profile-picture-input" id="profile-picture-label">
-                <img src="../../../assets/image/cruiser.gif" alt="profile picture" id="profile-picture">
+                <img src="${fromdjangoImg}" alt="profile picture" id="profile-picture">
             </label>
             <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
         `;
     } else {
         return `
-            <img src="../../../assets/image/cruiser.gif" alt="profile picture" id="profile-picture-not-me">
+            <img src="${fromdjangoImg}" alt="profile picture" id="profile-picture-not-me">
         `;
     }
 }

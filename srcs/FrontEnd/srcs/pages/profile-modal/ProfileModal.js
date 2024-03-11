@@ -13,11 +13,7 @@ import HistoryTab from "./HistoryTab.js";
  */
 export default function ProfileModal($container, nickname, isMe) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
-    let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
-
-    const infoDummyData = [
-        { totalWinRate: 50, oneOnOneWinRate: 34, tournamentWinRate: 100 }
-    ]
+    let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist')
 
     const render = () => {
         const page = $container.querySelector('#page');
@@ -168,11 +164,24 @@ export default function ProfileModal($container, nickname, isMe) {
             button.classList.remove('shake-animation');
         }, 500);
     };
-
-    const updateInfo = () => {
+    
+    const updateInfo = async () => {
         const infoTabContainer = $container.querySelector('#info-content');
+        let image = "";
+        let option = {};
+        let data = [];
+        option = {
+            method: 'POST',
+            body: JSON.stringify({ nickname: nickname }),
+        };
+        try {
+            let data = await fetchWithAuth(`${BACKEND}/user/info/`, option);
+            image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
+        } catch (error) {
+            console.error('Error:', error);
+        }
         if (infoTabContainer) {
-            infoTabContainer.innerHTML = InfoTab(nickname, isMe, infoDummyData[0]);
+            infoTabContainer.innerHTML = InfoTab(nickname, isMe, data, image);
         }
     }
 
