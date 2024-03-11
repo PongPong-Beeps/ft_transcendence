@@ -185,8 +185,8 @@ export default function ProfileModal($container, nickname, isMe) {
             inputBox.classList.remove('input-highlight');
         }, 1000);
     }
-
-    const updateInfo = () => {
+    
+    const updateInfo = async () => {
         const infoTabContainer = $container.querySelector('#info-content');
         let image = "";
         let option = {};
