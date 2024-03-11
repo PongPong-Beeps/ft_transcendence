@@ -99,7 +99,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-ASGI_APPLICATION= 'project.asgi.application' #Websocket
+ASGI_APPLICATION= 'project.asgi.application' # Websocket
+
+CHANNEL_LAYERS = {                           # channel layer 설정
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
