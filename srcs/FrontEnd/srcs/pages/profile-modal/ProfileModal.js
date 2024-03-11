@@ -157,7 +157,7 @@ export default function ProfileModal($container, nickname, isMe) {
                             nicknameInput.placeholder = "기존 닉네임과 동일";
                             break;
                         case 401:
-                            nicknameInput.placeholder = "이미 있는 닉네임";
+                            nicknameInput.placeholder = "이미 존재하는 닉네임";
                             break;
                         case 402:
                             nicknameInput.placeholder = "2~8글자 사이로 입력";
