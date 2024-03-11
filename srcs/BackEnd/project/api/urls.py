@@ -10,4 +10,6 @@ urlpatterns = [
     
     path('logout/', views.Logout.as_view(), name='logout'), #로그아웃
     path('friend/', include('friend.urls'), name='friend'), #친구
+    
+    path('chat/', include('chat.urls'), name='chat_test'), #채널
 ]
