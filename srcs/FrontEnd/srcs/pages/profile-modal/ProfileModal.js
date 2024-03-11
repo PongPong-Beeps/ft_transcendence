@@ -148,6 +148,7 @@ export default function ProfileModal($container, nickname, isMe) {
             })
                 .then(() => {
                     nicknameInput.placeholder = nicknameInput.value;
+                    highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
                 })
                 .catch(error => {
@@ -169,19 +170,25 @@ export default function ProfileModal($container, nickname, isMe) {
                             new ErrorPage($container, error.status);
                             return;
                     }
-                    shakeButton(button);
                     nicknameInput.value = "";
+                    shakeButton(button);
                 })
         }
     };
 
     const shakeButton = (button) => {
         button.classList.add('shake-animation');
-
         setTimeout(() => {
             button.classList.remove('shake-animation');
         }, 500);
     };
+
+    const highlightInputBox = (inputBox) => {
+        inputBox.classList.add('input-highlight');
+        setTimeout(() => {
+            inputBox.classList.remove('input-highlight');
+        }, 1000);
+    }
 
     const updateInfo = () => {
         const infoTabContainer = $container.querySelector('#info-content');
