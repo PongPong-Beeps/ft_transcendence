@@ -186,26 +186,6 @@ export default function ProfileModal($container, nickname, isMe) {
         }, 1000);
     }
     
-    const updateInfo = async () => {
-        const infoTabContainer = $container.querySelector('#info-content');
-        let image = "";
-        let option = {};
-        let data = [];
-        option = {
-            method: 'POST',
-            body: JSON.stringify({ nickname: nickname }),
-        };
-        try {
-            let data = await fetchWithAuth(`${BACKEND}/user/info/`, option);
-            image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
-        } catch (error) {
-            console.error('Error:', error);
-        }
-        if (infoTabContainer) {
-            infoTabContainer.innerHTML = InfoTab(nickname, isMe, data, image);
-        }
-    }
-
     const updateBlacklist = () => {
         fetchWithAuth(`${BACKEND}/user/blacklist/`)
             .then(data => {
