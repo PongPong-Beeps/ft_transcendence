@@ -127,6 +127,7 @@ class ChangeNicknameView(APIView):
 #/api/user/info
 class UserInfoView(APIView):
     # permission_classes = [IsAuthenticated]
+    
     def calculate_user_info(self, user, data):
         nickname = user.nickname
 
