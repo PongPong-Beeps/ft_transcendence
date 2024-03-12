@@ -161,9 +161,9 @@ class UserInfoView(APIView):
         response_data = {
             "image" : get_image(user),
             "nickname": nickname,
-            "total": total_winning_percentage,
-            "easy": easy_winning_percentage,
-            "hard": hard_winning_percentage,
+            "total": int(total_winning_percentage),
+            "easy": int(easy_winning_percentage),
+            "hard": int(hard_winning_percentage),
             "freind": data['is_friend'], #친구인지 여부
             "block": data['is_blocked'], #블랙리스트에 있는지 여부
         }
