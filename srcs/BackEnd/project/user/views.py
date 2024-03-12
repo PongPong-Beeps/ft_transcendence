@@ -300,3 +300,4 @@ class ChangeImageView(APIView):
             return Response(response_data, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
