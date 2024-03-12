@@ -179,13 +179,6 @@ export default function ProfileModal($container, nickname, isMe) {
         }, 500);
     };
 
-    const highlightInputBox = (inputBox) => {
-        inputBox.classList.add('input-highlight');
-        setTimeout(() => {
-            inputBox.classList.remove('input-highlight');
-        }, 1000);
-    }
-
     const updateInfo = () => {
         const infoTabContainer = $container.querySelector('#info-content');
         let image = "";
