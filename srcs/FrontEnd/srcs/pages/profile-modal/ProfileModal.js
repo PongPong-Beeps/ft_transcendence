@@ -178,16 +178,22 @@ export default function ProfileModal($container, nickname, isMe) {
             button.classList.remove('shake-animation');
         }, 500);
     };
-
-    const highlightInputBox = (inputBox) => {
-        inputBox.classList.add('input-highlight');
-        setTimeout(() => {
-            inputBox.classList.remove('input-highlight');
-        }, 1000);
-    }
     
     const updateInfo = async () => {
         const infoTabContainer = $container.querySelector('#info-content');
+        let image = "";
+        let option = {};
+        let data = [];
+        option = {
+            method: 'POST',
+            body: JSON.stringify({ nickname: nickname }),
+        };
+        try {
+            let data = await fetchWithAuth(`${BACKEND}/user/info/`, option);
+            image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
+        } catch (error) {
+            console.error('Error:', error);
+        }
         let image = "";
         let option = {};
         let data = [];
