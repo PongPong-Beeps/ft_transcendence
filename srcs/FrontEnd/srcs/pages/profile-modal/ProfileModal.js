@@ -13,7 +13,7 @@ import HistoryTab from "./HistoryTab.js";
  */
 export default function ProfileModal($container, nickname, isMe) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
-    let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist')
+    let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
 
     const render = () => {
