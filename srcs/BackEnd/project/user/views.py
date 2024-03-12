@@ -127,33 +127,7 @@ class ChangeNicknameView(APIView):
 #/api/user/info
 class UserInfoView(APIView):
     # permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(tags=['Profile'], response={200: "image : image"})
-    def get_image(self, data, user):
-        try :
-            # user_id = request.user.id
-            # user = User.objects.get(id=user_id)
-            # 이미지 파일을 읽어옵니다.
-            image_file = user.image_file
-            #with는 파일을 안전하게 열고 닫는다.
-            with open(image_file.path, "rb") as f: # "rb" : 이미지 파일을 바이너리 읽기 모드로 엽니다.
-                image_data = f.read()
-
-            # 이미지를 Base64로 인코딩합니다.
-            # image -> base64로 인코딩 -> FrontEnd에서 다시 디코딩하여 이미지로 사용 (<img src="data:image/png;base64, <base64 code>" alt="이미지">)
-            image_base64 = base64.b64encode(image_data)
-            print("image_base64: ", image_base64)
-            data['image'] = image_base64
-        except Exception as e:
-            print("error: ", e)
-            # 응답 데이터에 이미지 Base64 문자열을 포함시킵니다.
-            # response_data = {
-            #     "message": "프로필 이미지가 정상적으로 가져와졌습니다",
-            #     "image": image_base64,
-            # }
-        #     return Response(response_data, status=200)
-        # except Exception as e:
-        #     return Response({"error": str(e)}, status=500)
-        
+    
     def calculate_user_info(self, user, data):
         nickname = user.nickname
 
@@ -185,7 +159,7 @@ class UserInfoView(APIView):
         print("hard_winning_percentage: ", hard_winning_percentage)
                     
         response_data = {
-            "image" : '', #추후 이미지도 추가해야함
+            #image : user.image, #추후 이미지도 추가해야함
             "nickname": nickname,
             "total": total_winning_percentage,
             "easy": easy_winning_percentage,
@@ -210,7 +184,6 @@ class UserInfoView(APIView):
             'is_blocked' : False,
         }
         response_data = self.calculate_user_info(user, data)
-        self.get_image(response_data, user)
         return Response(response_data)
     
     @swagger_auto_schema(
