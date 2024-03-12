@@ -22,8 +22,8 @@ export default function Practice($container) {
         canvas.width = 800;
         canvas.height = 400;
         // 플레이어, 공 초기화
-        player1 = { x: 20, y: canvas.height / 2 - 60, score: 0 };
-        player2 = { x: canvas.width - 30, y: canvas.height / 2 - 60, score: 0 };
+        player1 = { x: 0, y: canvas.height / 2 - 60, score: 0 };
+        player2 = { x: canvas.width - 12, y: canvas.height / 2 - 60, score: 0 };
         ball = { x: canvas.width / 2, y: canvas.height / 2 };
 
         gameLoop();
@@ -73,10 +73,10 @@ export default function Practice($container) {
         }
         // 패들 충돌 검사
         let nearestPlayer = (ball.x < canvas.width / 2) ? player1 : player2;
-        if (ball.x - ballInfo.radius < nearestPlayer.x + paddleInfo.width
-            && ball.x + ballInfo.radius > nearestPlayer.x
-            && ball.y - ballInfo.radius < nearestPlayer.y + paddleInfo.height
-            && ball.y + ballInfo.radius > nearestPlayer.y) {
+        if (ball.x - ballInfo.radius <= nearestPlayer.x + paddleInfo.width
+            && ball.x + ballInfo.radius >= nearestPlayer.x
+            && ball.y - ballInfo.radius <= nearestPlayer.y + paddleInfo.height
+            && ball.y + ballInfo.radius >= nearestPlayer.y) {
             ballInfo.velocityX = -ballInfo.velocityX; // X 방향 반전
         }
     };
