@@ -141,33 +141,54 @@ export default function ProfileModal($container, nickname, isMe) {
 
     const handleUpdateNicknameButtonClick = (button) => {
         const nicknameInput = $container.querySelector('#nickname-input');
-        if (nicknameInput) {
+        if (nicknameInput/* && nicknameInput.value !== nickname*/) {
             fetchWithAuth(`${BACKEND}/user/me/nickname/`, {
                 method: 'POST',
                 body: JSON.stringify({ nickname: nicknameInput.value }),
             })
                 .then(() => {
                     nicknameInput.placeholder = nicknameInput.value;
+                    highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
                 })
                 .catch(error => {
-                    if (error.status === 400) {
-                        shakeButton(button);
-                    } else {
-                        console.error("[ fetchNickname ] " + error.message);
-                        new ErrorPage($container, error.status);
+                    switch (error.status) {
+                        case 400:
+                            nicknameInput.placeholder = "기존 닉네임과 동일";
+                            break;
+                        case 401:
+                            nicknameInput.placeholder = "이미 존재하는 닉네임";
+                            break;
+                        case 402:
+                            nicknameInput.placeholder = "2~8글자 사이로 입력";
+                            break;
+                        case 403:
+                            nicknameInput.placeholder = "숫자, 영어, 한글만 입력";
+                            break;
+                        default:
+                            console.error("[ fetchNickname ] " + error.message);
+                            new ErrorPage($container, error.status);
+                            return;
                     }
+                    nicknameInput.value = "";
+                    shakeButton(button);
                 })
         }
     };
 
     const shakeButton = (button) => {
         button.classList.add('shake-animation');
-
         setTimeout(() => {
             button.classList.remove('shake-animation');
         }, 500);
     };
+
+    const highlightInputBox = (inputBox) => {
+        inputBox.classList.add('input-highlight');
+        setTimeout(() => {
+            inputBox.classList.remove('input-highlight');
+        }, 1000);
+    }
 
     const updateInfo = () => {
         const infoTabContainer = $container.querySelector('#info-content');

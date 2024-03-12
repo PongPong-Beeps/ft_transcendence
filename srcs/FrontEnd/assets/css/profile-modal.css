@@ -279,6 +279,18 @@
     padding: 10px;
 }
 
+@keyframes highlight {
+    0% {
+        box-shadow: 0 0 0px #fff; /* 시작 상태 */
+    }
+    50% {
+        box-shadow: 0 0 8px 2px #EAF79C; /* 가장 밝은 상태 */
+    }
+    100% {
+        box-shadow: 0 0 0px #fff; /* 끝 상태 */
+    }
+}
+
 #nickname-input {
     display: flex;
     width: 50%;
@@ -293,6 +305,11 @@
 
 #nickname-input::placeholder {
     color: #959f5d;
+}
+
+#nickname-input.input-highlight {
+    animation: highlight 1s;
+    border: 4px solid;
 }
 
 @keyframes shake {
