@@ -14,6 +14,7 @@ import HistoryTab from "./HistoryTab.js";
 export default function ProfileModal($container, nickname, isMe) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist')
+    let [getInfo, setInfo] = useState({}, this, 'renderInfo');
 
     const render = () => {
         const page = $container.querySelector('#page');
@@ -51,6 +52,13 @@ export default function ProfileModal($container, nickname, isMe) {
 
     };
 
+    this.renderInfo = () => {
+        const infoTabContainer = $container.querySelector('#info-content');
+        if (infoTabContainer) {
+            infoTabContainer.innerHTML = InfoTab(isMe, getInfo());
+        }
+    };
+
     this.renderHistory = () => {
         const historyTabContainer = $container.querySelector('#history-content');
         if (historyTabContainer) {
@@ -66,7 +74,7 @@ export default function ProfileModal($container, nickname, isMe) {
                 const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
                 if (cell) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
-                        event.stopPropagation(); // 이벤트 전파를 막음
+                        event.stopPropagation();
                         handleUnBlockButtonClick(blacklist.nickname);
                     });
                 }
@@ -199,16 +207,17 @@ export default function ProfileModal($container, nickname, isMe) {
     }
 
     const fetchProfileModalData = () => {
-        let option = {};
+        const option = {
+            method: 'POST',
+            body: JSON.stringify({ nickname: nickname }),
+        };
+
         if (isMe) {
             updateBlacklist();
         } else {
-            option = {
-                method: 'POST',
-                body: JSON.stringify({ nickname: nickname }),
-            };
             $container.querySelector('#blacklist-btn').classList.add('hidden');
         }
+     
         // 데이터 채우기
         fetchWithAuth(`${BACKEND}/user/history/`, option)
             .then(data => {
@@ -218,8 +227,17 @@ export default function ProfileModal($container, nickname, isMe) {
             .catch(error => {
                 console.error("[ fetchHistoryData ] " + error.message);
                 new ErrorPage($container, error.status);
+            });
+
+        fetchWithAuth(`${BACKEND}/user/info/`, option)
+            .then(data => {
+                setInfo(data);
+                console.log("[ fetchInfoData ] 정보 패치 완료");
             })
-        updateInfo();
+            .catch(error => {
+                console.error("[ fetchInfoData ] " + error.message);
+                new ErrorPage($container, error.status);
+            });
     };
 
     importCss("assets/css/profile-modal.css");
