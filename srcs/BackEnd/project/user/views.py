@@ -159,7 +159,7 @@ class UserInfoView(APIView):
         print("hard_winning_percentage: ", hard_winning_percentage)
                     
         response_data = {
-            #image : user.image, #추후 이미지도 추가해야함
+            "image" : get_image(user),
             "nickname": nickname,
             "total": total_winning_percentage,
             "easy": easy_winning_percentage,
@@ -300,3 +300,16 @@ class ChangeImageView(APIView):
             return Response(response_data, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+        
+#내 프로필 이미지 가져오기 함수
+def get_image(user):
+    try:
+        image_file = user.image_file
+        with open(image_file.path, "rb") as f:
+            image_data = f.read()
+        image_base64 = base64.b64encode(image_data)
+        print("image_base64: ", image_base64)
+
+        return image_base64
+    except Exception as e: # 이미지가 없을 경우 read()에서 예외 발생!
+        return ('') # 이미지가 없을 경우 빈 문자열을 반환
