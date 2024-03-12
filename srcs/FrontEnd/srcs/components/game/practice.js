@@ -85,10 +85,9 @@ export default function Practice($container) {
         isBallMoving = false;
         ball.x = canvas.width / 2;
         ball.y = canvas.height / 2;
-        ballInfo.speed = 5;
         // 랜덤한 방향으로 시작 각도 조정
-        ballInfo.velocityX = 5 * (Math.random() > 0.5 ? 1 : -1);
-        ballInfo.velocityY = 5 * (Math.random() > 0.5 ? 1 : -1);
+        ballInfo.velocityX = ballInfo.speed * (Math.random() > 0.5 ? 1 : -1);
+        ballInfo.velocityY = ballInfo.speed * (Math.random() > 0.5 ? 1 : -1);
         setTimeout(() => {
             isBallMoving = true;
         }, 500);
