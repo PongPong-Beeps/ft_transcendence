@@ -193,7 +193,7 @@ export default function ProfileModal($container, nickname, isMe) {
             inputBox.classList.remove('input-highlight');
         }, 1000);
     }
-    
+
     const updateBlacklist = () => {
         fetchWithAuth(`${BACKEND}/user/blacklist/`)
             .then(data => {
