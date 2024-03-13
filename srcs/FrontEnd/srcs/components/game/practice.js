@@ -3,7 +3,7 @@ import ExitConfirmation from "../../pages/ExitConfirmation.js";
 
 export default function Practice($container) {
     let canvas, ctx; // 캔버스 정보
-    let player1, player2, balls;
+    let player1, player2, balls, playerImage = new Image();
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
     let isBallMoving = false;
     let keys = {
@@ -26,6 +26,7 @@ export default function Practice($container) {
     }
 
     const gameInit = () => {
+        playerImage.src = "../../assets/image/img.png";
         canvas = $container.querySelector('.pong-canvas');
         ctx = canvas.getContext('2d');
         // 캔버스 크기 설정
@@ -126,6 +127,10 @@ export default function Practice($container) {
         ctx.fillRect(player1.x, player1.y, paddle.width, paddle.height);
         ctx.fillStyle = paddle.color;
         ctx.fillRect(player2.x, player2.y, paddle.width, paddle.height);
+        if (playerImage.complete) {
+            ctx.drawImage(playerImage, player1.x - 50, player1.y, 50, 50);
+            ctx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y, 50, 50);
+        }
         // 공 그리기
         balls.forEach(ball => {
             ctx.beginPath();

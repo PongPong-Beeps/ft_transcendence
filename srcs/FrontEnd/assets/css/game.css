@@ -8,6 +8,7 @@
     justify-content: center;
     flex-direction: column;
     padding: 10px;
+    gap: 10px;
 }
 
 .game-title-container {
@@ -24,6 +25,5 @@
 }
 
 .pong-canvas {
-    border-radius: 20px;
     border: 5px solid #5C7320;
 }
