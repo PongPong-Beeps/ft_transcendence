@@ -132,6 +132,9 @@ export default function Practice($container) {
         });
 
         document.addEventListener('keydown', (event) => {
+            for (const key in keys) {
+                keys[key] = false;
+            }
             switch (event.code) {
                 case 'KeyW': keys['w'] = true; break;
                 case 'KeyS': keys['s'] = true; break;
@@ -140,14 +143,14 @@ export default function Practice($container) {
             }
         });
 
-        document.addEventListener('keyup', (event) => {
-            switch (event.code) {
-                case 'KeyW': keys['w'] = false; break;
-                case 'KeyS': keys['s'] = false; break;
-                case 'ArrowUp': keys['ArrowUp'] = false; break;
-                case 'ArrowDown': keys['ArrowDown'] = false; break;
-            }
-        });
+        // document.addEventListener('keyup', (event) => {
+        //     switch (event.code) {
+        //         case 'KeyW': keys['w'] = false; break;
+        //         case 'KeyS': keys['s'] = false; break;
+        //         case 'ArrowUp': keys['ArrowUp'] = false; break;
+        //         case 'ArrowDown': keys['ArrowDown'] = false; break;
+        //     }
+        // });
     };
 
     importCss("assets/css/game.css");
