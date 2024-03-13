@@ -13,12 +13,7 @@ export default function Practice($container) {
         'ArrowDown': false
     };
     const w = window.innerWidth, h = window.innerHeight;
-    console.log(w, h);
-    // easy
-    // const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.004, color: 'BLACK' };
-    // const pong = { radius: w * 0.005, speed: w * 0.003, color: 'RED' };
-    // hard
-    const paddle = { width: w * 0.005, height: h * 0.05, speed: w * 0.005, color: 'BLACK' };
+    const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.0055, color: 'BLACK' };
     const pong = { radius: w * 0.005, speed: w * 0.004, color: 'RED' };
 
     const gameInit = () => {
