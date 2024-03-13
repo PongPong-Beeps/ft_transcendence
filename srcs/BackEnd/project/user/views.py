@@ -92,8 +92,8 @@ class CurrentUserView(APIView):
         user = User.objects.get(id=user_id)
         print(user)
         response_data = {
-                 "nickname": user.nickname,
-                 #추후 이미지도 추가해야함
+                "image" : get_image(user), #user/me 이미지
+                "nickname": user.nickname,
         }
         return Response(response_data)
 
