@@ -14,7 +14,7 @@ export default function Practice($container) {
     };
     const w = window.innerWidth, h = window.innerHeight;
     const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.003, color: 'BLACK' };
-    const pong = { radius: w * 0.005, speed: w * 0.002, color: 'RED' };
+    const pong = { radius: w * 0.005, speed: w * 0.002, color: '#ffa939' };
 
     function getRandomDirection() {
         let angle = Math.random() * Math.PI / 2 - Math.PI / 4;
@@ -39,7 +39,7 @@ export default function Practice($container) {
         let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
         balls = [
             { x: canvas.width / 2, y: canvas.height / 2, ...ball1Direction },
-            { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
+            // { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
         ];
 
         gameLoop();
@@ -81,10 +81,10 @@ export default function Practice($container) {
                 ball.dirY = -ball.dirY; // Y 방향 반전
             }
             // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
-            if (ball.x - pong.radius < 0) { // 왼쪽 벽에 충돌
+            if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
                 player2.score++;
                 resetBall();
-            } else if (ball.x + pong.radius > canvas.width) { // 오른쪽 벽에 충돌
+            } else if (ball.x + pong.radius > canvas.width - 50) { // 오른쪽 벽에 충돌
                 player1.score++;
                 resetBall();
             }
@@ -120,8 +120,27 @@ export default function Practice($container) {
     };
 
     const renderGame = () => {
-        // 배경 클리어
+        // 배경
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#27522d';
+        ctx.fillRect(50, 0, canvas.width - 100, canvas.height);
+        ctx.strokeStyle = "WHITE";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); // 경로 시작
+        ctx.setLineDash([]); // 실선으로 설정
+        ctx.moveTo(50, canvas.height / 2); // 수정된 위치: 시작 위치를 캔버스 세로 중앙으로 설정
+        ctx.lineTo(canvas.width - 50, canvas.height / 2); // 수정된 위치: 끝 위치를 캔버스 세로 중앙으로 설정
+        ctx.stroke(); // 선 그리기
+        ctx.beginPath(); // 경로 시작
+        ctx.setLineDash([]); // 실선으로 설정
+        ctx.moveTo(canvas.width / 2, 0); // 수정된 위치: 시작 위치를 캔버스 세로 중앙으로 설정
+        ctx.lineTo(canvas.width / 2, canvas.height); // 수정된 위치: 끝 위치를 캔버스 세로 중앙으로 설정
+        ctx.stroke(); // 선 그리기
+        // 점수 그리기
+        ctx.font = "2em DNF Bit Bit v2";
+        ctx.fillStyle = "WHITE";
+        ctx.fillText(player1.score.toString(), canvas.width / 4, 50);
+        ctx.fillText(player2.score.toString(), (3 * canvas.width) / 4, 50);
         // 플레이어 패들 그리기
         ctx.fillStyle = paddle.color;
         ctx.fillRect(player1.x, player1.y, paddle.width, paddle.height);
@@ -139,11 +158,6 @@ export default function Practice($container) {
             ctx.fill();
             ctx.closePath();
         });
-        // 점수 그리기
-        ctx.font = "2em DNF Bit Bit v2";
-        ctx.fillStyle = "WHITE";
-        ctx.fillText(player1.score.toString(), canvas.width / 4, canvas.height / 2);
-        ctx.fillText(player2.score.toString(), (3 * canvas.width) / 4, canvas.height / 2);
     };
 
     const render = () => {
