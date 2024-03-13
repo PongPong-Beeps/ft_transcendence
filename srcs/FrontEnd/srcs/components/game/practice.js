@@ -2,8 +2,8 @@ import { importCss } from "../../utils/importCss.js";
 import ExitConfirmation from "../../pages/ExitConfirmation.js";
 
 export default function Practice($container) {
-    let canvas, ctx; // 캔버스 정보
-    let player1, player2, balls, playerImage = new Image();
+    let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
+    let paddle, pong, player1, player2, balls, playerImage = new Image();
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
     let isBallMoving;
     let gameMode = 'easy'; // 기본 게임 모드를 'easy'로 설정
@@ -13,17 +13,29 @@ export default function Practice($container) {
         'ArrowUp': false,
         'ArrowDown': false
     };
-    const w = window.innerWidth, h = window.innerHeight;
-    const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.003, color: 'WHITE' };
-    const pong = { radius: w * 0.005, speed: w * 0.002, color: '#ffa939' };
+
 
     const init = () => {
+        const container = $container.querySelector('.game-canvas-container');
+        const containerWidth = container.offsetWidth;
+        const containerHeight = container.offsetHeight;
         playerImage.src = "../../assets/image/img.png";
-        canvas = $container.querySelector('.pong-canvas');
-        ctx = canvas.getContext('2d');
-        // 캔버스 크기 설정
-        canvas.width = w * 0.4;
-        canvas.height = h * 0.3;
+
+        paddle = { width: containerHeight * 0.03, height: containerHeight * 0.15, speed: containerHeight * 0.02, color: 'WHITE' };
+        pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.02, color: '#ffa939' };
+
+        // 배경용 캔버스 초기화
+        backgroundCanvas = $container.querySelector('#background-canvas');
+        backgroundCtx = backgroundCanvas.getContext('2d');
+        backgroundCanvas.width = containerWidth;
+        backgroundCanvas.height = containerHeight;
+        drawBackground(); // 배경 그리기 함수 호출
+
+        // 게임 오브젝트용 캔버스 초기화
+        gameCanvas = $container.querySelector('#game-canvas');
+        gameCtx = gameCanvas.getContext('2d');
+        gameCanvas.width = containerWidth;
+        gameCanvas.height = containerHeight;
     }
 
     function getRandomDirection() {
@@ -38,19 +50,19 @@ export default function Practice($container) {
     const gameInit = () => {
         isBallMoving = false;
         // 플레이어 초기화
-        player1 = { x: 50, y: canvas.height / 2 - paddle.height / 2, score: 0 };
-        player2 = { x: canvas.width - paddle.width - 50, y: canvas.height / 2 - paddle.height / 2, score: 0 };
+        player1 = { x: 50, y: gameCanvas.height / 2 - paddle.height / 2, score: 0 };
+        player2 = { x: gameCanvas.width - paddle.width - 50, y: gameCanvas.height / 2 - paddle.height / 2, score: 0 };
         // 모드에 따른 공 초기화
         if (gameMode === 'easy') {
             balls = [
-                { x: canvas.width / 2, y: canvas.height / 2, ...getRandomDirection() }
+                { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...getRandomDirection() }
             ];
         } else { // 'hard'
             let ball1Direction = getRandomDirection();
             let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
             balls = [
-                { x: canvas.width / 2, y: canvas.height / 2, ...ball1Direction },
-                { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
+                { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball1Direction },
+                { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball2Direction }
             ];
         }
 
@@ -63,7 +75,7 @@ export default function Practice($container) {
     const gameLoop = () => {
         movePaddle();
         update();
-        renderGame();
+        drawGame();
         animationFrameId = requestAnimationFrame(gameLoop); // 게임 루프 생성
     };
 
@@ -72,13 +84,13 @@ export default function Practice($container) {
             player1.y = Math.max(player1.y - paddle.speed, 0);
         }
         if (keys['s']) {
-            player1.y = Math.min(player1.y + paddle.speed, canvas.height - paddle.height);
+            player1.y = Math.min(player1.y + paddle.speed, gameCanvas.height - paddle.height);
         }
         if (keys['ArrowUp']) {
             player2.y = Math.max(player2.y - paddle.speed, 0);
         }
         if (keys['ArrowDown']) {
-            player2.y = Math.min(player2.y + paddle.speed, canvas.height - paddle.height);
+            player2.y = Math.min(player2.y + paddle.speed, gameCanvas.height - paddle.height);
         }
     };
 
@@ -89,19 +101,19 @@ export default function Practice($container) {
             ball.x += pong.speed * ball.dirX;
             ball.y += pong.speed * ball.dirY;
             // 벽 충돌 검사
-            if (ball.y + pong.radius > canvas.height || ball.y - pong.radius < 0) {
+            if (ball.y + pong.radius > gameCanvas.height || ball.y - pong.radius < 0) {
                 ball.dirY = -ball.dirY; // Y 방향 반전
             }
             // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
             if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
                 player2.score++;
                 resetBall();
-            } else if (ball.x + pong.radius > canvas.width - 50) { // 오른쪽 벽에 충돌
+            } else if (ball.x + pong.radius > gameCanvas.width - 50) { // 오른쪽 벽에 충돌
                 player1.score++;
                 resetBall();
             }
             // 패들 충돌 검사
-            let nearestPlayer = (ball.x < canvas.width / 2) ? player1 : player2;
+            let nearestPlayer = (ball.x < gameCanvas.width / 2) ? player1 : player2;
             if (ball.x - pong.radius <= nearestPlayer.x + paddle.width
                 && ball.x + pong.radius >= nearestPlayer.x
                 && ball.y - pong.radius <= nearestPlayer.y + paddle.height
@@ -114,8 +126,8 @@ export default function Practice($container) {
     const resetBall = () => {
         isBallMoving = false;
         balls.forEach((ball, index) => {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
+            ball.x = gameCanvas.width / 2;
+            ball.y = gameCanvas.height / 2;
 
             let direction = getRandomDirection();
             if (index === 0) {
@@ -131,44 +143,46 @@ export default function Practice($container) {
         }, 500);
     };
 
-    const renderGame = () => {
-        // 배경 그리기
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#27522d';
-        ctx.fillRect(50, 0, canvas.width - 100, canvas.height);
-        ctx.strokeStyle = "WHITE";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.setLineDash([]);
-        ctx.moveTo(50, canvas.height / 2);
-        ctx.lineTo(canvas.width - 50, canvas.height / 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.setLineDash([]);
-        ctx.moveTo(canvas.width / 2, 0);
-        ctx.lineTo(canvas.width / 2, canvas.height);
-        ctx.stroke();
+    const drawBackground = () => {
+        backgroundCtx.fillStyle = '#27522d';
+        backgroundCtx.fillRect(50, 0, backgroundCanvas.width - 100, backgroundCanvas.height);
+        backgroundCtx.strokeStyle = "WHITE";
+        backgroundCtx.lineWidth = 1;
+        backgroundCtx.beginPath();
+        backgroundCtx.setLineDash([]);
+        backgroundCtx.moveTo(50, backgroundCanvas.height / 2);
+        backgroundCtx.lineTo(backgroundCanvas.width - 50, backgroundCanvas.height / 2);
+        backgroundCtx.stroke();
+        backgroundCtx.beginPath();
+        backgroundCtx.setLineDash([]);
+        backgroundCtx.moveTo(backgroundCanvas.width / 2, 0);
+        backgroundCtx.lineTo(backgroundCanvas.width / 2, backgroundCanvas.height);
+        backgroundCtx.stroke();
+    }
+
+    const drawGame = () => {
+        gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
         // 점수 그리기
-        ctx.font = "2em DNF Bit Bit v2";
-        ctx.fillStyle = "WHITE";
-        ctx.fillText(player1.score.toString(), canvas.width / 4, 50);
-        ctx.fillText(player2.score.toString(), (3 * canvas.width) / 4, 50);
+        gameCtx.font = "2em DNF Bit Bit v2";
+        gameCtx.fillStyle = "WHITE";
+        gameCtx.fillText(player1.score.toString(), gameCanvas.width / 4, 50);
+        gameCtx.fillText(player2.score.toString(), (3 * gameCanvas.width) / 4, 50);
         // 플레이어 패들 그리기
-        ctx.fillStyle = paddle.color;
-        ctx.fillRect(player1.x, player1.y, paddle.width, paddle.height);
-        ctx.fillStyle = paddle.color;
-        ctx.fillRect(player2.x, player2.y, paddle.width, paddle.height);
+        gameCtx.fillStyle = paddle.color;
+        gameCtx.fillRect(player1.x, player1.y, paddle.width, paddle.height);
+        gameCtx.fillStyle = paddle.color;
+        gameCtx.fillRect(player2.x, player2.y, paddle.width, paddle.height);
         if (playerImage.complete) {
-            ctx.drawImage(playerImage, player1.x - 50, player1.y, 50, 50);
-            ctx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y, 50, 50);
+            gameCtx.drawImage(playerImage, player1.x - 50, player1.y, 50, 50);
+            gameCtx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y, 50, 50);
         }
         // 공 그리기
         balls.forEach(ball => {
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, pong.radius, 0, Math.PI*2, true);
-            ctx.fillStyle = pong.color;
-            ctx.fill();
-            ctx.closePath();
+            gameCtx.beginPath();
+            gameCtx.arc(ball.x, ball.y, pong.radius, 0, Math.PI*2, true);
+            gameCtx.fillStyle = pong.color;
+            gameCtx.fill();
+            gameCtx.closePath();
         });
     };
 
@@ -182,7 +196,10 @@ export default function Practice($container) {
                         <button id="hard-btn" class="game-mode-btn green-btn non-outline-btn">하드</button>
                     </div>
                 </div>
-                <canvas class="pong-canvas"></canvas>
+                <div class="game-canvas-container">
+                    <canvas id="background-canvas"></canvas>
+                    <canvas id="game-canvas"></canvas>
+                </div>
             </div>
         `;
         const easyButton = $container.querySelector('#easy-btn');

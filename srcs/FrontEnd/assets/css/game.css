@@ -39,3 +39,18 @@
 .game-mode-btn.selected {
     background-color: #8DAA4E;
 }
+
+.game-canvas-container {
+    position: relative;
+    width: 55vw;
+    height: 43vh;
+    margin: auto;
+}
+
+#background-canvas, #game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* 컨테이너 내부를 꽉 채움 */
+    height: 100%; /* 컨테이너 내부를 꽉 채움 */
+}
