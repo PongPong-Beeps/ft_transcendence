@@ -132,14 +132,11 @@ export default function Practice($container) {
         });
 
         document.addEventListener('keydown', (event) => {
-            for (const key in keys) {
-                keys[key] = false;
-            }
             switch (event.code) {
-                case 'KeyW': keys['w'] = true; break;
-                case 'KeyS': keys['s'] = true; break;
-                case 'ArrowUp': keys['ArrowUp'] = true; break;
-                case 'ArrowDown': keys['ArrowDown'] = true; break;
+                case 'KeyW': keys['s'] = false; keys['w'] = true; break;
+                case 'KeyS': keys['w'] = false; keys['s'] = true; break;
+                case 'ArrowUp': keys['ArrowDown'] = false; keys['ArrowUp'] = true; break;
+                case 'ArrowDown': keys['ArrowUp'] = false; keys['ArrowDown'] = true; break;
             }
         });
 
