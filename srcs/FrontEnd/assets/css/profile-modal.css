@@ -143,6 +143,12 @@
     width: auto;
 }
 
+#blacklist-message {
+    font-size: 1.1em;
+    text-align: center;
+    margin: 20px;
+}
+
 .blacklist-cell {
     display: flex;
     justify-content: space-between;
