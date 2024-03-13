@@ -13,7 +13,8 @@
 
 .game-title-container {
     display: flex;
-    padding: 10px;
+    justify-content: space-between;
+    padding: 10px 50px 10px 50px;
 }
 
 .game-back-btn {
@@ -22,4 +23,19 @@
     font-family: "DNF Bit Bit v2", serif;
     font-size: 1.5em;
     color: white;
+}
+
+#game-mode-button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.game-mode-btn {
+    font-size: 1em;
+    border: 5px solid #5C7320;
+    border-radius: 10px;
+}
+
+.game-mode-btn.selected {
+    background-color: #8DAA4E;
 }

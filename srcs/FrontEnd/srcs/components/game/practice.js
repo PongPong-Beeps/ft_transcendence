@@ -5,7 +5,8 @@ export default function Practice($container) {
     let canvas, ctx; // 캔버스 정보
     let player1, player2, balls, playerImage = new Image();
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
-    let isBallMoving = false;
+    let isBallMoving;
+    let gameMode = 'easy'; // 기본 게임 모드를 'easy'로 설정
     let keys = {
         'w': false,
         's': false,
@@ -13,8 +14,17 @@ export default function Practice($container) {
         'ArrowDown': false
     };
     const w = window.innerWidth, h = window.innerHeight;
-    const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.003, color: 'BLACK' };
+    const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.003, color: 'WHITE' };
     const pong = { radius: w * 0.005, speed: w * 0.002, color: '#ffa939' };
+
+    const init = () => {
+        playerImage.src = "../../assets/image/img.png";
+        canvas = $container.querySelector('.pong-canvas');
+        ctx = canvas.getContext('2d');
+        // 캔버스 크기 설정
+        canvas.width = w * 0.4;
+        canvas.height = h * 0.3;
+    }
 
     function getRandomDirection() {
         let angle = Math.random() * Math.PI / 2 - Math.PI / 4;
@@ -26,21 +36,23 @@ export default function Practice($container) {
     }
 
     const gameInit = () => {
-        playerImage.src = "../../assets/image/img.png";
-        canvas = $container.querySelector('.pong-canvas');
-        ctx = canvas.getContext('2d');
-        // 캔버스 크기 설정
-        canvas.width = w * 0.4;
-        canvas.height = h * 0.3;
-        // 플레이어, 공 초기화
+        isBallMoving = false;
+        // 플레이어 초기화
         player1 = { x: 50, y: canvas.height / 2 - paddle.height / 2, score: 0 };
         player2 = { x: canvas.width - paddle.width - 50, y: canvas.height / 2 - paddle.height / 2, score: 0 };
-        let ball1Direction = getRandomDirection();
-        let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
-        balls = [
-            { x: canvas.width / 2, y: canvas.height / 2, ...ball1Direction },
-            // { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
-        ];
+        // 모드에 따른 공 초기화
+        if (gameMode === 'easy') {
+            balls = [
+                { x: canvas.width / 2, y: canvas.height / 2, ...getRandomDirection() }
+            ];
+        } else { // 'hard'
+            let ball1Direction = getRandomDirection();
+            let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
+            balls = [
+                { x: canvas.width / 2, y: canvas.height / 2, ...ball1Direction },
+                { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
+            ];
+        }
 
         gameLoop();
         setTimeout(() => {
@@ -120,22 +132,22 @@ export default function Practice($container) {
     };
 
     const renderGame = () => {
-        // 배경
+        // 배경 그리기
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#27522d';
         ctx.fillRect(50, 0, canvas.width - 100, canvas.height);
         ctx.strokeStyle = "WHITE";
         ctx.lineWidth = 1;
-        ctx.beginPath(); // 경로 시작
-        ctx.setLineDash([]); // 실선으로 설정
-        ctx.moveTo(50, canvas.height / 2); // 수정된 위치: 시작 위치를 캔버스 세로 중앙으로 설정
-        ctx.lineTo(canvas.width - 50, canvas.height / 2); // 수정된 위치: 끝 위치를 캔버스 세로 중앙으로 설정
-        ctx.stroke(); // 선 그리기
-        ctx.beginPath(); // 경로 시작
-        ctx.setLineDash([]); // 실선으로 설정
-        ctx.moveTo(canvas.width / 2, 0); // 수정된 위치: 시작 위치를 캔버스 세로 중앙으로 설정
-        ctx.lineTo(canvas.width / 2, canvas.height); // 수정된 위치: 끝 위치를 캔버스 세로 중앙으로 설정
-        ctx.stroke(); // 선 그리기
+        ctx.beginPath();
+        ctx.setLineDash([]);
+        ctx.moveTo(50, canvas.height / 2);
+        ctx.lineTo(canvas.width - 50, canvas.height / 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.setLineDash([]);
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
         // 점수 그리기
         ctx.font = "2em DNF Bit Bit v2";
         ctx.fillStyle = "WHITE";
@@ -165,15 +177,37 @@ export default function Practice($container) {
             <div class="game-container">
                 <div class="game-title-container">
                     <button class="game-back-btn non-outline-btn">< 로비로 돌아가기</button>
+                    <div id="game-mode-button-container">
+                        <button id="easy-btn" class="game-mode-btn green-btn non-outline-btn">이지</button>
+                        <button id="hard-btn" class="game-mode-btn green-btn non-outline-btn">하드</button>
+                    </div>
                 </div>
                 <canvas class="pong-canvas"></canvas>
             </div>
         `;
+        const easyButton = $container.querySelector('#easy-btn');
+        easyButton.classList.add('selected');
     };
 
     const setupEventListener = () => {
         $container.querySelector('.game-back-btn').addEventListener('click', () => {
            new ExitConfirmation($container);
+        });
+
+        $container.querySelector('#game-mode-button-container').addEventListener('click', (event) => {
+            // 클릭된 요소가 게임 모드 버튼인지 확인
+            if (event.target.matches('#easy-btn') || event.target.matches('#hard-btn')) {
+                gameMode = event.target.matches('#easy-btn') ? 'easy' : 'hard';
+                $container.querySelectorAll('.game-mode-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                event.target.classList.add('selected');
+                cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
+                for (const key in keys) {
+                    keys[key] = false;
+                }
+                gameInit(); // 게임 초기화
+            }
         });
 
         document.addEventListener('keydown', (event) => {
@@ -189,5 +223,6 @@ export default function Practice($container) {
     importCss("assets/css/game.css");
     render();
     setupEventListener();
+    init();
     gameInit();
 }
