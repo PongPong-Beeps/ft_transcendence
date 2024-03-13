@@ -35,6 +35,9 @@ ALLOWED_HOSTS = ['13.209.222.162', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     'corsheaders',	#cors
     'user',
+    'channels',
+	'daphne',
+	'connect',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -110,6 +113,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'project.wsgi.application'
+ASGI_APPLICATION= 'project.asgi.application' #Websocket
+
+CHANNEL_LAYERS = {                           # channel layer 설정
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer',
+        "MIDDLEWARE": [
+            "channels.auth.TokenAuthMiddlewareStack",
+        ],
+    }
+}
 
 
 # Database
