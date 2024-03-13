@@ -3,7 +3,7 @@ import ExitConfirmation from "../../pages/ExitConfirmation.js";
 
 export default function Practice($container) {
     let canvas, ctx; // 캔버스 정보
-    let player1, player2, ball;
+    let player1, player2, balls;
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
     let isBallMoving = false;
     let keys = {
@@ -13,8 +13,17 @@ export default function Practice($container) {
         'ArrowDown': false
     };
     const w = window.innerWidth, h = window.innerHeight;
-    const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.0055, color: 'BLACK' };
-    const pong = { radius: w * 0.005, speed: w * 0.004, color: 'RED' };
+    const paddle = { width: w * 0.005, height: h * 0.06, speed: w * 0.003, color: 'BLACK' };
+    const pong = { radius: w * 0.005, speed: w * 0.002, color: 'RED' };
+
+    function getRandomDirection() {
+        let angle = Math.random() * Math.PI / 2 - Math.PI / 4;
+
+        return {
+            dirX: Math.cos(angle),
+            dirY: Math.sin(angle)
+        };
+    }
 
     const gameInit = () => {
         canvas = $container.querySelector('.pong-canvas');
@@ -25,7 +34,12 @@ export default function Practice($container) {
         // 플레이어, 공 초기화
         player1 = { x: 0, y: canvas.height / 2 - paddle.height / 2, score: 0 };
         player2 = { x: canvas.width - paddle.width, y: canvas.height / 2 - paddle.height / 2, score: 0 };
-        ball = { x: canvas.width / 2, y: canvas.height / 2, dirX: 1, dirY: 1,};
+        let ball1Direction = getRandomDirection();
+        let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY }; // 반대 방향
+        balls = [
+            { x: canvas.width / 2, y: canvas.height / 2, ...ball1Direction },
+            { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
+        ];
 
         gameLoop();
         setTimeout(() => {
@@ -57,38 +71,48 @@ export default function Practice($container) {
 
     const update = () => {
         if (!isBallMoving) return;
-        // 공의 위치 업데이트
-        ball.x += pong.speed * ball.dirX;
-        ball.y += pong.speed * ball.dirY;
-        // 벽 충돌 검사
-        if (ball.y + pong.radius > canvas.height || ball.y - pong.radius < 0) {
-            ball.dirY = -ball.dirY; // Y 방향 반전
-        }
-        // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
-        if (ball.x - pong.radius < 0) { // 왼쪽 벽에 충돌
-            player2.score++;
-            resetBall();
-        } else if (ball.x + pong.radius > canvas.width) { // 오른쪽 벽에 충돌
-            player1.score++;
-            resetBall();
-        }
-        // 패들 충돌 검사
-        let nearestPlayer = (ball.x < canvas.width / 2) ? player1 : player2;
-        if (ball.x - pong.radius <= nearestPlayer.x + paddle.width
-            && ball.x + pong.radius >= nearestPlayer.x
-            && ball.y - pong.radius <= nearestPlayer.y + paddle.height
-            && ball.y + pong.radius >= nearestPlayer.y) {
-            ball.dirX = -ball.dirX; // X 방향 반전
-        }
+        balls.forEach(ball => {
+            // 공의 위치 업데이트
+            ball.x += pong.speed * ball.dirX;
+            ball.y += pong.speed * ball.dirY;
+            // 벽 충돌 검사
+            if (ball.y + pong.radius > canvas.height || ball.y - pong.radius < 0) {
+                ball.dirY = -ball.dirY; // Y 방향 반전
+            }
+            // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
+            if (ball.x - pong.radius < 0) { // 왼쪽 벽에 충돌
+                player2.score++;
+                resetBall();
+            } else if (ball.x + pong.radius > canvas.width) { // 오른쪽 벽에 충돌
+                player1.score++;
+                resetBall();
+            }
+            // 패들 충돌 검사
+            let nearestPlayer = (ball.x < canvas.width / 2) ? player1 : player2;
+            if (ball.x - pong.radius <= nearestPlayer.x + paddle.width
+                && ball.x + pong.radius >= nearestPlayer.x
+                && ball.y - pong.radius <= nearestPlayer.y + paddle.height
+                && ball.y + pong.radius >= nearestPlayer.y) {
+                ball.dirX = -ball.dirX; // X 방향 반전
+            }
+        });
     };
 
     const resetBall = () => {
         isBallMoving = false;
-        ball.x = canvas.width / 2;
-        ball.y = canvas.height / 2;
-        // 랜덤한 방향으로 시작 각도 조정
-        ball.dirX = -ball.dirX;
-        ball.dirY = Math.random() > 0.5 ? 1 : -1;
+        balls.forEach((ball, index) => {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+
+            let direction = getRandomDirection();
+            if (index === 0) {
+                ball.dirX = direction.dirX;
+                ball.dirY = direction.dirY;
+            } else {
+                ball.dirX = -direction.dirX;
+                ball.dirY = -direction.dirY;
+            }
+        });
         setTimeout(() => {
             isBallMoving = true;
         }, 500);
@@ -103,11 +127,13 @@ export default function Practice($container) {
         ctx.fillStyle = paddle.color;
         ctx.fillRect(player2.x, player2.y, paddle.width, paddle.height);
         // 공 그리기
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, pong.radius, 0, Math.PI*2, true);
-        ctx.fillStyle = pong.color;
-        ctx.fill();
-        ctx.closePath();
+        balls.forEach(ball => {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, pong.radius, 0, Math.PI*2, true);
+            ctx.fillStyle = pong.color;
+            ctx.fill();
+            ctx.closePath();
+        });
         // 점수 그리기
         ctx.font = "2em DNF Bit Bit v2";
         ctx.fillStyle = "WHITE";
@@ -139,15 +165,6 @@ export default function Practice($container) {
                 case 'ArrowDown': keys['ArrowUp'] = false; keys['ArrowDown'] = true; break;
             }
         });
-
-        // document.addEventListener('keyup', (event) => {
-        //     switch (event.code) {
-        //         case 'KeyW': keys['w'] = false; break;
-        //         case 'KeyS': keys['s'] = false; break;
-        //         case 'ArrowUp': keys['ArrowUp'] = false; break;
-        //         case 'ArrowDown': keys['ArrowDown'] = false; break;
-        //     }
-        // });
     };
 
     importCss("assets/css/game.css");
