@@ -32,10 +32,10 @@ export default function Practice($container) {
         canvas.width = w * 0.4;
         canvas.height = h * 0.3;
         // 플레이어, 공 초기화
-        player1 = { x: 0, y: canvas.height / 2 - paddle.height / 2, score: 0 };
-        player2 = { x: canvas.width - paddle.width, y: canvas.height / 2 - paddle.height / 2, score: 0 };
+        player1 = { x: 50, y: canvas.height / 2 - paddle.height / 2, score: 0 };
+        player2 = { x: canvas.width - paddle.width - 50, y: canvas.height / 2 - paddle.height / 2, score: 0 };
         let ball1Direction = getRandomDirection();
-        let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY }; // 반대 방향
+        let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
         balls = [
             { x: canvas.width / 2, y: canvas.height / 2, ...ball1Direction },
             { x: canvas.width / 2, y: canvas.height / 2, ...ball2Direction }
@@ -137,8 +137,8 @@ export default function Practice($container) {
         // 점수 그리기
         ctx.font = "2em DNF Bit Bit v2";
         ctx.fillStyle = "WHITE";
-        ctx.fillText(player1.score.toString(), canvas.width / 4, 50);
-        ctx.fillText(player2.score.toString(), (3 * canvas.width) / 4, 50);
+        ctx.fillText(player1.score.toString(), canvas.width / 4, canvas.height / 2);
+        ctx.fillText(player2.score.toString(), (3 * canvas.width) / 4, canvas.height / 2);
     };
 
     const render = () => {
