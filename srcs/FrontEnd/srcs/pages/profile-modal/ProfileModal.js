@@ -15,6 +15,7 @@ export default function ProfileModal($container, nickname, isMe) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
+    const blockButtonText = '차단';
 
     const render = () => {
         const page = $container.querySelector('#page');
@@ -37,7 +38,7 @@ export default function ProfileModal($container, nickname, isMe) {
                         </div>
                         <div id="profile-modal-button-container">
                             ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
-                            <button class="non-outline-btn" id="block-btn">차단</button>
+                            <button class="non-outline-btn" id="block-btn">${blockButtonText}</button>
                             <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
                             <button class="non-outline-btn" id="ok-btn">확인</button>
                             `}
@@ -52,30 +53,35 @@ export default function ProfileModal($container, nickname, isMe) {
 
     };
 
+    this.handleImageChange = function() {
+        let formData = new FormData();
+        if (this.files.length > 0) {
+            formData.append('image', this.files[0]);
+        }
+        fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(data => {
+            console.log('Success:', data);
+            fetchProfileModalData();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
     this.renderInfo = () => {
         const infoTabContainer = $container.querySelector('#info-content');
         if (infoTabContainer) {
-            infoTabContainer.innerHTML = InfoTab(isMe, getInfo());
+            let infoData = getInfo();
+            infoTabContainer.innerHTML = InfoTab(isMe, infoData);
+            if (infoData.block)
+                $container.querySelector('#block-btn').innerHTML = '차단 해제';
             let inputElement = $container.querySelector('#profile-picture-input');
             if (inputElement) { // Add this condition
-                inputElement.addEventListener('change', function () {
-                    let formData = new FormData();
-                    if (this.files.length > 0) {
-                        formData.append('image', this.files[0]);
-                    }
-                    fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
-                        method: 'POST',
-                        body: formData,
-                    })
-                    .then(data => {
-                        console.log('Success:', data);
-                        fetchProfileModalData();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                });
-            }
+                inputElement.addEventListener('change', this.handleImageChange);
+            };
         }
     };
 
@@ -116,7 +122,12 @@ export default function ProfileModal($container, nickname, isMe) {
             } else if (event.target.closest('#nickname-submit-btn')) {
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
-                handleBlockButtonClick();
+                if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
+                    console.log(nickname);
+                    handleUnBlockButtonClick(nickname);
+                } else {
+                    handleBlockButtonClick();
+                }
             }
         });
     };
@@ -128,6 +139,7 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toBlock),
         })
         .then(data => {
+            $container.querySelector('#block-btn').innerHTML = '차단 해제';
             console.log('Success:', data);
         })
         .catch(error => {
@@ -143,6 +155,7 @@ export default function ProfileModal($container, nickname, isMe) {
         })
         .then(data => {
             updateBlacklist();
+            $container.querySelector('#block-btn').innerHTML = '차단';
             console.log('Success:', data);
         })
         .catch(error => {
