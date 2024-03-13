@@ -4,7 +4,7 @@ export default function InfoTab(isMe, infoData) {
     const hardWinRateBar = createWinRateBar(infoData.hard, 'HARD');
     const nicknameBox = createNicknameBox(infoData.nickname, isMe);
     const profilePicture = createProfilePicture(isMe, infoData.image);
-    console.log(infoData);
+    
     return `
         <div id="profile-picture-container">
             ${profilePicture}
@@ -32,8 +32,8 @@ function createProfilePicture(isMe, image) {
         return `
             <label for="profile-picture-input" id="profile-picture-label">
                 <img src="${image}" alt="profile picture" id="profile-picture">
+                <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
             </label>
-            <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
         `;
     } else {
         return `
