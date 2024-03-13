@@ -5,6 +5,7 @@
     background-color: #779630;
     font-family: "DNF Bit Bit v2", serif;
     display: flex;
+    justify-content: center;
     flex-direction: column;
     padding: 10px;
 }
