@@ -21,7 +21,7 @@ export default function Practice($container) {
         const containerHeight = container.offsetHeight;
         playerImage.src = "../../assets/image/img.png";
 
-        paddle = { width: containerHeight * 0.03, height: containerHeight * 0.15, speed: containerHeight * 0.02, color: 'WHITE' };
+        paddle = { width: containerHeight * 0.03, height: containerHeight * 0.15, speed: containerHeight * 0.015, color: 'WHITE' };
         pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.02, color: '#ffa939' };
 
         // 배경용 캔버스 초기화
@@ -237,7 +237,6 @@ export default function Practice($container) {
         });
     };
 
-    importCss("assets/css/game.css");
     render();
     setupEventListener();
     init();
