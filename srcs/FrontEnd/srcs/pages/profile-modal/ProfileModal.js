@@ -6,6 +6,7 @@ import {BACKEND, fetchWithAuth, fetchWithAuthFormData} from "../../api.js";
 import ErrorPage from "../ErrorPage.js";
 import HistoryTab from "./HistoryTab.js";
 import MyProfile from "../../components/MyProfile.js";
+import ImgUploadError from "../ImgUploadError.js";
 
 /**
  * @param {HTMLElement} $container
@@ -55,9 +56,18 @@ export default function ProfileModal($container, nickname, isMe) {
     };
 
     this.handleImageChange = function() {
+        let file = '';
         let formData = new FormData();
         if (this.files.length > 0) {
-            formData.append('image', this.files[0]);
+            file = this.files[0];
+            formData.append('image', file);
+        }
+        // 이미지 파일 크기 제한
+        const fileSizeInMB = file.size / (1024 * 1024);
+        if (fileSizeInMB > 3) {
+            new ImgUploadError($container);
+            setupEventListener();
+        return;
         }
         fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
             method: 'POST',
@@ -81,7 +91,7 @@ export default function ProfileModal($container, nickname, isMe) {
             if (infoData.block)
                 $container.querySelector('#block-btn').innerHTML = '차단 해제';
             let inputElement = $container.querySelector('#profile-picture-input');
-            if (inputElement) { // Add this condition
+            if (inputElement) {
                 inputElement.addEventListener('change', this.handleImageChange);
             };
         }
@@ -132,6 +142,10 @@ export default function ProfileModal($container, nickname, isMe) {
                 }
             }
         });
+        const inputElement = $container.querySelector('#profile-picture-input');
+        if (inputElement) {
+          inputElement.addEventListener('change', this.handleImageChange);
+        }
     };
 
     const handleBlockButtonClick = () => {
@@ -189,7 +203,8 @@ export default function ProfileModal($container, nickname, isMe) {
                 body: JSON.stringify({ nickname: nicknameInput.value }),
             })
                 .then(() => {
-                    nicknameInput.placeholder = nicknameInput.value;
+                    nickname=nicknameInput.value;
+                    nicknameInput.placeholder = nickname;
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
                     new MyProfile($container);
