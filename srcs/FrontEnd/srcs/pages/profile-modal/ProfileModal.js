@@ -5,6 +5,7 @@ import useState from "../../utils/useState.js";
 import {BACKEND, fetchWithAuth, fetchWithAuthFormData} from "../../api.js";
 import ErrorPage from "../ErrorPage.js";
 import HistoryTab from "./HistoryTab.js";
+import MyProfile from "../../components/MyProfile.js";
 
 /**
  * @param {HTMLElement} $container
@@ -65,6 +66,7 @@ export default function ProfileModal($container, nickname, isMe) {
         .then(data => {
             console.log('Success:', data);
             fetchProfileModalData();
+            new MyProfile($container);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -190,6 +192,7 @@ export default function ProfileModal($container, nickname, isMe) {
                     nicknameInput.placeholder = nicknameInput.value;
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
+                    new MyProfile($container);
                 })
                 .catch(error => {
                     switch (error.status) {
