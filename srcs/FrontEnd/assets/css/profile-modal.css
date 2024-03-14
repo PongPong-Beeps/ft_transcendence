@@ -187,6 +187,11 @@
     color: #5C7320;
     background-color: #A9CE50;
     border: 4px solid #588329;
+    transition: transform 0.1s ease-in-out;
+}
+
+#profile-modal-button-container button:hover {
+    transform: scale(0.95);
 }
 
 /* ~~~~~~~~~info tab container below~~~~~~~~~~ */
@@ -237,6 +242,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: filter 0.3s ease-in-out;
 }
 
 #profile-picture-not-me {
@@ -247,7 +253,7 @@
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.24);
 }
 
-#profile-picture-label:hover {
+#profile-picture-label:hover #profile-picture {
     filter: brightness(50%);
 }
 
@@ -333,6 +339,11 @@
     background-color: #A9CE50;
     border: 4px solid #588329;
     font-size: 1em;
+    transition: transform 0.1s ease-in-out;
+}
+
+#nickname-submit-btn:hover {
+    transform: scale(0.95);
 }
 
 #nickname-submit-btn.shake-animation {
