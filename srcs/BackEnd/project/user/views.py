@@ -269,7 +269,13 @@ class ChangeImageView(APIView):
             # ImageField에 파일 경로 저장
             user.image_file = file_path
             user.save()
-            return Response({"message": "프로필 이미지가 정상적으로 변경되었습니다"}, status=200)
+            
+            response_data = {
+                "message": "프로필 이미지가 정상적으로 변경되었습니다",
+                "image": get_image(user),
+            }
+            
+            return Response(response_data, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
     
