@@ -76,7 +76,7 @@ export default function ProfileModal($container, nickname, isMe, setNicknameFn =
             body: formData,
         })
         .then(data => {
-            console.log('Success:', data.image);
+            console.log('Success:', data);
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
             $container.querySelector('#profile-picture').src = data.image;
             setProfileImageFn(data.image);
