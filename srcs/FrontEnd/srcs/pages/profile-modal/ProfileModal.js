@@ -9,11 +9,13 @@ import MyProfile from "../../components/MyProfile.js";
 import ImgUploadError from "../ImgUploadError.js";
 
 /**
- * @param {HTMLElement} $container
- * @param {string} nickname
- * @param {boolean} isMe
+ * @param { HTMLElement } $container
+ * @param { string } nickname
+ * @param { boolean } isMe
+ * @param { Function } setNicknameFn
+ * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, nickname, isMe) {
+export default function ProfileModal($container, nickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -67,16 +69,17 @@ export default function ProfileModal($container, nickname, isMe) {
         if (fileSizeInMB > 3) {
             new ImgUploadError($container);
             setupEventListener();
-        return;
+            return;
         }
         fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
             method: 'POST',
             body: formData,
         })
         .then(data => {
-            console.log('Success:', data);
-            fetchProfileModalData();
-            new MyProfile($container);
+            console.log('Success:', data.image);
+            data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
+            $container.querySelector('#profile-picture').src = data.image;
+            setProfileImageFn(data.image);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -93,7 +96,7 @@ export default function ProfileModal($container, nickname, isMe) {
             let inputElement = $container.querySelector('#profile-picture-input');
             if (inputElement) {
                 inputElement.addEventListener('change', this.handleImageChange);
-            };
+            }
         }
     };
 
@@ -204,11 +207,11 @@ export default function ProfileModal($container, nickname, isMe) {
                 body: JSON.stringify({ nickname: nicknameInput.value }),
             })
                 .then(() => {
-                    nickname=nicknameInput.value;
+                    nickname = nicknameInput.value;
                     nicknameInput.placeholder = nickname;
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
-                    new MyProfile($container);
+                    setNicknameFn(nickname);
                 })
                 .catch(error => {
                     switch (error.status) {
