@@ -14,7 +14,6 @@ export default function Practice($container) {
         'ArrowDown': false
     };
 
-
     const init = () => {
         const container = $container.querySelector('.game-canvas-container');
         const containerWidth = container.offsetWidth;
@@ -29,7 +28,7 @@ export default function Practice($container) {
         backgroundCtx = backgroundCanvas.getContext('2d');
         backgroundCanvas.width = containerWidth;
         backgroundCanvas.height = containerHeight;
-        drawBackground(); // 배경 그리기 함수 호출
+        drawBackground();
 
         // 게임 오브젝트용 캔버스 초기화
         gameCanvas = $container.querySelector('#game-canvas');
@@ -40,7 +39,6 @@ export default function Practice($container) {
 
     function getRandomDirection() {
         let angle = Math.random() * Math.PI / 2 - Math.PI / 4;
-
         return {
             dirX: Math.cos(angle),
             dirY: Math.sin(angle)
@@ -57,7 +55,7 @@ export default function Practice($container) {
             balls = [
                 { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...getRandomDirection() }
             ];
-        } else { // 'hard'
+        } else {
             let ball1Direction = getRandomDirection();
             let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
             balls = [
