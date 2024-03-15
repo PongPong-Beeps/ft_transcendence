@@ -167,7 +167,7 @@
     transition: transform 0.1s ease-in-out;
 }
 
-.unblock-btn:hover {
+.unblock-btn:active {
     transform: scale(0.95);
 }
 
@@ -190,7 +190,7 @@
     transition: transform 0.1s ease-in-out;
 }
 
-#profile-modal-button-container button:hover {
+#profile-modal-button-container button:active {
     transform: scale(0.95);
 }
 
@@ -342,7 +342,7 @@
     transition: transform 0.1s ease-in-out;
 }
 
-#nickname-submit-btn:hover {
+#nickname-submit-btn:active {
     transform: scale(0.95);
 }
 

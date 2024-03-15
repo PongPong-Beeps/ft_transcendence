@@ -135,7 +135,6 @@ export default function ProfileModal($container, nickname, isMe) {
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
                 if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
-                    console.log(nickname);
                     handleUnBlockButtonClick(nickname);
                 } else {
                     handleBlockButtonClick();
@@ -170,8 +169,10 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toUnBlock),
         })
         .then(data => {
-            updateBlacklist();
-            $container.querySelector('#block-btn').innerHTML = '차단';
+            if (isMe)
+                updateBlacklist();
+            else
+                $container.querySelector('#block-btn').innerHTML = '차단';
             console.log('Success:', data);
         })
         .catch(error => {
