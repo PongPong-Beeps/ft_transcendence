@@ -126,11 +126,20 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         message = event['message']
         
         is_receiver = user.nickname == receiver
+        is_sender = user.nickname == sender
         is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
+        
         if is_receiver and not is_blocked:
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "sender": sender,
+                "message": message
+            }))
+        
+        if is_sender:
+            await self.send(text_data=json.dumps({
+                "type": "dm_chat",
+                "receiver": receiver,
                 "message": message
             }))
     
