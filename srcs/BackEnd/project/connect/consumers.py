@@ -1,14 +1,13 @@
 import json
-from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import AnonymousUser
+from channels.generic.websocket import AsyncWebsocketConsumer
 
-
-class ConnectConsumer(WebsocketConsumer):
-    def connect(self):
+class ConnectConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
         self.room_group_name = 'connect'
         
-        async_to_sync(self.channel_layer.group_add)(
+        await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
@@ -21,11 +20,11 @@ class ConnectConsumer(WebsocketConsumer):
         else:
             print("user is authenticated:", user)
             
-        self.accept()
+        await self.accept()
     
-    def disconnect(self, message):
+    async def disconnect(self, message):
         
-        async_to_sync(self.channel_layer.group_discard)(
+        await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
