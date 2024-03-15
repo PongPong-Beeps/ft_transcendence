@@ -61,6 +61,15 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "friend_list", "sender": sender}
             )
+        elif type == 'all_chat':
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "all_chat", "sender": sender, "message": text_data_json["message"]}
+            )
+        elif type == 'dm_chat':
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "dm_chat", "sender": sender, "receiver": text_data_json["receiver"] ,"message": text_data_json["message"]}
+            ) 
+            
     
     async def friend_list(self, event):
         user = self.scope['user']
@@ -96,3 +105,33 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         friends = await database_sync_to_async(lambda: list(user.friendlist.all()))()
         for friend in friends:
             print("Friend: ", friend.nickname)
+    
+    async def all_chat(self, event):
+        user = self.scope['user']
+        sender = event['sender']
+        message = event['message']
+        
+        is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
+        if not is_blocked:
+            await self.send(text_data=json.dumps({
+                "type": "all_chat",
+                "sender": sender,
+                "message": message
+            }))
+    
+    async def dm_chat(self, event):
+        user = self.scope['user']
+        sender = event['sender']
+        receiver = event['receiver']
+        message = event['message']
+        
+        is_receiver = user.nickname == receiver
+        is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
+        if is_receiver and not is_blocked:
+            await self.send(text_data=json.dumps({
+                "type": "dm_chat",
+                "sender": sender,
+                "message": message
+            }))
+    
+        
