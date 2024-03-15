@@ -127,16 +127,17 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         
         is_receiver = user.nickname == receiver
         is_sender = user.nickname == sender
-        is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
+        is_blocked_sender = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
+        is_blocked_receiver = await database_sync_to_async(lambda: user.blacklist.filter(nickname=receiver).exists())()
         
-        if is_receiver and not is_blocked:
+        if is_receiver and not is_blocked_sender:   # receiver가 sender를 차단하지 않은 경우
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "sender": sender,
                 "message": message
             }))
         
-        if is_sender:
+        if is_sender and not is_blocked_receiver:   # sender가 receiver를 차단하지 않은 경우
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "receiver": receiver,
