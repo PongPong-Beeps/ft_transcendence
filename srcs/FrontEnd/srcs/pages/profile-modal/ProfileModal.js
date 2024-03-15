@@ -2,9 +2,11 @@ import BlacklistCell from "./BlacklistCell.js";
 import InfoTab from "./InfoTab.js";
 import {importCss} from "../../utils/importCss.js";
 import useState from "../../utils/useState.js";
-import {BACKEND, fetchWithAuth} from "../../api.js";
+import {BACKEND, fetchWithAuth, fetchWithAuthFormData} from "../../api.js";
 import ErrorPage from "../ErrorPage.js";
 import HistoryTab from "./HistoryTab.js";
+import MyProfile from "../../components/MyProfile.js";
+import ImgUploadError from "../ImgUploadError.js";
 
 /**
  * @param {HTMLElement} $container
@@ -15,6 +17,7 @@ export default function ProfileModal($container, nickname, isMe) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
+    const blockButtonText = '차단';
 
     const render = () => {
         const page = $container.querySelector('#page');
@@ -37,7 +40,7 @@ export default function ProfileModal($container, nickname, isMe) {
                         </div>
                         <div id="profile-modal-button-container">
                             ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
-                            <button class="non-outline-btn" id="block-btn">차단</button>
+                            <button class="non-outline-btn" id="block-btn">${blockButtonText}</button>
                             <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
                             <button class="non-outline-btn" id="ok-btn">확인</button>
                             `}
@@ -52,10 +55,45 @@ export default function ProfileModal($container, nickname, isMe) {
 
     };
 
+    this.handleImageChange = function() {
+        let file = '';
+        let formData = new FormData();
+        if (this.files.length > 0) {
+            file = this.files[0];
+            formData.append('image', file);
+        }
+        // 이미지 파일 크기 제한
+        const fileSizeInMB = file.size / (1024 * 1024);
+        if (fileSizeInMB > 3) {
+            new ImgUploadError($container);
+            setupEventListener();
+        return;
+        }
+        fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(data => {
+            console.log('Success:', data);
+            fetchProfileModalData();
+            new MyProfile($container);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
     this.renderInfo = () => {
         const infoTabContainer = $container.querySelector('#info-content');
         if (infoTabContainer) {
-            infoTabContainer.innerHTML = InfoTab(isMe, getInfo());
+            let infoData = getInfo();
+            infoTabContainer.innerHTML = InfoTab(isMe, infoData);
+            if (infoData.block)
+                $container.querySelector('#block-btn').innerHTML = '차단 해제';
+            let inputElement = $container.querySelector('#profile-picture-input');
+            if (inputElement) {
+                inputElement.addEventListener('change', this.handleImageChange);
+            };
         }
     };
 
@@ -70,6 +108,9 @@ export default function ProfileModal($container, nickname, isMe) {
         const blacklist = $container.querySelector('#blacklist-content');
         if (blacklist) {
             blacklist.innerHTML = getBlacklist().map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+            if (getBlacklist().length === 0) {
+                blacklist.innerHTML = '<div id="blacklist-message">블랙리스트가 비어있습니다</div>';
+            }
             getBlacklist().forEach(blacklist => {
                 const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
                 if (cell) {
@@ -81,7 +122,7 @@ export default function ProfileModal($container, nickname, isMe) {
             }
             );
         }
-    }           
+    }
 
     const setupEventListener = () => {
         const profileModalContainer = $container.querySelector('#profile-modal-container');
@@ -93,11 +134,20 @@ export default function ProfileModal($container, nickname, isMe) {
             } else if (event.target.closest('#nickname-submit-btn')) {
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
-                handleBlockButtonClick();
+                if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
+                    console.log(nickname);
+                    handleUnBlockButtonClick(nickname);
+                } else {
+                    handleBlockButtonClick();
+                }
             }
         });
+        const inputElement = $container.querySelector('#profile-picture-input');
+        if (inputElement) {
+          inputElement.addEventListener('change', this.handleImageChange);
+        }
     };
-    
+
     const handleBlockButtonClick = () => {
         const toBlock = { "nickname": nickname };
         fetchWithAuth(`${BACKEND}/user/block/`, {
@@ -105,6 +155,7 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toBlock),
         })
         .then(data => {
+            $container.querySelector('#block-btn').innerHTML = '차단 해제';
             console.log('Success:', data);
         })
         .catch(error => {
@@ -120,6 +171,7 @@ export default function ProfileModal($container, nickname, isMe) {
         })
         .then(data => {
             updateBlacklist();
+            $container.querySelector('#block-btn').innerHTML = '차단';
             console.log('Success:', data);
         })
         .catch(error => {
@@ -151,9 +203,11 @@ export default function ProfileModal($container, nickname, isMe) {
                 body: JSON.stringify({ nickname: nicknameInput.value }),
             })
                 .then(() => {
-                    nicknameInput.placeholder = nicknameInput.value;
+                    nickname=nicknameInput.value;
+                    nicknameInput.placeholder = nickname;
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
+                    new MyProfile($container);
                 })
                 .catch(error => {
                     switch (error.status) {

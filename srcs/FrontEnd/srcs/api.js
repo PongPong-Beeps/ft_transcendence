@@ -57,6 +57,41 @@ export async function fetchWithAuth(url, options = {}) {
     return await response.json();
 }
 
+export async function fetchWithAuthFormData(url, options = {}) {
+    const defaultHeaders = {
+        'X-CSRFToken': getCookie("csrftoken"),
+        'Authorization': `Bearer ${getCookie("access_token")}`,
+    };
+
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            ...defaultHeaders,
+            ...options.headers,
+        },
+    });
+    // 토큰 만료 시 재발급 후 요청 재시도
+    if (response.status === 401) {
+        await refreshToken();
+        response = await fetch(url, {
+            ...options,
+            headers: {
+                ...defaultHeaders,
+                ...options.headers,
+                'Authorization': `Bearer ${getCookie("access_token")}`,
+            },
+        });
+    }
+    // 요청 실패 시 상태 코드 설정 후 에러 던짐
+    if (!response.ok) {
+        const error = new Error(`'${url}' 요청 실패`);
+        error.status = response.status;
+        throw error;
+    }
+
+    return await response.json();
+}
+
 /*
 
 [ 바디 없을 때 ]

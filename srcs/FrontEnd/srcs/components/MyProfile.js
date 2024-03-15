@@ -9,6 +9,7 @@ import Router from "../router.js";
  */
 export default function MyProfile($container) {
     let [getNickname, setNickname] = useState("", this, 'renderNickname');
+    let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
 
     async function getProfile() {
         await fetch("https://127.0.0.1/api/user/me", {
@@ -41,13 +42,15 @@ export default function MyProfile($container) {
                 }
             })
             .then(data => {
+                data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
                 setNickname(data.nickname);
+                setProfileImage(data.image);
             })
     };
     const render = () => {
         $container.querySelector('#profile').innerHTML = `
             <div id="profile-container">
-                <div id="profile-image"></div>
+                <div id="profile-image"><img id="profile-img" src="" alt="Profile Image" width="100%" height="100%"></div>
                 <div id="nickname"></div>
                 <button class="green-btn non-outline-btn" id="profile-btn">상세 정보</button>
             </div>
@@ -62,6 +65,9 @@ export default function MyProfile($container) {
 
     this.renderNickname = () => {
         $container.querySelector('#nickname').textContent = getNickname();
+    }
+    this.renderProfileImage = () => {
+        $container.querySelector('#profile-img').src = getProfileImage();
     }
 
     importCss("assets/css/my-profile.css");
