@@ -66,7 +66,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         sender = event['sender']
         
-        if user == sender: #자신의 친구목록을 요청한 경우
+        if user.nickname == sender: #자신의 친구목록을 요청한 경우
             friend_list_json = await self.generate_friend_list_status_json(user)
             await self.send(text_data=friend_list_json)
             
