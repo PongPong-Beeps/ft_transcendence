@@ -16,7 +16,7 @@ export default function MyProfile($container) {
     const render = () => {
         $container.querySelector('#profile').innerHTML = `
             <div id="profile-container">
-                <div id="profile-image"><img id="profile-img" src="" alt="Profile Image" width="100%" height="100%"></div>
+                <div id="profile-image"><img id="profile-img" src="" alt="" width="100%" height="100%"></div>
                 <div id="profile-detail">
                     <div id="nickname"></div>
                     <button class="green-btn non-outline-btn" id="profile-btn">프로필</button>
@@ -27,7 +27,7 @@ export default function MyProfile($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, getNickname(), true);
+            new ProfileModal($container, getNickname(), true, setNickname, setProfileImage);
         });
     }
 
