@@ -26,7 +26,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif self.scope['category'] == "quick_start":
             await self.quick_start(user)
         elif self.scope['category'] == "invite":
-            await self.accept_invite(user)
+            status = await self.accept_invite(user)
+            if status == 'fail':
+                return
                 
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
@@ -34,9 +36,16 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send_game_status()
     
-    async def disconnect(self, message):
-        user = self.scope['user']
+    async def disconnect(self, close_code):
+        if close_code == 4000 :
+            print('Game does not exist.')
+            return
+        elif close_code == 4001 :
+            print('Game is full.')
+            return
         
+        user = self.scope['user']
+    
         await self.remove_player_and_check_game(user)
         
         await self.channel_layer.group_discard(
@@ -72,27 +81,31 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.create_room(user)
 
     async def accept_invite(self, user):
-        game = await database_sync_to_async(Game.objects.filter)(id=self.scope['game_id'])
-        if not game:
+        try :
+            game = await database_sync_to_async(Game.objects.get)(id=self.scope['game_id'])
+            if game.is_full:
+                await self.accept()
+                await self.send(text_data=json.dumps({
+                    'status': '4001',
+                    'message': 'The game is full.'
+                }))
+                await self.close(4001)
+                return 'fail'
+            else:
+                empty_slot = game.get_empty_player_slot()
+                setattr(game, empty_slot, user.nickname)
+                await database_sync_to_async(game.save)()
+                await database_sync_to_async(game.check_full)()
+                self.room_group_name = str(game.id)
+                return 'success'
+        except Game.DoesNotExist:
             await self.accept()
             await self.send(text_data=json.dumps({
-                'status': '404',
+                'status': '4000',
                 'message': 'The game does not exist.'
             }))
-            await self.close()
-        elif game.is_full:
-            await self.accept()
-            await self.send(text_data=json.dumps({
-                'status': '405',
-                'message': 'The game is full.'
-            }))
-            await self.close()
-        else:
-            empty_slot = game.get_empty_player_slot()
-            setattr(game, empty_slot, user.nickname)
-            await database_sync_to_async(game.save)()
-            await database_sync_to_async(game.check_full)()
-            self.room_group_name = str(game.id)
+            await self.close(4000)
+            return 'fail'
 
     
     async def send_game_status(self):
