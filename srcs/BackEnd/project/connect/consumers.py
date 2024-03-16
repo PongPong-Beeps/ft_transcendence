@@ -69,7 +69,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "dm_chat", "sender": sender, "receiver": text_data_json["receiver"] ,"message": text_data_json["message"]}
             ) 
-            
+
     
     async def friend_list(self, event):
         user = self.scope['user']
@@ -143,5 +143,3 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                 "receiver": receiver,
                 "message": message
             }))
-    
-        
