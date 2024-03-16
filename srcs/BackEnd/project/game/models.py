@@ -1,5 +1,7 @@
 from django.db import models
-
+from connect.models import Client
+from channels.db import database_sync_to_async
+    
 class Game(models.Model):
     score_a = models.IntegerField(default=0)
     score_b = models.IntegerField(default=0)
@@ -7,22 +9,17 @@ class Game(models.Model):
     mode = models.CharField(max_length=20) #easy or hard
     
     # webSocket별로 게임에 참여하려면 player들을 Clinet로 바꿀지 고민
-    # player1 = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='player1')
-    # player2 = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='player2')
-    # player3 = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='player3')
-    # player4 = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='player4')
-    
-    player1 = models.CharField(max_length=100, default='')
-    player2 = models.CharField(max_length=100, default='')
-    player3 = models.CharField(max_length=100, default='')
-    player4 = models.CharField(max_length=100, default='')
+    player1 = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_as_player1')
+    player2 = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_as_player2')
+    player3 = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_as_player3')
+    player4 = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_as_player4')
     
     is_full = models.BooleanField(default=False)
     
     #빈 플레이어 슬롯을 찾아서 반환
-    def get_empty_player_slot(self):
+    async def get_empty_player_slot(self):
         for player_slot in ['player1', 'player2', 'player3', 'player4']:
-            if getattr(self, player_slot) == '':
+            if await database_sync_to_async(getattr)(self, player_slot) is None:
                 return player_slot
         return None
     
