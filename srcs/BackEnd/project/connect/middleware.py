@@ -23,6 +23,13 @@ class TokenAuthMiddleware(BaseMiddleware):
             scope['user'] = await get_user_from_token(token)
         else:
             scope['user'] = AnonymousUser()
+        
+        #프론트에서 쿼리로 전달 : category, type, mode, game_id(초대수락시에만 전달)
+        scope['category'] = query_string.get('category', [None])[0]
+        scope['type'] = query_string.get('type', [None])[0]
+        scope['mode'] = query_string.get('mode', [None])[0]
+        scope['game_id'] = query_string.get('game_id', [None])[0]
+        
         return await super().__call__(scope, receive, send)
 
 def TokenAuthMiddlewareStack(inner):
