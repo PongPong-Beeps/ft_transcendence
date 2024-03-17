@@ -72,16 +72,26 @@ html, body {
     grid-area: bottom-trailing;
 }
 
+.green-btn:active {
+    transform: scale(0.95);
+}
+
 .green-btn {
     background-color: #D3E95A;
     color: #5C7320;
     font-family: "DNF Bit Bit v2", serif;
+    transition: transform 0.1s ease-in-out;
+}
+
+.red-btn:active {
+    transform: scale(0.95);
 }
 
 .red-btn {
     background-color: #E9855A;
     color : white;
     font-family: "DNF Bit Bit v2", serif;
+    transition: transform 0.1s ease-in-out;
 }
 
 .non-outline-btn {}

@@ -46,4 +46,9 @@
     border: 4px solid #5C7320;
     border-radius: 10px;
     margin: 0 10px;
+    transition: transform 0.1s ease-in-out;
+}
+
+#profile-btn:active {
+    transform: scale(0.95);
 }
