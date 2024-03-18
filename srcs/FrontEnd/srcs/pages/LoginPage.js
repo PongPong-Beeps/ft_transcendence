@@ -34,7 +34,6 @@ export default function LoginPage($container) {
         }
     };
 
-    handleAccessToken();
     const setupEventListener = () => {
         const loginButtons = {
           '#login-btn': '42',
