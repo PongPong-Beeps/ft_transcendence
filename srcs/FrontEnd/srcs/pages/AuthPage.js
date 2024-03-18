@@ -23,7 +23,9 @@ export default function AuthPage($container) {
 
     function sendAuthorizationCode() {
         // authorization_code 추출
-        const provider = window.location.search.includes('google') ? 'google' : window.location.search.includes('kakao') ? 'kakao' : '42';
+        const provider = localStorage.getItem('provider');
+        localStorage.clear();
+        console.log("[ sendAuthorizationCode ] provider : ", provider);
         const urlParams = new URLSearchParams(window.location.search);
         const authorization_code = urlParams.get('code');
         console.log("[ sendAuthorizationCode ] 인증 코드 추출 : ", authorization_code);
@@ -47,6 +49,7 @@ export default function AuthPage($container) {
             })
             .catch(error => {
                 console.error("[ sendAuthorizationCode ] ", error);
+                localStorage.clear();
             });
     }
 

@@ -31,8 +31,8 @@ export default function LoginPage($container) {
           '#google-login-btn': 'google',
           '#kakao-login-btn': 'kakao'
         };
-      
         const handleLogin = (endpoint) => {
+          localStorage.setItem('provider', endpoint);
           window.location.href = `${BACKEND}/login/${endpoint}/`;
         };
       
