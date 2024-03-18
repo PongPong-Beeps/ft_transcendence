@@ -8,6 +8,8 @@ from rest_framework import status
 import datetime
 from user.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.core.files.storage import default_storage #파일을 저장하기 위한 모듈
+from django.core.files.base import ContentFile #파일을 읽고 쓰기 위한 모듈
 
 google = {
     'grant_type': 'authorization_code',
@@ -106,9 +108,17 @@ def process_login(request, config, nickname_prefix=''):
         else :
             user_nickname = nickname_prefix + user_info.get('data', {}).get(config['nickname'])
             user_email = user_info.get('data', {}).get('email')
-        save_user_to_db(user_email, user_nickname)
-
+        is_saved = save_user_to_db(user_email, user_nickname)
         user = User.objects.get(email=user_email)
+        if nickname_prefix == 'k_' and is_saved == 'saved': #카카오 이면서 db에 저장된 경우에만 이미지 저장
+            image_url = user_info.get('data', {}).get('properties', {}).get('profile_image')
+            response = requests.get(image_url) #이미지 url get 요청으로 받아오기
+            if response.status_code == 200:
+                #이미지 장고 스토리지에 저장
+                file_path = default_storage.save('user_images/' + user_nickname + '/' + 'kakao.jpg', ContentFile(response.content))
+                user.image_file = file_path #이미지 경로 db에 저장
+                user.save()
+                
         jwt_token = create_jwt_token(user)
 
         response = Response({"message": "POST 요청 처리 완료"}, status=status.HTTP_200_OK)
@@ -152,9 +162,10 @@ def save_user_to_db(_user_email, _user_nickname):
             nickname = _user_nickname,
         )
         print(_user_email, " saved to db")
+        return ('saved')
     else :
         print(_user_email, " aleady saved db")
-        
+        return ('already')
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
