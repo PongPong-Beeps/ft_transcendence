@@ -32,6 +32,17 @@ fortytwo = {
     'nickname' : 'login',
 }
 
+kakao = {
+    'grant_type': 'authorization_code',
+    'client_id': '257d8e54c12291cad3e70e839117a6b0',
+    'redirect_uri': 'https://127.0.0.1/auth',
+    'scope': 'profile_nickname+profile_image',
+    'client_secret': 'eqeu3JhxTMo7QMKP4qFxJUESqIQ5yBSb',
+    'target_url': 'https://kauth.kakao.com/oauth/authorize?client_id=257d8e54c12291cad3e70e839117a6b0&redirect_uri=https://127.0.0.1/auth&response_type=code&scope=profile_nickname+profile_image',
+    'token_url': 'https://kauth.kakao.com/oauth/token',
+    'user_info_url': 'https://kapi.kakao.com/v2/user/me',
+}
+
 def get_access_token(auth_code, config):
         code = auth_code
         token_response = requests.post(
@@ -73,7 +84,15 @@ class LoginGoogleView(APIView):
 class LoginGoogleCallbackView(APIView):
     def post(self, request):
         return process_login(request, google, 'g_') #구글 아이디에만 g_를 붙여줌
-    
+
+class LoginKakaoView(APIView):
+    def get(self, request):
+        return redirect(kakao['target_url'])
+
+class LoginKakaoCallbackView(APIView):
+    def post(self, request):
+        return process_login(request, kakao, 'k_')
+
 def process_login(request, config, nickname_prefix=''):
     auth_code = request.data.get('code')
     access_token = get_access_token(auth_code, config)
@@ -81,8 +100,12 @@ def process_login(request, config, nickname_prefix=''):
         return Response({"message": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
     user_info = get_user_info(access_token, config['user_info_url'])
     if user_info['success']:
-        user_nickname = nickname_prefix + user_info.get('data', {}).get(config['nickname'])
-        user_email = user_info.get('data', {}).get('email')
+        if nickname_prefix == 'k_' :
+            user_nickname = nickname_prefix + user_info.get('data', {}).get('properties', {}).get('nickname')
+            user_email = user_nickname + '@kakao.com'
+        else :
+            user_nickname = nickname_prefix + user_info.get('data', {}).get(config['nickname'])
+            user_email = user_info.get('data', {}).get('email')
         save_user_to_db(user_email, user_nickname)
 
         user = User.objects.get(email=user_email)
