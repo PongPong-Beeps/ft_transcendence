@@ -23,12 +23,13 @@ export default function AuthPage($container) {
 
     function sendAuthorizationCode() {
         // authorization_code 추출
+        const provider = window.location.search.includes('google') ? 'google' : window.location.search.includes('kakao') ? 'kakao' : '42';
         const urlParams = new URLSearchParams(window.location.search);
         const authorization_code = urlParams.get('code');
         console.log("[ sendAuthorizationCode ] 인증 코드 추출 : ", authorization_code);
 
         // 백엔드로 전송
-        fetch(`${BACKEND}/login/42/callback/`, {
+        fetch(`${BACKEND}/login/${provider}/callback/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
