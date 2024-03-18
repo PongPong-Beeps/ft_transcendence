@@ -1,12 +1,17 @@
 import {navigate} from "../utils/navigate.js";
 import {importCss} from "../utils/importCss.js";
 import {BACKEND} from "../api.js";
+import getCookie from "../utils/cookie.js";
 
 /**
  * @param {HTMLElement} $container
  */
 export default function LoginPage($container) {
     const render = () => {
+        if (getCookie("access_token")) {
+            navigate('lobby');
+            return;
+        }
         const page = $container.querySelector('#page');
         if (page) {
             page.innerHTML = `
