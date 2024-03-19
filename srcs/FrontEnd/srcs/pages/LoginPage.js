@@ -34,14 +34,6 @@ export default function LoginPage($container) {
         }
     };
 
-    const handleAccessToken = () => {
-        if (getCookie("access_token")) {
-            fetchWithAuth(`${BACKEND}`)
-                .then(() => navigate('lobby'))
-            return;
-        }
-    };
-
     const setupEventListener = () => {
         const loginButtons = {
           '#login-btn': '42',
