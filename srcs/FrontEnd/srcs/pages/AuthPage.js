@@ -49,7 +49,7 @@ export default function AuthPage($container) {
                         console.log("웹 소켓 생성 완료");
                         navigate('lobby', ws);
                     }
-                    ws.onclose = functioin(event) {
+                    ws.onclose = function(event) {
                         console.log("웹 소켓 닫아용");
                     }
                 }
