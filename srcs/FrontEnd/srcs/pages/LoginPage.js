@@ -29,7 +29,16 @@ export default function LoginPage($container) {
     const handleAccessToken = () => {
         if (getCookie("access_token")) {
             fetchWithAuth(`${BACKEND}`)
-                .then(() => navigate('lobby'))
+                .then(data => {
+                    let ws = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    ws.onopen = function(event) {
+                        console.log("웹 소켓 생성 완료");
+                        navigate('lobby', ws);
+                    }
+                    ws.onclose = function(event) {
+                        console.log("웹 소켓 닫아용");
+                    }
+                });
             return;
         }
     };
