@@ -77,7 +77,7 @@ class Login42TestView(APIView):
     
 class Login42CallbackView(APIView):
     def post(self, request):
-        return process_login(request, fortytwo) #구글 아이디에만 g_를 붙여줌
+        return process_login(request, fortytwo) #42로그인은 인트라 아이디
     
 class LoginGoogleView(APIView):
     def get(self, request):
@@ -85,11 +85,11 @@ class LoginGoogleView(APIView):
 
 class LoginGoogleCallbackView(APIView):
     def post(self, request):
-        return process_login(request, google, 'g_') #구글 아이디에만 g_를 붙여줌
+        return process_login(request, google, 'g_') #구글 로그인은 닉네임 앞에 g_를 붙여줌
 
 class LoginKakaoView(APIView):
     def get(self, request):
-        return redirect(kakao['target_url'])
+        return redirect(kakao['target_url']) #카카오 로그인은 닉네임 앞에 k_를 붙여줌
 
 class LoginKakaoCallbackView(APIView):
     def post(self, request):
@@ -108,12 +108,15 @@ def process_login(request, config, nickname_prefix=''):
         else :
             user_nickname = nickname_prefix + user_info.get('data', {}).get(config['nickname'])
             user_email = user_info.get('data', {}).get('email')
-        is_saved = save_user_to_db(user_email, user_nickname)
+        save_user_to_db(user_email, user_nickname)
         user = User.objects.get(email=user_email)
-        if nickname_prefix == 'k_' and is_saved == 'saved': #카카오 이면서 db에 저장된 경우에만 이미지 저장
+        #카카오 로그인이면서 and (장고 스토리지가 초기화됬거나(추후 volume설정 필요), DB에 이미지 저장이 안되어 있거나 or 프로필 사진을 변경안하고 카카오 프로필 이미지를 쓸경우는) 로그인 할때마다 프로필 이미지로 업데이트
+        if (nickname_prefix == 'k_') and (not default_storage.exists('user_images/') or not user.image_file or 'kakao.jpg' in user.image_file.name.split('/')[2]):
             image_url = user_info.get('data', {}).get('properties', {}).get('profile_image')
             response = requests.get(image_url) #이미지 url get 요청으로 받아오기
             if response.status_code == 200:
+                if ('user_images/' + user_nickname + '/') in user.image_file.name: #기존 이미지가 있으면 삭제
+                    default_storage.delete(user.image_file.name)
                 #이미지 장고 스토리지에 저장
                 file_path = default_storage.save('user_images/' + user_nickname + '/' + 'kakao.jpg', ContentFile(response.content))
                 user.image_file = file_path #이미지 경로 db에 저장
@@ -162,10 +165,8 @@ def save_user_to_db(_user_email, _user_nickname):
             nickname = _user_nickname,
         )
         print(_user_email, " saved to db")
-        return ('saved')
     else :
         print(_user_email, " aleady saved db")
-        return ('already')
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
