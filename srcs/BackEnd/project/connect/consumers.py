@@ -7,14 +7,21 @@ from channels.db import database_sync_to_async
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = 'connect'
-        
-        
         user = self.scope['user']
         if isinstance(user, AnonymousUser):
             print("User is anonymous")
             # await self.close()
         else:
             print("user is authenticated:", user)
+            
+            #중복유저에게 disconnect 하게 하기
+            double_clients = await database_sync_to_async(list)(Client.objects.filter(user=user))
+            if double_clients: #중복유저가 있을 경우
+                for double_client in double_clients:
+                    await self.channel_layer.send(
+                        double_client.channel_name, { "type": "double_user" }
+                    )
+            
             client = await database_sync_to_async(Client.objects.create)(channel_name=self.channel_name, user=user)
             await database_sync_to_async(client.save)()
             print("client created, ", client)
@@ -36,13 +43,14 @@ class ConnectConsumer(AsyncWebsocketConsumer):
           self.room_group_name, {"type": "friend_list", "sender": user}
         )
         
-    async def disconnect(self, message):
+    async def disconnect(self, close_code):
         user = self.scope['user']
         
         client = await database_sync_to_async(Client.objects.get)(channel_name=self.channel_name)
         await database_sync_to_async(client.delete)()
-        print("client deleted")
-            
+        
+        if close_code == 4003 : #중복유저가 있어서 disconnect된 경우
+            print("double user disconnected : ", self.channel_name)
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -142,3 +150,10 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                 "receiver": receiver,
                 "message": message
             }))
+
+    async def double_user(self, event):
+        await self.send(text_data=json.dumps({
+            "status": 4003,
+            "message" : "double user connected",
+        }))
+        await self.close(4003)
