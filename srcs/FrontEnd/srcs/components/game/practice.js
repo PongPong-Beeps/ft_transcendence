@@ -1,4 +1,3 @@
-import { importCss } from "../../utils/importCss.js";
 import ExitConfirmation from "../../pages/ExitConfirmation.js";
 
 export default function Practice($container) {
@@ -44,31 +43,42 @@ export default function Practice($container) {
             dirY: Math.sin(angle)
         };
     }
+    const  initGameObjects = (resetScores = false) => {
+        // 플레이어 초기 위치 설정
+        player1.y = gameCanvas.height / 2 - paddle.height / 2;
+        player2.y = gameCanvas.height / 2 - paddle.height / 2;
+        // 점수를 리셋해야 하는 경우에만 점수 초기화
+        if (resetScores) {
+            player1.score = 0;
+            player2.score = 0;
+        }
+        // 공의 위치와 방향 초기화
+        balls = []; // 공 배열 초기화
+        let initialBallDirection = getRandomDirection();
+        balls.push({ x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...initialBallDirection });
+        if (gameMode === 'hard') {
+            let ball2Direction = { dirX: -initialBallDirection.dirX, dirY: -initialBallDirection.dirY };
+            balls.push({ x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball2Direction });
+        }
+
+        // 키 입력 상태 초기화
+        for (const key in keys) {
+            keys[key] = false;
+        }
+    }
 
     const gameInit = () => {
         isBallMoving = false;
-        // 플레이어 초기화
-        player1 = { x: 50, y: gameCanvas.height / 2 - paddle.height / 2, score: 0 };
-        player2 = { x: gameCanvas.width - paddle.width - 50, y: gameCanvas.height / 2 - paddle.height / 2, score: 0 };
-        // 모드에 따른 공 초기화
-        if (gameMode === 'easy') {
-            balls = [
-                { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...getRandomDirection() }
-            ];
-        } else {
-            let ball1Direction = getRandomDirection();
-            let ball2Direction = { dirX: -ball1Direction.dirX, dirY: -ball1Direction.dirY };
-            balls = [
-                { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball1Direction },
-                { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball2Direction }
-            ];
-        }
+        player1 = { x: 50, y: 0, score: 0 }
+        player2 = { x: gameCanvas.width - paddle.width - 50, y: 0, score: 0 }
+        initGameObjects(true);
 
-        gameLoop();
         setTimeout(() => {
             isBallMoving = true;
         }, 500);
-    };
+
+        gameLoop();
+    }
 
     const gameLoop = () => {
         movePaddle();
@@ -76,6 +86,15 @@ export default function Practice($container) {
         drawGame();
         animationFrameId = requestAnimationFrame(gameLoop); // 게임 루프 생성
     };
+
+    const resetPosition = () => {
+        isBallMoving = false;
+        initGameObjects(); // 위치만 재설정, 점수는 유지
+
+        setTimeout(() => {
+            isBallMoving = true;
+        }, 500);
+    }
 
     const movePaddle = () => {
         if (keys['w']) {
@@ -105,10 +124,10 @@ export default function Practice($container) {
             // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
             if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
                 player2.score++;
-                restartGame();
+                resetPosition();
             } else if (ball.x + pong.radius > gameCanvas.width - 50) { // 오른쪽 벽에 충돌
                 player1.score++;
-                restartGame();
+                resetPosition();
             }
             // 패들 충돌 검사
             let nearestPlayer = (ball.x < gameCanvas.width / 2) ? player1 : player2;
@@ -119,14 +138,6 @@ export default function Practice($container) {
                 ball.dirX = -ball.dirX; // X 방향 반전
             }
         });
-    };
-
-    const restartGame = () => {
-        cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
-        for (const key in keys) {
-            keys[key] = false;
-        }
-        gameInit(); // 게임 초기화
     };
 
     const drawBackground = () => {
@@ -205,7 +216,11 @@ export default function Practice($container) {
                     btn.classList.remove('selected');
                 });
                 event.target.classList.add('selected');
-                restartGame();
+                cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
+                for (const key in keys) {
+                    keys[key] = false;
+                }
+                gameInit(); // 게임 초기화
             }
         });
 
