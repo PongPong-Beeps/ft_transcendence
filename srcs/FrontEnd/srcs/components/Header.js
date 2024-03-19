@@ -4,7 +4,11 @@ import {BACKEND, fetchWithAuth} from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
 import {navigate} from "../utils/navigate.js";
 
-export default function Header($container) {
+/**
+ * @param { HTMLElement } $container
+ * @param { WebSocket } ws
+ */
+export default function Header($container, ws) {
     const render = () => {
         const header = $container.querySelector('#header');
         if (header) {
@@ -26,6 +30,7 @@ export default function Header($container) {
            fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
                .then(data => {
                    console.log("[ logout ] 완료");
+                   ws.close();
                    navigate('/');
                })
                .catch(error => {

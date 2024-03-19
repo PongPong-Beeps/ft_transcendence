@@ -28,7 +28,7 @@ export default function MyProfile($container, ws) {
 
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, getNickname(), true, setNickname, setProfileImage);
+            new ProfileModal($container, ws, getNickname(), true, setNickname, setProfileImage);
         });
     }
 
@@ -47,7 +47,6 @@ export default function MyProfile($container, ws) {
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
             setNickname(data.nickname);
             setProfileImage(data.image);
-            ws.send(`{ "type": "friend_list", "sender": ${data.nickname}`);
         })
         .catch(error => {
             console.error("[ fetchMyProfileData ] " + error.message);

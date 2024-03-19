@@ -10,12 +10,13 @@ import ImgUploadError from "../ImgUploadError.js";
 
 /**
  * @param { HTMLElement } $container
+ * @param { WebSocket } ws
  * @param { string } nickname
  * @param { boolean } isMe
  * @param { Function } setNicknameFn
  * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, nickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+export default function ProfileModal($container, ws, nickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -43,7 +44,7 @@ export default function ProfileModal($container, nickname, isMe, setNicknameFn =
                         <div id="profile-modal-button-container">
                             ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
                             <button class="non-outline-btn" id="block-btn">${blockButtonText}</button>
-                            <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
+                            <button class="non-outline-btn" id="add-friend-btn"></button>
                             <button class="non-outline-btn" id="ok-btn">확인</button>
                             `}
                         </div>
@@ -93,6 +94,9 @@ export default function ProfileModal($container, nickname, isMe, setNicknameFn =
             infoTabContainer.innerHTML = InfoTab(isMe, infoData);
             if (infoData.block)
                 $container.querySelector('#block-btn').innerHTML = '차단 해제';
+            if (!isMe) {
+                $container.querySelector('#add-friend-btn').innerHTML = infoData.freind ? '친구 해제' : '친구 추가';
+            }
             let inputElement = $container.querySelector('#profile-picture-input');
             if (inputElement) {
                 inputElement.addEventListener('change', this.handleImageChange);
@@ -142,6 +146,12 @@ export default function ProfileModal($container, nickname, isMe, setNicknameFn =
                 } else {
                     handleBlockButtonClick();
                 }
+            } else if (event.target.closest('#add-friend-btn')) {
+                if (event.target.innerHTML === '친구 해제') {
+                    handleFriendEvent('friend/delete', "친구 추가");
+                } else {
+                    handleFriendEvent('friend/add', "친구 해제");
+                }
             }
         });
         const inputElement = $container.querySelector('#profile-picture-input');
@@ -149,6 +159,22 @@ export default function ProfileModal($container, nickname, isMe, setNicknameFn =
           inputElement.addEventListener('change', this.handleImageChange);
         }
     };
+
+    const handleFriendEvent = (uri, innerText) => {
+        fetchWithAuth(`${BACKEND}/${uri}/`, {
+            method: 'POST',
+            body: JSON.stringify({ "nickname": nickname }),
+        })
+        .then(data => {
+            console.log(data);
+            $container.querySelector('#add-friend-btn').innerHTML = innerText;
+            ws.send(JSON.stringify({ "type": "friend_list", "sender": nickname }));
+        })
+        .catch(error => {
+            console.error("[ handleFriendEvent ] " + error.message);
+            new ErrorPage($container, error.status);
+        });
+    }
 
     const handleBlockButtonClick = () => {
         const toBlock = { "nickname": nickname };

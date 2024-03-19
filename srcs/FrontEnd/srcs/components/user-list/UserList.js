@@ -15,16 +15,6 @@ export default function UserList($container, ws) {
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
 
-    // 더미 데이터
-    const friendListData = [
-        { nickname: "친구 1", isOnline: true },
-        { nickname: "친구 2", isOnline: true },
-        { nickname: "친구 3", isOnline: true },
-        { nickname: "친구 4", isOnline: true },
-        { nickname: "친구 5", isOnline: false },
-        { nickname: "친구 6", isOnline: false }
-    ];
-
     const render = () => {
         $container.querySelector('#menu').innerHTML = `
             <div id="user-list-container">
@@ -44,7 +34,7 @@ export default function UserList($container, ws) {
 
     this.renderFriendList = () => {
         const friendsListTab = $container.querySelector('#friend-list-tab');
-        friendsListTab.innerHTML = friendListData
+        friendsListTab.innerHTML = getFriendList()
             .map(friend => FriendCell(friend))
             .join('');
     };
@@ -84,7 +74,7 @@ export default function UserList($container, ws) {
         } else if (event.target.matches('.invite-btn')) {
             alert(`${nickname} 초대`);
         } else {
-            new ProfileModal($container, nickname, false);
+            new ProfileModal($container, ws, nickname, false);
         }
     };
 
@@ -117,7 +107,8 @@ export default function UserList($container, ws) {
                 new ErrorPage($container, error.status);
             });
         ws.onmessage = function(event) {
-            console.log(event.data);
+            setFriendList(JSON.parse(event.data).friendList);
+            console.log(getFriendList());
         }
     }
 
