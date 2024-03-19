@@ -75,6 +75,7 @@ export default function UserList($container) {
 
     const handleUserListCellClick = (event) => {
         const userCell = event.target.closest('[data-nickname]');
+        if (!userCell) return; // margin으로 인한 빈 공간 클릭했을 때
         const nickname = userCell.getAttribute('data-nickname');
         if (event.target.matches('.dm-btn')) {
             alert(`${nickname}에게 귓속말`);

@@ -6,34 +6,49 @@
     box-sizing: border-box;
     background-color: #A8CB60;
     font-family: "DNF Bit Bit v2", serif;
-    display: grid;
-    padding: 30px 10px;
-    grid-template-areas:
-    'image nickname'
-    'image button';
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
+    padding: 10px;
 }
 
 #profile-image {
-    grid-area: image;
+    flex: 1;
     border-radius: 5px;
-    background-color: #75787C;
     border: 4px solid white;
+    background-color: white;
     margin-left: 10px;
+    aspect-ratio: 1/1;
+}
+
+#profile-img {
+    object-fit: cover;
+}
+
+#profile-detail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 #nickname {
-    grid-area: nickname;
+    min-height: 30px;
     text-align: center;
     color: white;
     font-size: 1.2em;
 }
 
 #profile-btn {
-    grid-area: button;
-    font-size: 0.8em;
+    height: 50px;
+    font-size: 0.9em;
     border: 4px solid #5C7320;
     border-radius: 10px;
     margin: 0 10px;
+    transition: transform 0.1s ease-in-out;
+}
+
+#profile-btn:active {
+    transform: scale(0.95);
 }

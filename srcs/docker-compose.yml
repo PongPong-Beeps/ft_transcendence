@@ -21,6 +21,8 @@ services:
       - "8000:8000"
     tty: true
     stdin_open: true
+    volumes:
+      - ./BackEnd/storage:/usr/src/app/user_images
     restart: on-failure
 
   nginx:

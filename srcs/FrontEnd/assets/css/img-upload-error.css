@@ -1,0 +1,47 @@
+#img-upload-error-background {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#img-upload-error-container {
+    width: 400px;
+    height: 190px;
+    background-color: #83A644;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    gap: 30px;
+}
+
+#img-upload-error-title {
+    flex: 3;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 1.3em;
+    text-align: center;
+    color: white;
+}
+
+#img-upload-error-button-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+#img-upload-error-button-container > button {
+    font-size: 1em;
+    border: 4px solid #5C7320;
+    border-radius: 10px;
+    width: 150px;
+    height: 45px;
+    transition: 0.1s ease-in-out;
+}
+
+#img-upload-error-button-container > button:active {
+    scale: 0.95;
+}

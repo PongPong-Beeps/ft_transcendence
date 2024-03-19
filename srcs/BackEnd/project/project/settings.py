@@ -35,6 +35,9 @@ ALLOWED_HOSTS = ['13.209.222.162', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     'corsheaders',	#cors
     'user',
+    'channels',
+	'daphne',
+	'connect',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,12 +46,27 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_yasg', #swagger
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
     )
+}
+
+#swagger 상단 Authorize 버튼 정보 설정
+#swagger 내에서 JWT토큰 사용하기위함
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'value': ''
+            #value값에 Bearer를 넣어주면 swagger에서 Authorize 버튼을 눌렀을 때 자동으로 Bearer를 넣어준다.
+        }
+    }
 }
 
 SIMPLE_JWT = {
@@ -95,6 +113,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'project.wsgi.application'
+ASGI_APPLICATION= 'project.asgi.application' #Websocket
+
+CHANNEL_LAYERS = {                           # channel layer 설정
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer',
+        "MIDDLEWARE": [
+            "channels.auth.TokenAuthMiddlewareStack",
+        ],
+    }
+}
 
 
 # Database

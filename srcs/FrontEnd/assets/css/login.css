@@ -16,8 +16,30 @@
 }
 
 #login-btn {
-    border-radius: 10px;
+    border-radius: 12px;
     border: 5px solid #5C7320;
     font-size: 2em;
     padding: 15px;
+}
+
+#google-login-btn {
+    border-radius: 12px;
+    border: transparent;
+    padding: 0;
+    transition: transform 0.1s ease-in-out;
+}
+
+#google-login-btn:active {
+    transform: scale(0.95);
+}
+
+#kakao-login-btn {
+    border-radius: 12px;
+    border: transparent;
+    padding: 0;
+    transition: transform 0.1s ease-in-out;
+}
+
+#kakao-login-btn:active {
+    transform: scale(0.95);
 }

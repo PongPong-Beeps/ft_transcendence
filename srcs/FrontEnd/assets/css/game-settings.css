@@ -68,6 +68,11 @@
 
 .game-settings-option-item.selected {
     filter: brightness(50%);
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.game-settings-option-item.selected img {
+    transform: scale(0.95);
 }
 
 .game-settings-option-item:hover {

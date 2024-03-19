@@ -2,23 +2,24 @@ import BlacklistCell from "./BlacklistCell.js";
 import InfoTab from "./InfoTab.js";
 import {importCss} from "../../utils/importCss.js";
 import useState from "../../utils/useState.js";
-import {BACKEND, fetchWithAuth} from "../../api.js";
+import {BACKEND, fetchWithAuth, fetchWithAuthFormData} from "../../api.js";
 import ErrorPage from "../ErrorPage.js";
 import HistoryTab from "./HistoryTab.js";
 import MyProfile from "../../components/MyProfile.js";
+import ImgUploadError from "../ImgUploadError.js";
 
 /**
- * @param {HTMLElement} $container
- * @param {string} nickname
- * @param {boolean} isMe
+ * @param { HTMLElement } $container
+ * @param { string } nickname
+ * @param { boolean } isMe
+ * @param { Function } setNicknameFn
+ * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, nickname, isMe) {
+export default function ProfileModal($container, nickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
-
-    const infoDummyData = [
-        { totalWinRate: 50, oneOnOneWinRate: 34, tournamentWinRate: 100 }
-    ]
+    let [getInfo, setInfo] = useState({}, this, 'renderInfo');
+    const blockButtonText = '차단';
 
     const render = () => {
         const page = $container.querySelector('#page');
@@ -41,7 +42,7 @@ export default function ProfileModal($container, nickname, isMe) {
                         </div>
                         <div id="profile-modal-button-container">
                             ${isMe ? '<button class="non-outline-btn" id="ok-btn">확인</button>' : `
-                            <button class="non-outline-btn" id="block-btn">차단</button>
+                            <button class="non-outline-btn" id="block-btn">${blockButtonText}</button>
                             <button class="non-outline-btn" id="add-friend-btn">친구 추가</button>
                             <button class="non-outline-btn" id="ok-btn">확인</button>
                             `}
@@ -56,6 +57,49 @@ export default function ProfileModal($container, nickname, isMe) {
 
     };
 
+    this.handleImageChange = function() {
+        let file = '';
+        let formData = new FormData();
+        if (this.files.length > 0) {
+            file = this.files[0];
+            formData.append('image', file);
+        }
+        // 이미지 파일 크기 제한
+        const fileSizeInMB = file.size / (1024 * 1024);
+        if (fileSizeInMB > 3) {
+            new ImgUploadError($container);
+            setupEventListener();
+            return;
+        }
+        fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(data => {
+            console.log('Success:', data);
+            data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
+            $container.querySelector('#profile-picture').src = data.image;
+            setProfileImageFn(data.image);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    this.renderInfo = () => {
+        const infoTabContainer = $container.querySelector('#info-content');
+        if (infoTabContainer) {
+            let infoData = getInfo();
+            infoTabContainer.innerHTML = InfoTab(isMe, infoData);
+            if (infoData.block)
+                $container.querySelector('#block-btn').innerHTML = '차단 해제';
+            let inputElement = $container.querySelector('#profile-picture-input');
+            if (inputElement) {
+                inputElement.addEventListener('change', this.handleImageChange);
+            }
+        }
+    };
+
     this.renderHistory = () => {
         const historyTabContainer = $container.querySelector('#history-content');
         if (historyTabContainer) {
@@ -67,18 +111,21 @@ export default function ProfileModal($container, nickname, isMe) {
         const blacklist = $container.querySelector('#blacklist-content');
         if (blacklist) {
             blacklist.innerHTML = getBlacklist().map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+            if (getBlacklist().length === 0) {
+                blacklist.innerHTML = '<div id="blacklist-message">블랙리스트가 비어있습니다</div>';
+            }
             getBlacklist().forEach(blacklist => {
                 const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
                 if (cell) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
-                        event.stopPropagation(); // 이벤트 전파를 막음
+                        event.stopPropagation();
                         handleUnBlockButtonClick(blacklist.nickname);
                     });
                 }
             }
             );
         }
-    }           
+    }
 
     const setupEventListener = () => {
         const profileModalContainer = $container.querySelector('#profile-modal-container');
@@ -90,11 +137,19 @@ export default function ProfileModal($container, nickname, isMe) {
             } else if (event.target.closest('#nickname-submit-btn')) {
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
-                handleBlockButtonClick();
+                if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
+                    handleUnBlockButtonClick(nickname);
+                } else {
+                    handleBlockButtonClick();
+                }
             }
         });
+        const inputElement = $container.querySelector('#profile-picture-input');
+        if (inputElement) {
+          inputElement.addEventListener('change', this.handleImageChange);
+        }
     };
-    
+
     const handleBlockButtonClick = () => {
         const toBlock = { "nickname": nickname };
         fetchWithAuth(`${BACKEND}/user/block/`, {
@@ -102,6 +157,7 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toBlock),
         })
         .then(data => {
+            $container.querySelector('#block-btn').innerHTML = '차단 해제';
             console.log('Success:', data);
         })
         .catch(error => {
@@ -116,7 +172,10 @@ export default function ProfileModal($container, nickname, isMe) {
             body: JSON.stringify(toUnBlock),
         })
         .then(data => {
-            updateBlacklist();
+            if (isMe)
+                updateBlacklist();
+            else
+                $container.querySelector('#block-btn').innerHTML = '차단';
             console.log('Success:', data);
         })
         .catch(error => {
@@ -148,9 +207,11 @@ export default function ProfileModal($container, nickname, isMe) {
                 body: JSON.stringify({ nickname: nicknameInput.value }),
             })
                 .then(() => {
-                    nicknameInput.placeholder = nicknameInput.value;
+                    nickname = nicknameInput.value;
+                    nicknameInput.placeholder = nickname;
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
+                    setNicknameFn(nickname);
                     new MyProfile($container);
                 })
                 .catch(error => {
@@ -192,13 +253,6 @@ export default function ProfileModal($container, nickname, isMe) {
         }, 1000);
     }
 
-    const updateInfo = () => {
-        const infoTabContainer = $container.querySelector('#info-content');
-        if (infoTabContainer) {
-            infoTabContainer.innerHTML = InfoTab(nickname, isMe, infoDummyData[0]);
-        }
-    }
-
     const updateBlacklist = () => {
         fetchWithAuth(`${BACKEND}/user/blacklist/`)
             .then(data => {
@@ -212,14 +266,14 @@ export default function ProfileModal($container, nickname, isMe) {
     }
 
     const fetchProfileModalData = () => {
-        let option = {};
+        const option = {
+            method: 'POST',
+            body: JSON.stringify({ nickname: nickname }),
+        };
+
         if (isMe) {
             updateBlacklist();
         } else {
-            option = {
-                method: 'POST',
-                body: JSON.stringify({ nickname: nickname }),
-            };
             $container.querySelector('#blacklist-btn').classList.add('hidden');
         }
         // 데이터 채우기
@@ -231,8 +285,17 @@ export default function ProfileModal($container, nickname, isMe) {
             .catch(error => {
                 console.error("[ fetchHistoryData ] " + error.message);
                 new ErrorPage($container, error.status);
+            });
+
+        fetchWithAuth(`${BACKEND}/user/info/`, option)
+            .then(data => {
+                setInfo(data);
+                console.log("[ fetchInfoData ] 정보 패치 완료");
             })
-        updateInfo();
+            .catch(error => {
+                console.error("[ fetchInfoData ] " + error.message);
+                new ErrorPage($container, error.status);
+            });
     };
 
     importCss("assets/css/profile-modal.css");
