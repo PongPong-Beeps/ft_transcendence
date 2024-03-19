@@ -8,9 +8,11 @@ import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
 
 /**
- * @param {HTMLElement} $container
+ * @param { HTMLElement } $container
+ * @param { WebSocket } ws
  */
-export default function UserList($container) {
+export default function UserList($container, ws) {
+    let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
 
     // 더미 데이터
@@ -92,23 +94,35 @@ export default function UserList($container) {
         $container.querySelectorAll('.user-list-tab').forEach(list => {
             list.style.display = list.id === showListId ? 'block' : 'none';
         });
+        if (showListId === 'all-user-list-tab') {
+            fetchWithAuth(`${BACKEND}/user/list/`)
+                .then(data => {
+                    console.log("[ fetchUserListData ] 유저 리스트 패치 완료");
+                    setAllUserList(data.userList);
+                })
+                .catch(error => {
+                    console.error("[ fetchUserListData ] " + error.message);
+                    new ErrorPage($container, error.status);
+                });
+        }
     };
 
-    const fetchUserListData = () => { // 🌟 웹소켓으로 변경 필요
-        this.renderFriendList(); // 임시
-        fetchWithAuth(`${BACKEND}/user/list/`)
+    const setupUserListData = () => {
+        fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
-                console.log("[ fetchUserListData ] 유저 리스트 패치 완료");
-                setAllUserList(data.userList);
+                ws.send(JSON.stringify({ type: "friend_list", sender: data.nickname }));
             })
             .catch(error => {
-                console.error("[ fetchUserListData ] " + error.message);
+                console.error("[ setupUserListData ] ", error.message);
                 new ErrorPage($container, error.status);
             });
+        ws.onmessage = function(event) {
+            console.log(event.data);
+        }
     }
 
     importCss("assets/css/user-list.css");
     render();
     setupEventListener();
-    fetchUserListData();
+    setupUserListData();
 }

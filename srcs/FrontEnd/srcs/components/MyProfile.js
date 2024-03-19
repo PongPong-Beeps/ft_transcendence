@@ -7,9 +7,10 @@ import {BACKEND, fetchWithAuth} from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
 
 /**
- * @param {HTMLElement} $container
+ * @param { HTMLElement } $container
+ * @param { WebSocket } ws
  */
-export default function MyProfile($container) {
+export default function MyProfile($container, ws) {
     let [getNickname, setNickname] = useState("", this, 'renderNickname');
     let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
 
@@ -46,6 +47,7 @@ export default function MyProfile($container) {
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
             setNickname(data.nickname);
             setProfileImage(data.image);
+            ws.send(`{ "type": "friend_list", "sender": ${data.nickname}`);
         })
         .catch(error => {
             console.error("[ fetchMyProfileData ] " + error.message);
