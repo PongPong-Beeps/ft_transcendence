@@ -1,6 +1,7 @@
 import {navigate} from "../utils/navigate.js";
 import {importCss} from "../utils/importCss.js";
-import {BACKEND} from "../api.js";
+import getCookie from "../utils/cookie.js";
+import {BACKEND, fetchWithAuth} from "../api.js";
 
 /**
  * @param {HTMLElement} $container
@@ -25,6 +26,15 @@ export default function LoginPage($container) {
         }
     }
 
+    const handleAccessToken = () => {
+        if (getCookie("access_token")) {
+            fetchWithAuth(`${BACKEND}`)
+                .then(() => navigate('lobby'))
+            return;
+        }
+    };
+
+    handleAccessToken();
     const setupEventListener = () => {
         const loginButtons = {
           '#login-btn': '42',
@@ -42,6 +52,7 @@ export default function LoginPage($container) {
       };
 
     importCss("assets/css/login.css");
+    handleAccessToken();
     render();
     setupEventListener();
 }
