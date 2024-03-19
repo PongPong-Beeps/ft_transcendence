@@ -212,7 +212,6 @@ export default function ProfileModal($container, nickname, isMe, setNicknameFn =
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
                     setNicknameFn(nickname);
-                    new MyProfile($container);
                 })
                 .catch(error => {
                     switch (error.status) {
