@@ -20,6 +20,7 @@ export default function GameSettings($container) {
                 <div id="game-settings-title-container">
                     <div id="game-settings-title">게임 설정</div>
                     <div id="game-settings-warning-message">모든 옵션을 정상적으로 선택하세요 !</div>
+                    <button id="practice-btn" class="green-btn non-outline-btn">연습 게임</button>
                 </div>
                 <div id="game-settings-option-container">
                     ${GameSettingsOption("모드", modeOptions)}
@@ -34,6 +35,10 @@ export default function GameSettings($container) {
     };
 
     const setupEventListener = () => {
+        $container.querySelector('#practice-btn').addEventListener('click', () => {
+           navigate('practice');
+        });
+
         $container.querySelector('#game-settings-option-container').addEventListener('click', (event) => {
             const target = event.target.closest('.game-settings-option-item');
             if (!target) return;
@@ -66,7 +71,7 @@ export default function GameSettings($container) {
 
                 // 테스트용
                 if (button.id === 'create-room-btn') console.log("방 만들기");
-                else console.log("빠른 시작");
+                else if (button.id === 'quick-start-btn') console.log("빠른 시작");
 
                 navigate(`${selectedMode.dataset.label}-room`, selectedDifficulty.dataset.label);
             });

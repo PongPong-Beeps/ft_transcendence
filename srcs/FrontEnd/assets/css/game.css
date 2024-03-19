@@ -1,0 +1,56 @@
+.game-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background-color: #779630;
+    font-family: "DNF Bit Bit v2", serif;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+}
+
+.game-title-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 50px 10px 50px;
+}
+
+.game-back-btn {
+    border: none;
+    background-color: transparent;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 1.5em;
+    color: white;
+}
+
+#game-mode-button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.game-mode-btn {
+    font-size: 1em;
+    border: 5px solid #5C7320;
+    border-radius: 10px;
+}
+
+.game-mode-btn.selected {
+    background-color: #8DAA4E;
+}
+
+.game-canvas-container {
+    position: relative;
+    width: 55vw;
+    height: 43vh;
+    margin: auto;
+}
+
+#background-canvas, #game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
