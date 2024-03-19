@@ -7,9 +7,10 @@ import {BACKEND, fetchWithAuth} from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
 
 /**
- * @param {HTMLElement} $container
+ * @param { HTMLElement } $container
+ * @param { WebSocket } ws
  */
-export default function MyProfile($container) {
+export default function MyProfile($container, ws) {
     let [getNickname, setNickname] = useState("", this, 'renderNickname');
     let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
 
@@ -27,7 +28,7 @@ export default function MyProfile($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, getNickname(), true, setNickname, setProfileImage);
+            new ProfileModal($container, ws, getNickname(), true, setNickname, setProfileImage);
         });
     }
 
