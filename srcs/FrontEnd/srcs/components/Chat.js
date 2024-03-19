@@ -1,9 +1,41 @@
 import {importCss} from "../utils/importCss.js";
+import getCookie from "../utils/cookie.js";
+import useState from "../utils/useState.js";
+import {BACKEND, fetchWithAuth} from "../api.js";
+import { WebSocketManager } from "../utils/webSocketManager.js";
 
 /**
  * @param {HTMLElement} $container
  */
-export default function Chat($container) {
+export default function Chat($container, ws) {
+    // const accessToken = getCookie('access_token'); 
+    let myNickname = '';  
+
+    const wsManager = new WebSocketManager(ws);
+
+    fetchWithAuth(`${BACKEND}/user/me`)
+    .then(data => {
+        myNickname = data.nickname;
+    })
+    .catch(error => {
+        console.error("[ fetchMyNickname ] " + error.message);
+        new ErrorPage($container, error.status);
+    });
+
+    wsManager.addMessageHandler(function(data) {
+        if (data.sender && data.message) {
+            const chatMessages = document.querySelector('#chat-messages');
+            const messageElement = document.createElement('p');
+            messageElement.textContent = `${data.sender}: ${data.message}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
+
+    const sendMessage = (message) => {
+        wsManager.sendMessage({ "type": "all_chat", "sender": myNickname, "message": message });
+    };
+
     const render = () => {
         $container.querySelector("#footer").innerHTML = `
             <div id="Chat">
@@ -27,7 +59,25 @@ export default function Chat($container) {
                     </div>
                 </div>
             </div>
-            `;
+        `;
+
+        const sendButton = document.querySelector('#send-button');
+        const messageInput = document.querySelector('#message-input');
+
+        const handleSendMessage = () => {
+            const message = messageInput.value;
+            if (!message.trim())
+                return;
+            sendMessage(message);
+            messageInput.value = '';
+        };
+
+        sendButton.addEventListener('click', handleSendMessage);
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                handleSendMessage();
+            }
+        });
     };
 
     importCss("assets/css/chat.css");
