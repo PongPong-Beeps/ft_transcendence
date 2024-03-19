@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import datetime
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,9 +133,9 @@ CHANNEL_LAYERS = {                           # channel layer 설정
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pong_db',
-        'USER': 'admin',
-        'PASSWORD': '1234',
+        'NAME': os.environ['POSTGRES_DB'],  # POSTGRES_DB 환경변수의 값을 직접 참조
+        'USER': os.environ['POSTGRES_USER'],  # POSTGRES_USER 환경변수의 값을 직접 참조
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'], 
         'HOST': 'db',  # db라는 컨테이너 이름을 사용하여 호스트를 지정합니다.
         'PORT': '5432',
     }
