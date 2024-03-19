@@ -11,12 +11,13 @@ import ImgUploadError from "../ImgUploadError.js";
 /**
  * @param { HTMLElement } $container
  * @param { WebSocket } ws
- * @param { string } nickname
+ * @param { string } myNickname
+ * @param { string } targetNickname
  * @param { boolean } isMe
  * @param { Function } setNicknameFn
  * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, ws, nickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+export default function ProfileModal($container, ws, myNickname, targetNickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -142,7 +143,7 @@ export default function ProfileModal($container, ws, nickname, isMe, setNickname
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
                 if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
-                    handleUnBlockButtonClick(nickname);
+                    handleUnBlockButtonClick(targetNickname);
                 } else {
                     handleBlockButtonClick();
                 }
@@ -163,12 +164,12 @@ export default function ProfileModal($container, ws, nickname, isMe, setNickname
     const handleFriendEvent = (uri, innerText) => {
         fetchWithAuth(`${BACKEND}/${uri}/`, {
             method: 'POST',
-            body: JSON.stringify({ "nickname": nickname }),
+            body: JSON.stringify({ "nickname": targetNickname }),
         })
         .then(data => {
             console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
-            ws.send(JSON.stringify({ "type": "friend_list", "sender": nickname }));
+            ws.send(JSON.stringify({ "type": "friend_list", "sender": myNickname }));
         })
         .catch(error => {
             console.error("[ handleFriendEvent ] " + error.message);
@@ -177,7 +178,7 @@ export default function ProfileModal($container, ws, nickname, isMe, setNickname
     }
 
     const handleBlockButtonClick = () => {
-        const toBlock = { "nickname": nickname };
+        const toBlock = { "nickname": targetNickname };
         fetchWithAuth(`${BACKEND}/user/block/`, {
             method: 'POST',
             body: JSON.stringify(toBlock),
@@ -227,17 +228,17 @@ export default function ProfileModal($container, ws, nickname, isMe, setNickname
 
     const handleUpdateNicknameButtonClick = (button) => {
         const nicknameInput = $container.querySelector('#nickname-input');
-        if (nicknameInput/* && nicknameInput.value !== nickname*/) {
+        if (nicknameInput) {
             fetchWithAuth(`${BACKEND}/user/me/nickname/`, {
                 method: 'POST',
-                body: JSON.stringify({ nickname: nicknameInput.value }),
+                body: JSON.stringify({ "nickname": nicknameInput.value }),
             })
                 .then(() => {
-                    nickname = nicknameInput.value;
-                    nicknameInput.placeholder = nickname;
+                    myNickname = nicknameInput.value;
+                    nicknameInput.placeholder = myNickname;
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
-                    setNicknameFn(nickname);
+                    setNicknameFn(myNickname);
                 })
                 .catch(error => {
                     switch (error.status) {
@@ -293,7 +294,7 @@ export default function ProfileModal($container, ws, nickname, isMe, setNickname
     const fetchProfileModalData = () => {
         const option = {
             method: 'POST',
-            body: JSON.stringify({ nickname: nickname }),
+            body: JSON.stringify({ nickname: targetNickname }),
         };
 
         if (isMe) {

@@ -12,6 +12,7 @@ import {BACKEND, fetchWithAuth} from "../../api.js";
  * @param { WebSocket } ws
  */
 export default function UserList($container, ws) {
+    let myNickname;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
 
@@ -74,7 +75,7 @@ export default function UserList($container, ws) {
         } else if (event.target.matches('.invite-btn')) {
             alert(`${nickname} 초대`);
         } else {
-            new ProfileModal($container, ws, nickname, false);
+            new ProfileModal($container, ws, myNickname, nickname, false);
         }
     };
 
@@ -100,7 +101,8 @@ export default function UserList($container, ws) {
     const setupUserListData = () => {
         fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
-                ws.send(JSON.stringify({ type: "friend_list", sender: data.nickname }));
+                myNickname = data.nickname;
+                ws.send(JSON.stringify({ type: "friend_list", sender: myNickname }));
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);

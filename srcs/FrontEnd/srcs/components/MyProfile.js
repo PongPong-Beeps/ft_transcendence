@@ -28,7 +28,7 @@ export default function MyProfile($container, ws) {
 
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, ws, getNickname(), true, setNickname, setProfileImage);
+            new ProfileModal($container, ws, getNickname(), getNickname(), true, setNickname, setProfileImage);
         });
     }
 
