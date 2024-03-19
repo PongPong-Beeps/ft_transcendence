@@ -105,10 +105,10 @@ export default function Practice($container) {
             // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
             if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
                 player2.score++;
-                resetBall();
+                restartGame();
             } else if (ball.x + pong.radius > gameCanvas.width - 50) { // 오른쪽 벽에 충돌
                 player1.score++;
-                resetBall();
+                restartGame();
             }
             // 패들 충돌 검사
             let nearestPlayer = (ball.x < gameCanvas.width / 2) ? player1 : player2;
@@ -121,24 +121,12 @@ export default function Practice($container) {
         });
     };
 
-    const resetBall = () => {
-        isBallMoving = false;
-        balls.forEach((ball, index) => {
-            ball.x = gameCanvas.width / 2;
-            ball.y = gameCanvas.height / 2;
-
-            let direction = getRandomDirection();
-            if (index === 0) {
-                ball.dirX = direction.dirX;
-                ball.dirY = direction.dirY;
-            } else {
-                ball.dirX = -direction.dirX;
-                ball.dirY = -direction.dirY;
-            }
-        });
-        setTimeout(() => {
-            isBallMoving = true;
-        }, 500);
+    const restartGame = () => {
+        cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
+        for (const key in keys) {
+            keys[key] = false;
+        }
+        gameInit(); // 게임 초기화
     };
 
     const drawBackground = () => {
@@ -217,11 +205,7 @@ export default function Practice($container) {
                     btn.classList.remove('selected');
                 });
                 event.target.classList.add('selected');
-                cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
-                for (const key in keys) {
-                    keys[key] = false;
-                }
-                gameInit(); // 게임 초기화
+                restartGame();
             }
         });
 
