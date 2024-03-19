@@ -3,6 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Client
 from channels.db import database_sync_to_async
+from user.models import User
 
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -75,8 +76,25 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         elif type == 'dm_chat':
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "dm_chat", "sender": sender, "receiver": text_data_json["receiver"] ,"message": text_data_json["message"]}
-            ) 
-
+            )
+        elif type == 'invite':
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "invite", "sender": sender, "receiver": text_data_json["receiver"]}
+            )
+    
+    async def invite(self, event):
+        user = self.scope['user']
+        sender = event['sender']
+        receiver = event['receiver']
+        if user.nickname == receiver: #초대된 닉네임이 나라면
+            sender_user = await database_sync_to_async(User.objects.get)(nickname=sender)
+            await self.send(text_data=json.dumps({
+                "type": "invite",
+                "sender":sender,
+                "receiver":receiver,
+                "game_id" : str(sender_user.id),
+            })
+        )
     
     async def friend_list(self, event):
         user = self.scope['user']
