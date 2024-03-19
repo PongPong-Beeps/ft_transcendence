@@ -4,10 +4,8 @@ services:
   db:
     image: postgres:latest
     container_name: db
-    environment:
-      POSTGRES_DB: 'pong_db'
-      POSTGRES_USER: 'admin'
-      POSTGRES_PASSWORD: '1234'
+    env_file:
+      - ./.env
     volumes:
       - ./BackEnd/database:/var/lib/postgresql/data
     restart: on-failure
@@ -19,6 +17,8 @@ services:
     container_name: django
     ports:
       - "8000:8000"
+    env_file:
+      - ./.env
     tty: true
     stdin_open: true
     volumes:

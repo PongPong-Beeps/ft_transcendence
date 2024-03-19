@@ -10,13 +10,14 @@ from user.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.files.storage import default_storage #파일을 저장하기 위한 모듈
 from django.core.files.base import ContentFile #파일을 읽고 쓰기 위한 모듈
+import os
 
 google = {
     'grant_type': 'authorization_code',
-    'client_id': '764267800189-kv95o993o21djer1fjc82mbjbgt44jkf.apps.googleusercontent.com',
-    'redirect_uri': 'https://127.0.0.1/auth',
+    'client_id': os.getenv('GOOGLE_CLIENT_ID'),
+    'redirect_uri': os.getenv('REDIRECT_URI'),
     'scope': 'https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile',
-    'client_secret': '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',
+    'client_secret': os.getenv('GOOGLE_CLIENT_SECRET'),
     'target_url': 'https://accounts.google.com/o/oauth2/auth?client_id=764267800189-kv95o993o21djer1fjc82mbjbgt44jkf.apps.googleusercontent.com&redirect_uri=https://127.0.0.1/auth&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile',
     'token_url': 'https://accounts.google.com/o/oauth2/token',
     'user_info_url': 'https://www.googleapis.com/oauth2/v1/userinfo',
@@ -25,9 +26,9 @@ google = {
 
 fortytwo = {
     'grant_type': 'authorization_code',
-    'client_id': 'u-s4t2ud-942fd4b0016fa5993b2a57b000789a0d9b6e6b05ef6a004724062905ea9dc440',
-    'client_secret': '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',
-    'redirect_uri': 'https://127.0.0.1/auth',
+    'client_id': os.getenv('FORTYTWO_CLIENT_ID'),
+    'client_secret': os.getenv('FORTYTWO_CLIENT_SECRET'),
+    'redirect_uri': os.getenv('REDIRECT_URI'),
     'target_url': 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-942fd4b0016fa5993b2a57b000789a0d9b6e6b05ef6a004724062905ea9dc440&redirect_uri=https%3A%2F%2F127.0.0.1%2Fauth&response_type=code',
     'token_url' : 'https://api.intra.42.fr/oauth/token',
     'user_info_url' : 'https://api.intra.42.fr/v2/me',
@@ -36,10 +37,10 @@ fortytwo = {
 
 kakao = {
     'grant_type': 'authorization_code',
-    'client_id': '257d8e54c12291cad3e70e839117a6b0',
-    'redirect_uri': 'https://127.0.0.1/auth',
+    'client_id': os.getenv('KAKAO_CLIENT_ID'),
+    'redirect_uri': os.getenv('REDIRECT_URI'),
     'scope': 'profile_nickname+profile_image',
-    'client_secret': 'eqeu3JhxTMo7QMKP4qFxJUESqIQ5yBSb',
+    'client_secret': os.getenv('KAKAO_CLIENT_SECRET'),
     'target_url': 'https://kauth.kakao.com/oauth/authorize?client_id=257d8e54c12291cad3e70e839117a6b0&redirect_uri=https://127.0.0.1/auth&response_type=code&scope=profile_nickname+profile_image',
     'token_url': 'https://kauth.kakao.com/oauth/token',
     'user_info_url': 'https://kapi.kakao.com/v2/user/me',
