@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile #파일을 읽고 쓰기 위한 �
 import os
 
 google = {
+    'type' : 'google',
     'grant_type': 'authorization_code',
     'client_id': os.getenv('GOOGLE_CLIENT_ID'),
     'redirect_uri': os.getenv('REDIRECT_URI'),
@@ -25,6 +26,7 @@ google = {
 }
 
 fortytwo = {
+    'type' : '42',
     'grant_type': 'authorization_code',
     'client_id': os.getenv('FORTYTWO_CLIENT_ID'),
     'client_secret': os.getenv('FORTYTWO_CLIENT_SECRET'),
@@ -36,6 +38,7 @@ fortytwo = {
 }
 
 kakao = {
+    'type' : 'kakao',
     'grant_type': 'authorization_code',
     'client_id': os.getenv('KAKAO_CLIENT_ID'),
     'redirect_uri': os.getenv('REDIRECT_URI'),
@@ -44,6 +47,7 @@ kakao = {
     'target_url': 'https://kauth.kakao.com/oauth/authorize?client_id=257d8e54c12291cad3e70e839117a6b0&redirect_uri=https://127.0.0.1/auth&response_type=code&scope=profile_nickname+profile_image',
     'token_url': 'https://kauth.kakao.com/oauth/token',
     'user_info_url': 'https://kapi.kakao.com/v2/user/me',
+    'nickname' : 'nickname',
 }
 
 def get_access_token(auth_code, config):
@@ -63,10 +67,10 @@ def get_access_token(auth_code, config):
         else:
             return None
 
-def get_user_info(access_token, token_url):
+def get_user_info(access_token, user_info_url):
     headers = {'Authorization': f'Bearer {access_token}'}
 
-    response = requests.get(token_url, headers=headers)
+    response = requests.get(user_info_url, headers=headers)
     if response.status_code == 200:
         return {'success': True, 'data': response.json()}
     return {'success': False, 'status_code': response.status_code}
@@ -78,7 +82,7 @@ class Login42TestView(APIView):
     
 class Login42CallbackView(APIView):
     def post(self, request):
-        return process_login(request, fortytwo) #42로그인은 인트라 아이디
+        return process_login(request, fortytwo)
     
 class LoginGoogleView(APIView):
     def get(self, request):
@@ -86,43 +90,26 @@ class LoginGoogleView(APIView):
 
 class LoginGoogleCallbackView(APIView):
     def post(self, request):
-        return process_login(request, google, 'g_') #구글 로그인은 닉네임 앞에 g_를 붙여줌
+        return process_login(request, google)
 
 class LoginKakaoView(APIView):
     def get(self, request):
-        return redirect(kakao['target_url']) #카카오 로그인은 닉네임 앞에 k_를 붙여줌
+        return redirect(kakao['target_url'])
 
 class LoginKakaoCallbackView(APIView):
     def post(self, request):
-        return process_login(request, kakao, 'k_')
+        return process_login(request, kakao)
+        
 
-def process_login(request, config, nickname_prefix=''):
+def process_login(request, config):
     auth_code = request.data.get('code')
     access_token = get_access_token(auth_code, config)
     if not access_token:
         return Response({"message": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
     user_info = get_user_info(access_token, config['user_info_url'])
+    
     if user_info['success']:
-        if nickname_prefix == 'k_' :
-            user_nickname = nickname_prefix + user_info.get('data', {}).get('properties', {}).get('nickname')
-            user_email = user_nickname + '@kakao.com'
-        else :
-            user_nickname = nickname_prefix + user_info.get('data', {}).get(config['nickname'])
-            user_email = user_info.get('data', {}).get('email')
-        save_user_to_db(user_email, user_nickname)
-        user = User.objects.get(email=user_email)
-        #카카오 로그인이면서 and (장고 스토리지가 초기화됬거나(추후 volume설정 필요), DB에 이미지 저장이 안되어 있거나 or 프로필 사진을 변경안하고 카카오 프로필 이미지를 쓸경우는) 로그인 할때마다 프로필 이미지로 업데이트
-        if (nickname_prefix == 'k_') and (not default_storage.exists('user_images/') or not user.image_file or 'kakao.jpg' in user.image_file.name.split('/')[2]):
-            image_url = user_info.get('data', {}).get('properties', {}).get('profile_image')
-            response = requests.get(image_url) #이미지 url get 요청으로 받아오기
-            if response.status_code == 200:
-                if ('user_images/' + user_nickname + '/') in user.image_file.name: #기존 이미지가 있으면 삭제
-                    default_storage.delete(user.image_file.name)
-                #이미지 장고 스토리지에 저장
-                file_path = default_storage.save('user_images/' + user_nickname + '/' + 'kakao.jpg', ContentFile(response.content))
-                user.image_file = file_path #이미지 경로 db에 저장
-                user.save()
-                
+        user = save_db(user_info, config)                
         jwt_token = create_jwt_token(user)
 
         response = Response({"message": "POST 요청 처리 완료"}, status=status.HTTP_200_OK)
@@ -156,6 +143,53 @@ def create_jwt_token(user):
         'refresh_token': str(refresh),
     }
 
+#KAKAO
+# user_info: {
+    # 'properties' : {'nickname': 'nickname', profile_image : 'url'},
+    # }
+
+#GOOGLE
+# user_info: {
+    # 'email': 'geonwlee22@gmail.com', 
+    # 'given_name': 'geonwu', 
+    # 'picture': 'url',
+    # }
+
+#42
+# user_info: {
+    # 'email': 'geonwule@student.42seoul.kr',
+    #  login': 'geonwule', 
+    # 'image': { 'versions': { 'large': 'url', 'medium': 'url', 'small': 'url', 'migro': 'url' }
+        
+def save_db(user_info, config):
+    if config['type'] == 'kakao' :
+        user_nickname = 'k_' + user_info.get('data', {}).get('properties', {}).get(config['nickname'])
+        user_email = user_nickname[2:] + '@kakao.com'
+    elif config['type'] == 'google' :
+        user_nickname = 'g_' + user_info.get('data', {}).get(config['nickname'])
+        user_email = user_info.get('data', {}).get('email')
+    else : #42
+        user_nickname = user_info.get('data', {}).get(config['nickname'])
+        user_email = user_info.get('data', {}).get('email')
+    save_user_to_db(user_email, user_nickname)
+    user = User.objects.get(email=user_email)
+    #(장고 스토리지가 초기화됬거나(추후 volume설정 필요), DB에 이미지 저장이 안되어 있거나 or 프로필 사진을 변경안하고 카카오 프로필 이미지를 쓸경우는) 로그인 할때마다 프로필 이미지로 업데이트
+    if not default_storage.exists('user_images/' + user_nickname) or not user.image_file or config['type'] + '.jpg' in user.image_file.name.split('/')[2]:
+        if config['type'] == 'kakao' :
+            image_url = user_info.get('data', {}).get('properties', {}).get('profile_image')
+        elif config['type'] == 'google' :
+            image_url = user_info.get('data', {}).get('picture')
+        else : #42
+            image_url = user_info.get('data', {}).get('image', {}).get('versions', {}).get('small')
+        response = requests.get(image_url) #이미지 url get 요청으로 받아오기
+        if response.status_code == 200:
+            if ('user_images/' + user_nickname + '/') in user.image_file.name: #기존 이미지가 있으면 삭제
+                default_storage.delete(user.image_file.name)
+            #이미지 장고 스토리지에 저장
+            file_path = default_storage.save('user_images/' + user_nickname + '/' + config['type'] + '.jpg', ContentFile(response.content))
+            user.image_file = file_path #이미지 경로 db에 저장
+            user.save()
+    return user
 
 def save_user_to_db(_user_email, _user_nickname):
      # user_id와 email이 모두 이미 존재하는지 확인
