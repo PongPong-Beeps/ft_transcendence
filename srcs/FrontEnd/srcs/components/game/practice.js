@@ -17,7 +17,7 @@ export default function Practice($container) {
         const container = $container.querySelector('.game-canvas-container');
         const containerWidth = container.offsetWidth;
         const containerHeight = container.offsetHeight;
-        playerImage.src = "../../assets/image/img.png";
+        playerImage.src = "../../assets/image/character.png";
 
         paddle = { width: containerHeight * 0.03, height: containerHeight * 0.15, speed: containerHeight * 0.015, color: 'WHITE' };
         pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.02, color: '#ffa939' };
@@ -136,6 +136,7 @@ export default function Practice($container) {
                 && ball.y - pong.radius <= nearestPlayer.y + paddle.height
                 && ball.y + pong.radius >= nearestPlayer.y) {
                 ball.dirX = -ball.dirX; // X 방향 반전
+                ball.x += ball.dirX;
             }
         });
     };
