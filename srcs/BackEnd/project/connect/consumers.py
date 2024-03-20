@@ -41,7 +41,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.accept()
         
         await self.channel_layer.group_send(
-          self.room_group_name, {"type": "friend_list", "sender": user}
+          self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
         
     async def disconnect(self, close_code):
@@ -57,7 +57,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.channel_layer.group_send(
-          self.room_group_name, {"type": "friend_list", "sender": user}
+          self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
     
     async def receive(self, text_data):
