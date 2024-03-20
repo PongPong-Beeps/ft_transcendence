@@ -12,8 +12,9 @@ import { WebSocketManager } from "../../utils/webSocketManager.js";
  * @param { HTMLElement } $container
  * @param { WebSocket } ws
  */
+
 export default function UserList($container, wsManager) {
-    let myNickname;
+    let id;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
 
@@ -68,15 +69,15 @@ export default function UserList($container, wsManager) {
     };
 
     const handleUserListCellClick = (event) => {
-        const userCell = event.target.closest('[data-nickname]');
+        const userCell = event.target.closest('[data-id]');
         if (!userCell) return; // margin으로 인한 빈 공간 클릭했을 때
-        const nickname = userCell.getAttribute('data-nickname');
+        const targetId = userCell.getAttribute('data-id');
         if (event.target.matches('.dm-btn')) {
-            alert(`${nickname}에게 귓속말`);
+            alert(`${targetId}에게 귓속말`);
         } else if (event.target.matches('.invite-btn')) {
-            alert(`${nickname} 초대`);
+            alert(`${targetId} 초대`);
         } else {
-            new ProfileModal($container, wsManager, myNickname, nickname, false);
+            new ProfileModal($container, wsManager, id, targetId, false);
         }
     };
 
@@ -102,8 +103,9 @@ export default function UserList($container, wsManager) {
     const setupUserListData = () => {
         fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
-                myNickname = data.nickname;
-                wsManager.sendMessage({ type: "friend_list", sender: myNickname });
+                id = data.id;
+                wsManager.sendMessage({ type: "friend_list", sender: id });
+
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);

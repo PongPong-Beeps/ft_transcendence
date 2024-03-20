@@ -6,7 +6,7 @@ from rest_framework import serializers
 class BlackListSerializer(serializers.ModelSerializer):
     class Meta:
         model = views.User #이부분도 모델에서 import로 수정예정
-        fields = ['nickname']
+        fields = ['id', 'nickname']
         
 class FriendListSerializer(serializers.ModelSerializer):
     class Meta:
