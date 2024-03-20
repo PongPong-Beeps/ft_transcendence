@@ -7,11 +7,8 @@ import { WebSocketManager } from "../utils/webSocketManager.js";
 /**
  * @param {HTMLElement} $container
  */
-export default function Chat($container, ws) {
-    // const accessToken = getCookie('access_token'); 
+export default function Chat($container, wsManager) {
     let myNickname = '';  
-
-    const wsManager = new WebSocketManager(ws);
 
     fetchWithAuth(`${BACKEND}/user/me`)
     .then(data => {

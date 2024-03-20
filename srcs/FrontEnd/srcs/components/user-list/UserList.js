@@ -6,12 +6,13 @@ import UserCell from "./UserCell.js";
 import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
+import { WebSocketManager } from "../../utils/webSocketManager.js";
 
 /**
  * @param { HTMLElement } $container
  * @param { WebSocket } ws
  */
-export default function UserList($container, ws) {
+export default function UserList($container, wsManager) {
     let myNickname;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
@@ -75,7 +76,7 @@ export default function UserList($container, ws) {
         } else if (event.target.matches('.invite-btn')) {
             alert(`${nickname} 초대`);
         } else {
-            new ProfileModal($container, ws, myNickname, nickname, false);
+            new ProfileModal($container, wsManager, myNickname, nickname, false);
         }
     };
 
@@ -102,16 +103,17 @@ export default function UserList($container, ws) {
         fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
                 myNickname = data.nickname;
-                ws.send(JSON.stringify({ type: "friend_list", sender: myNickname }));
+                wsManager.sendMessage({ type: "friend_list", sender: myNickname });
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);
                 new ErrorPage($container, error.status);
             });
-        ws.onmessage = function(event) {
-            setFriendList(JSON.parse(event.data).friendList);
-            console.log(getFriendList());
-        }
+        wsManager.addMessageHandler(function(data) {
+            if (data.friendList) {
+                setFriendList(data.friendList);
+            }
+        });
     }
 
     importCss("assets/css/user-list.css");

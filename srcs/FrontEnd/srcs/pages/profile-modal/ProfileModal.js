@@ -17,7 +17,7 @@ import ImgUploadError from "../ImgUploadError.js";
  * @param { Function } setNicknameFn
  * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, ws, myNickname, targetNickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+export default function ProfileModal($container, wsManager, myNickname, targetNickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -169,7 +169,7 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
         .then(data => {
             console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
-            ws.send(JSON.stringify({ "type": "friend_list", "sender": myNickname }));
+            wsManager.sendMessage({ "type": "friend_list", "sender": myNickname });
         })
         .catch(error => {
             console.error("[ handleFriendEvent ] " + error.message);

@@ -8,7 +8,7 @@ import {navigate} from "../utils/navigate.js";
  * @param { HTMLElement } $container
  * @param { WebSocket } ws
  */
-export default function Header($container, ws) {
+export default function Header($container, wsManager) {
     const render = () => {
         const header = $container.querySelector('#header');
         if (header) {
@@ -30,7 +30,7 @@ export default function Header($container, ws) {
            fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
                .then(data => {
                    console.log("[ logout ] 완료");
-                   ws.close();
+                   wsManager.ws.close();
                    navigate('/');
                })
                .catch(error => {

@@ -3,6 +3,7 @@ import {importCss} from "../utils/importCss.js";
 import getCookie from "../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../api.js";
 import ErrorPage from "./ErrorPage.js";
+import { WebSocketManager } from "../utils/webSocketManager.js";
 
 /**
  * @param {HTMLElement} $container
@@ -44,10 +45,11 @@ export default function AuthPage($container) {
                     new ErrorPage($container, response.status);
                 } else {
                     console.log("[ sendAuthorizationCode ] 토큰 발급 성공");
-                    let ws = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const ws = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const wsManager = new WebSocketManager(ws);
                     ws.onopen = function(event) {
                         console.log("웹 소켓 생성 완료");
-                        navigate('lobby', ws);
+                        navigate('lobby', wsManager);
                     }
                     ws.onclose = function(event) {
                         console.log("웹 소켓 닫아용");
