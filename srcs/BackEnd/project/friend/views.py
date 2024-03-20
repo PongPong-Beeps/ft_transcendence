@@ -33,14 +33,14 @@ class AddFriendView(APIView):
     def post(self, request):
         try:
             user_me = User.objects.get(id=request.user.id) #내 아이디로 사용자 정보 추출
-            target = request.data.get('nickname') #타겟 닉네임 추출
-            user_target = User.objects.get(nickname=target) #타겟 닉네임으로 사용자 정보 추출
-            if user_me.friendlist.filter(nickname=target).exists():
-                return Response({"error": f"{target}은(는) 이미 친구입니다."}, status=400)
+            target_id = request.data.get('id') #타겟 닉네임 추출
+            user_target = User.objects.get(id=target_id) #타겟 닉네임으로 사용자 정보 추출
+            if user_me.friendlist.filter(id=target_id).exists():
+                return Response({"error": f"{user_target.nickname}은(는) 이미 친구입니다."}, status=400)
             user_me.friendlist.add(user_target)  #친구목록에 타겟 추가
-            return Response({"message": f"{target}이(가) 친구추가 되었습니다"}, status = 200)
+            return Response({"message": f"{user_target.nickname}이(가) 친구추가 되었습니다"}, status = 200)
         except User.DoesNotExist:
-            return Response({"error": f"{target}사용자가 존재하지 않습니다."}, status=401)
+            return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=401)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
         
@@ -55,13 +55,13 @@ class DeleteFriendView(APIView):
     def post(self, request):
         try :
             user_me = User.objects.get(id=request.user.id)
-            target = request.data.get('nickname')
-            user_target = User.objects.get(nickname=target)
-            if not user_me.friendlist.filter(nickname=target).exists():
-                return Response({"error": f"{target}은(는) 이미 친구목록에 없습니다."}, status=400)
+            target_id = request.data.get('id')
+            user_target = User.objects.get(id=target_id)
+            if not user_me.friendlist.filter(id=target_id).exists():
+                return Response({"error": f"{user_target.nickname}은(는) 이미 친구목록에 없습니다."}, status=400)
             user_me.friendlist.remove(user_target)  # 친구 삭제
-            return Response({"message": f"{target}이(가) 친구목록에서 삭제되었습니다"}, status=200)
+            return Response({"message": f"{user_target.nickname}이(가) 친구목록에서 삭제되었습니다"}, status=200)
         except User.DoesNotExist:
-            return Response({"error": f"{target}사용자가 존재하지 않습니다."}, status=401)
+            return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=401)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
