@@ -7,6 +7,7 @@ import ErrorPage from "../ErrorPage.js";
 import HistoryTab from "./HistoryTab.js";
 import MyProfile from "../../components/MyProfile.js";
 import ImgUploadError from "../ImgUploadError.js";
+import FriendCell from "../../components/user-list/FriendCell.js";
 
 /**
  * @param { HTMLElement } $container
@@ -115,20 +116,21 @@ export default function ProfileModal($container, ws, id, targetId, isMe, setNick
     this.renderBlacklist = () => {
         const blacklist = $container.querySelector('#blacklist-content');
         if (blacklist) {
-            blacklist.innerHTML = getBlacklist().map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+            blacklist.innerHTML = getBlacklist()
+                .map(blacklist => BlacklistCell(blacklist))
+                .join('');
             if (getBlacklist().length === 0) {
                 blacklist.innerHTML = '<div id="blacklist-message">블랙리스트가 비어있습니다</div>';
             }
             getBlacklist().forEach(blacklist => {
-                const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
+                const cell = $container.querySelector(`[data-id="${blacklist.id}"]`);
                 if (cell) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
                         event.stopPropagation();
-                        handleUnBlockButtonClick(blacklist.nickname);
+                        handleUnBlockButtonClick(blacklist.id);
                     });
                 }
-            }
-            );
+            });
         }
     }
 
@@ -143,7 +145,7 @@ export default function ProfileModal($container, ws, id, targetId, isMe, setNick
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
                 if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
-                    handleUnBlockButtonClick();
+                    handleUnBlockButtonClick(targetId);
                 } else {
                     handleBlockButtonClick();
                 }
@@ -192,8 +194,8 @@ export default function ProfileModal($container, ws, id, targetId, isMe, setNick
         });
     }
 
-    const handleUnBlockButtonClick = () => {
-        const toUnBlock = { "id": targetId };
+    const handleUnBlockButtonClick = (unblockId) => {
+        const toUnBlock = { "id": unblockId };
         fetchWithAuth(`${BACKEND}/user/unblock/`, {
             method: 'POST',
             body: JSON.stringify(toUnBlock),
