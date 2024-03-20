@@ -18,7 +18,7 @@ import FriendCell from "../../components/user-list/FriendCell.js";
  * @param { Function } setNicknameFn
  * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, ws, id, targetId, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+export default function ProfileModal($container, wsManager, id, targetId, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -171,6 +171,7 @@ export default function ProfileModal($container, ws, id, targetId, isMe, setNick
         .then(data => {
             console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
+            wsManager.sendMessage({ "type": "friend_list", "sender": id });
             ws.send(JSON.stringify({ "type": "friend_list", "sender": id }));
         })
         .catch(error => {
