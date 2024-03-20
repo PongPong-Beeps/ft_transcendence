@@ -67,7 +67,7 @@ export default function UserList($container, ws) {
     };
 
     const handleUserListCellClick = (event) => {
-        const userCell = event.target.closest('[data-nickname]');
+        const userCell = event.target.closest('[data-id]');
         if (!userCell) return; // margin으로 인한 빈 공간 클릭했을 때
         const targetId = userCell.getAttribute('data-id');
         if (event.target.matches('.dm-btn')) {
