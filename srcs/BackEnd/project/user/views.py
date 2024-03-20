@@ -313,8 +313,8 @@ def get_image(user):
         image_file = user.image_file
         with open(image_file.path, "rb") as f:
             image_data = f.read()
-        image_base64 = base64.b64encode(image_data)
-        print("image_base64: ", image_base64)
+        image_base64 = base64.b64encode(image_data).decode('utf-8')
+        # print("image_base64: ", image_base64)
 
         return image_base64
     except Exception as e: # 이미지가 없을 경우 read()에서 예외 발생!
