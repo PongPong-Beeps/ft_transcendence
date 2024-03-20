@@ -239,6 +239,7 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
                     highlightInputBox(nicknameInput);
                     console.log("[ fetchNickname ] 닉네임 변경 완료");
                     setNicknameFn(myNickname);
+                    ws.send(JSON.stringify({ "type": "friend_list", "sender": myNickname }));
                 })
                 .catch(error => {
                     switch (error.status) {
