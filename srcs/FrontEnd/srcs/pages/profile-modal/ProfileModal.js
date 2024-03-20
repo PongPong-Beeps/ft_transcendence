@@ -7,17 +7,18 @@ import ErrorPage from "../ErrorPage.js";
 import HistoryTab from "./HistoryTab.js";
 import MyProfile from "../../components/MyProfile.js";
 import ImgUploadError from "../ImgUploadError.js";
+import FriendCell from "../../components/user-list/FriendCell.js";
 
 /**
  * @param { HTMLElement } $container
  * @param { WebSocket } ws
- * @param { string } myNickname
- * @param { string } targetNickname
+ * @param { number } id
+ * @param { number } targetId
  * @param { boolean } isMe
  * @param { Function } setNicknameFn
  * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, ws, myNickname, targetNickname, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+export default function ProfileModal($container, ws, id, targetId, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -96,7 +97,7 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
             if (infoData.block)
                 $container.querySelector('#block-btn').innerHTML = '차단 해제';
             if (!isMe) {
-                $container.querySelector('#add-friend-btn').innerHTML = infoData.freind ? '친구 해제' : '친구 추가';
+                $container.querySelector('#add-friend-btn').innerHTML = infoData.friend ? '친구 해제' : '친구 추가';
             }
             let inputElement = $container.querySelector('#profile-picture-input');
             if (inputElement) {
@@ -115,20 +116,21 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
     this.renderBlacklist = () => {
         const blacklist = $container.querySelector('#blacklist-content');
         if (blacklist) {
-            blacklist.innerHTML = getBlacklist().map(blacklist => BlacklistCell(blacklist.nickname)).join('');
+            blacklist.innerHTML = getBlacklist()
+                .map(blacklist => BlacklistCell(blacklist))
+                .join('');
             if (getBlacklist().length === 0) {
                 blacklist.innerHTML = '<div id="blacklist-message">블랙리스트가 비어있습니다</div>';
             }
             getBlacklist().forEach(blacklist => {
-                const cell = $container.querySelector(`[data-nickname="${blacklist.nickname}"]`);
+                const cell = $container.querySelector(`[data-id="${blacklist.id}"]`);
                 if (cell) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
                         event.stopPropagation();
-                        handleUnBlockButtonClick(blacklist.nickname);
+                        handleUnBlockButtonClick(blacklist.id);
                     });
                 }
-            }
-            );
+            });
         }
     }
 
@@ -143,7 +145,7 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
                 handleUpdateNicknameButtonClick(event.target);
             } else if (event.target.closest('#block-btn')) {
                 if ($container.querySelector('#block-btn').innerHTML === '차단 해제') {
-                    handleUnBlockButtonClick(targetNickname);
+                    handleUnBlockButtonClick(targetId);
                 } else {
                     handleBlockButtonClick();
                 }
@@ -164,12 +166,12 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
     const handleFriendEvent = (uri, innerText) => {
         fetchWithAuth(`${BACKEND}/${uri}/`, {
             method: 'POST',
-            body: JSON.stringify({ "nickname": targetNickname }),
+            body: JSON.stringify({ "id": targetId }),
         })
         .then(data => {
             console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
-            ws.send(JSON.stringify({ "type": "friend_list", "sender": myNickname }));
+            ws.send(JSON.stringify({ "type": "friend_list", "sender": id }));
         })
         .catch(error => {
             console.error("[ handleFriendEvent ] " + error.message);
@@ -178,7 +180,7 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
     }
 
     const handleBlockButtonClick = () => {
-        const toBlock = { "nickname": targetNickname };
+        const toBlock = { "id": targetId };
         fetchWithAuth(`${BACKEND}/user/block/`, {
             method: 'POST',
             body: JSON.stringify(toBlock),
@@ -192,8 +194,8 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
         });
     }
 
-    const handleUnBlockButtonClick = (unblockNickname) => {
-        const toUnBlock = { "nickname": unblockNickname };
+    const handleUnBlockButtonClick = (unblockId) => {
+        const toUnBlock = { "id": unblockId };
         fetchWithAuth(`${BACKEND}/user/unblock/`, {
             method: 'POST',
             body: JSON.stringify(toUnBlock),
@@ -234,11 +236,10 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
                 body: JSON.stringify({ "nickname": nicknameInput.value }),
             })
                 .then(() => {
-                    myNickname = nicknameInput.value;
-                    nicknameInput.placeholder = myNickname;
+                    nicknameInput.placeholder = nicknameInput.value;
+                    setNicknameFn(nicknameInput.value);
                     highlightInputBox(nicknameInput);
-                    console.log("[ fetchNickname ] 닉네임 변경 완료");
-                    setNicknameFn(myNickname);
+                    ws.send(JSON.stringify({ "type": "friend_list", "sender": id }));
                 })
                 .catch(error => {
                     switch (error.status) {
@@ -294,7 +295,7 @@ export default function ProfileModal($container, ws, myNickname, targetNickname,
     const fetchProfileModalData = () => {
         const option = {
             method: 'POST',
-            body: JSON.stringify({ nickname: targetNickname }),
+            body: JSON.stringify({ "id": targetId }),
         };
 
         if (isMe) {

@@ -11,6 +11,7 @@ import ErrorPage from "../pages/ErrorPage.js";
  * @param { WebSocket } ws
  */
 export default function MyProfile($container, ws) {
+    let id;
     let [getNickname, setNickname] = useState("", this, 'renderNickname');
     let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
 
@@ -28,7 +29,7 @@ export default function MyProfile($container, ws) {
 
     const setupEventListener = () => {
         $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, ws, getNickname(), getNickname(), true, setNickname, setProfileImage);
+            new ProfileModal($container, ws, id, id, true, setNickname, setProfileImage);
         });
     }
 
@@ -44,6 +45,7 @@ export default function MyProfile($container, ws) {
     setupEventListener();
     fetchWithAuth(`${BACKEND}/user/me`)
         .then(data => {
+            id = data.id;
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
             setNickname(data.nickname);
             setProfileImage(data.image);

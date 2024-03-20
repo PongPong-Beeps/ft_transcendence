@@ -3,6 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Client
 from channels.db import database_sync_to_async
+from user.models import User
 
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -40,7 +41,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.accept()
         
         await self.channel_layer.group_send(
-          self.room_group_name, {"type": "friend_list", "sender": user}
+          self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
         
     async def disconnect(self, close_code):
@@ -56,7 +57,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.channel_layer.group_send(
-          self.room_group_name, {"type": "friend_list", "sender": user}
+          self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
     
     async def receive(self, text_data):
@@ -82,12 +83,12 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         sender = event['sender']
         
-        if user.nickname == sender: #자신의 친구목록을 요청한 경우
+        if user.id == sender: #자신의 친구목록을 요청한 경우
             friend_list_json = await self.generate_friend_list_status_json(user)
             await self.send(text_data=friend_list_json)
             
         else: #친구의 상태가 변한 경우
-            sender_exists_in_friends = await database_sync_to_async(lambda: user.friendlist.filter(nickname=sender).exists())()
+            sender_exists_in_friends = await database_sync_to_async(lambda: user.friendlist.filter(id=sender).exists())()
             if sender_exists_in_friends:
                 friend_list_json = await self.generate_friend_list_status_json(user)
                 await self.send(text_data=friend_list_json)
@@ -101,6 +102,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             # 각 친구가 Client 모델에 존재하는지 확인 (온라인 상태인지 확인)
             is_online = await database_sync_to_async(Client.objects.filter(user=friend).exists)()
             friendList.append({
+                "id" : friend.id,
                 "nickname": friend.nickname,
                 "is_online": is_online
             })
@@ -118,11 +120,12 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         sender = event['sender']
         message = event['message']
         
-        is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
+        is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
         if not is_blocked:
+            sender_nick = await database_sync_to_async(User.objects.get)(id=sender).nickname
             await self.send(text_data=json.dumps({
                 "type": "all_chat",
-                "sender": sender,
+                "sender": sender_nick,
                 "message": message
             }))
     
@@ -134,20 +137,22 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         
         is_receiver = user.nickname == receiver
         is_sender = user.nickname == sender
-        is_blocked_sender = await database_sync_to_async(lambda: user.blacklist.filter(nickname=sender).exists())()
-        is_blocked_receiver = await database_sync_to_async(lambda: user.blacklist.filter(nickname=receiver).exists())()
+        is_blocked_sender = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
+        is_blocked_receiver = await database_sync_to_async(lambda: user.blacklist.filter(id=receiver).exists())()
         
         if is_receiver and not is_blocked_sender:   # receiver가 sender를 차단하지 않은 경우
+            sender_nick = await database_sync_to_async(User.objects.get)(id=sender).nickname
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
-                "sender": sender,
+                "sender": sender_nick,
                 "message": message
             }))
         
         if is_sender and not is_blocked_receiver:   # sender가 receiver를 차단하지 않은 경우
+            receiver_nick = await database_sync_to_async(User.objects.get)(id=receiver).nickname
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
-                "receiver": receiver,
+                "receiver": receiver_nick,
                 "message": message
             }))
 
