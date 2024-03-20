@@ -11,7 +11,7 @@ import FriendCell from "../../components/user-list/FriendCell.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocket } ws
+ * @param { WebSocketManager } wsManager
  * @param { number } id
  * @param { number } targetId
  * @param { boolean } isMe
@@ -172,7 +172,6 @@ export default function ProfileModal($container, wsManager, id, targetId, isMe, 
             console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
             wsManager.sendMessage({ "type": "friend_list", "sender": id });
-            ws.send(JSON.stringify({ "type": "friend_list", "sender": id }));
         })
         .catch(error => {
             console.error("[ handleFriendEvent ] " + error.message);
@@ -240,7 +239,7 @@ export default function ProfileModal($container, wsManager, id, targetId, isMe, 
                     nicknameInput.placeholder = nicknameInput.value;
                     setNicknameFn(nicknameInput.value);
                     highlightInputBox(nicknameInput);
-                    ws.send(JSON.stringify({ "type": "friend_list", "sender": id }));
+                    wsManager.sendMessage({ "type": "friend_list", "sender": id });
                 })
                 .catch(error => {
                     switch (error.status) {

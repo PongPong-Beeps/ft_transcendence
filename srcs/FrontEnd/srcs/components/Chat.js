@@ -8,11 +8,11 @@ import { WebSocketManager } from "../utils/webSocketManager.js";
  * @param {HTMLElement} $container
  */
 export default function Chat($container, wsManager) {
-    let myNickname = '';  
+    let myId = '';  
 
     fetchWithAuth(`${BACKEND}/user/me`)
     .then(data => {
-        myNickname = data.nickname;
+        myId = data.id;
     })
     .catch(error => {
         console.error("[ fetchMyNickname ] " + error.message);
@@ -30,7 +30,7 @@ export default function Chat($container, wsManager) {
     });
 
     const sendMessage = (message) => {
-        wsManager.sendMessage({ "type": "all_chat", "sender": myNickname, "message": message });
+        wsManager.sendMessage({ "type": "all_chat", "sender": myId, "message": message });
     };
 
     const render = () => {

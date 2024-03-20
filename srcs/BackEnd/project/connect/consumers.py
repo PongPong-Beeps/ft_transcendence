@@ -122,7 +122,8 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         
         is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
         if not is_blocked:
-            sender_nick = await database_sync_to_async(User.objects.get)(id=sender).nickname
+            sender_user = await database_sync_to_async(User.objects.get)(id=sender)
+            sender_nick = sender_user.nickname
             await self.send(text_data=json.dumps({
                 "type": "all_chat",
                 "sender": sender_nick,
