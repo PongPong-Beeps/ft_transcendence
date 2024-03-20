@@ -11,12 +11,12 @@ class InviteView(APIView):
         request_body=InviteSerializer,
     )
     def post(self, request):
-        sender = request.data['sender']
-        receiver = request.data['receiver']
+        sender_id = request.data['sender']
+        receiver_id = request.data['receiver']
         try:
-            invite = InvitationQueue.objects.get(sender=sender, receiver=receiver)
+            invite = InvitationQueue.objects.get(sender_id=sender_id, receiver_id=receiver_id)
             return Response(status=400, data={"message": "already invited"})
         except InvitationQueue.DoesNotExist:
-            invite = InvitationQueue.objects.create(sender=sender, receiver=receiver)
+            invite = InvitationQueue.objects.create(sender_id=sender_id, receiver_id=receiver_id)
             invite.save()
             return Response(status=200, data={"message": "invite success"})

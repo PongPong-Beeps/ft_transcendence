@@ -11,8 +11,8 @@ class InputNickSerializer(serializers.Serializer):
 
 #[POST] sender, receiver 입력을 위한 Serializer
 class InviteSerializer(serializers.Serializer):
-    sender = serializers.CharField(max_length=20)
-    receiver = serializers.CharField(max_length=20)
+    sender = serializers.IntegerField()
+    receiver = serializers.IntegerField()
     
 user_list_schema = {
   200: openapi.Response(

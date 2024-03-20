@@ -79,20 +79,24 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             )
         elif type == 'invite':
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "invite", "sender": sender, "receiver": text_data_json["receiver"]}
+                self.room_group_name, {"type": "invited", "sender": sender, "receiver": text_data_json["receiver"]}
             )
     
-    async def invite(self, event):
+    async def invited(self, event):
         user = self.scope['user']
-        sender = event['sender']
-        receiver = event['receiver']
-        if user.nickname == receiver: #초대된 닉네임이 나라면
-            sender_user = await database_sync_to_async(User.objects.get)(nickname=sender)
+        sender_id = event['sender']
+        receiver_id = event['receiver']
+        if user.id == receiver_id: #초대된 닉네임이 나라면
+            sender_user = await database_sync_to_async(User.objects.get)(id=sender_id)
+            receiver_user = await database_sync_to_async(User.objects.get)(id=receiver_id)
+            #from game.models import Game
+            #game = await database_sync_to_async(Game.objects.get)(name=sender_id) #게임방 연결 후 주석해제
             await self.send(text_data=json.dumps({
-                "type": "invite",
-                "sender":sender,
-                "receiver":receiver,
-                "game_id" : str(sender_user.id),
+                "type": "invited",
+                "sender": sender_user.nickname,
+                "receiver": receiver_user.nickname,
+                #"game_type" : game.type,
+                #"game_mode" : game.mode,
             })
         )
     
