@@ -6,6 +6,8 @@ from channels.db import database_sync_to_async
 from connect.models import Client
 from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
+from connect.models import InvitationQueue
+from user.models import User
 
 # 프론트에서 쿼리로 전달 : category, type, mode
 # category = "create_room" or "invite" or "quick_start" 
@@ -97,14 +99,19 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def accept_invite(self, user, client):
         try :
-            #게임 대기열 머지 후 수정
-            #invitation = await database_sync_to_async(InvitationQueue.objects.get)(receiver_id=user.id) #초대 대기열에서 초대장 조회
-            #sender_id = invitation.sender_id #초대한 사람의 id  
-            #sender_user = await database_sync_to_async(User.objects.get)(id=sender_id) #초대한 사람의 user
-            #sender_client = await database_sync_to_async(Client.objects.get)(user=sender_user) #초대한 사람의 client
-            #game = await database_sync_to_async(Game.objects.get)(client=sender_client) #초대한 사람의 client가 참여한 게임
+            #초대장이 여러개일 경우도 생각해서 배열로 받음 
+            invitation_queryset = await database_sync_to_async(InvitationQueue.objects.filter)(receiver_id=user.id)
+            invitation = await database_sync_to_async(invitation_queryset.first)() #그중 젤 오래된 초대장을 받음
+            sender_id = invitation.sender_id #초대한 사람의 id
+            sender_user = await database_sync_to_async(User.objects.get)(id=sender_id) #초대한 사람의 user
+            sender_client = await database_sync_to_async(Client.objects.get)(user=sender_user) #초대한 사람의 client
             
-            game = await database_sync_to_async(Game.objects.get)(id=self.scope['game_id'])
+            #모든 게임방 중에 sender가 들어있는 game방을 찾기
+            games = await database_sync_to_async(lambda: list(Game.objects.all()))()
+            for game in games:
+                if await database_sync_to_async(game.is_player)(sender_client):
+                    break
+            
             if game.is_full:
                 await self.accept()
                 await self.send(text_data=json.dumps({

@@ -21,6 +21,12 @@ class Game(models.Model):
     
     is_full = models.BooleanField(default=False)
     
+    def is_player(self, player) :
+        if player == self.player1 or player == self.player2 or player == self.player3 or player == self.player4:
+            return True
+        else:
+            return False
+    
     #빈 플레이어 슬롯을 찾아서 반환
     async def get_empty_player_slot(self):
         for player_slot in ['player1', 'player2', 'player3', 'player4']:

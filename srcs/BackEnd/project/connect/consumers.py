@@ -4,7 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Client
 from channels.db import database_sync_to_async
 from user.models import User
-
+from game.models import Game
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = 'connect'
@@ -87,16 +87,23 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         sender_id = event['sender']
         receiver_id = event['receiver']
         if user.id == receiver_id: #초대된 닉네임이 나라면
-            sender_user = await database_sync_to_async(User.objects.get)(id=sender_id)
             receiver_user = await database_sync_to_async(User.objects.get)(id=receiver_id)
-            #from game.models import Game
-            #game = await database_sync_to_async(Game.objects.get)(name=sender_id) #게임방 연결 후 주석해제
+            sender_user = await database_sync_to_async(User.objects.get)(id=sender_id)
+            sender_client = await database_sync_to_async(Client.objects.get)(user=sender_user)
+            
+            #모든 게임방 중에 sender가 들어있는 game방을 찾기
+            games = await database_sync_to_async(lambda: list(Game.objects.all()))()
+            for game in games:
+                if await database_sync_to_async(game.is_player)(sender_client):
+                    break
+            
+            #모달에 띄울 정보
             await self.send(text_data=json.dumps({
                 "type": "invited",
                 "sender": sender_user.nickname,
                 "receiver": receiver_user.nickname,
-                #"game_type" : game.type,
-                #"game_mode" : game.mode,
+                "game_type" : game.type,
+                "game_mode" : game.mode,
             })
         )
     
