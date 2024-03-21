@@ -56,6 +56,10 @@
   padding-right: 10px;
 }
 
+#chat-messages p {
+  word-wrap: break-word;
+}
+
 #chat-messages::-webkit-scrollbar {
   width: 10px;
   border-radius: 12px;
