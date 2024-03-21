@@ -72,8 +72,17 @@ export default function UserList($container, wsManager) {
         const userCell = event.target.closest('[data-id]');
         if (!userCell) return; // margin으로 인한 빈 공간 클릭했을 때
         const targetId = userCell.getAttribute('data-id');
+        const targetNickname = userCell.querySelector('.nickname').innerText;
         if (event.target.matches('.dm-btn')) {
-            alert(`${targetId}에게 귓속말`);
+            const event = new CustomEvent('dmMessage', {
+                detail: {
+                    type: "dm_chat",
+                    receiver: parseInt(targetId),
+                    nickname: targetNickname,
+                    focusInput: true
+                } 
+            });
+            document.dispatchEvent(event);
         } else if (event.target.matches('.invite-btn')) {
             alert(`${targetId} 초대`);
         } else {
