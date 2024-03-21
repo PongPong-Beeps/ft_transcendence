@@ -14,6 +14,11 @@ class Game(models.Model):
     player3 = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_as_player3')
     player4 = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_as_player4')
     
+    p1_ready = models.BooleanField(default=False)
+    p2_ready = models.BooleanField(default=False)
+    p3_ready = models.BooleanField(default=False)
+    p4_ready = models.BooleanField(default=False)
+    
     is_full = models.BooleanField(default=False)
     
     #빈 플레이어 슬롯을 찾아서 반환
