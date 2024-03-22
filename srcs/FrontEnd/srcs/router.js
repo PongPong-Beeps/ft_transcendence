@@ -45,7 +45,7 @@ export default function Router($container) {
             if (!(currentMenu instanceof target.components.menu)) currentMenu = new target.components.menu($container, data);
             if (!(currentProfile instanceof MyProfile)) currentProfile = new MyProfile($container, data);
             if (!(currentMain instanceof target.components.main)) currentMain = new target.components.main($container, data);
-            if (!(currentFooter instanceof target.components.menu)) currentFooter = new target.components.footer($container, data);
+            if (!(currentFooter instanceof target.components.footer)) currentFooter = new target.components.footer($container, data);
         }
     };
 

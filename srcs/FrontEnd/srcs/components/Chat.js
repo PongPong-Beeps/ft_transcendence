@@ -56,9 +56,7 @@ export default function Chat($container, wsManager) {
         if (type === "dm_chat") {
             msgObject.receiver = receiver;
         }
-        console.log("sendMessage : ", msgObject);
         wsManager.sendMessage(msgObject);
-        console.log("Message sent");
     };
 
     const render = () => {
