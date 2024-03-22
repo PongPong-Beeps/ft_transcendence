@@ -67,6 +67,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def remove_player_and_check_game(self, client):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
         await database_sync_to_async(game.exit_player)(client)
         
     async def create_room(self, client):
@@ -142,6 +143,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
         players_nickname = await database_sync_to_async(game.get_players_nickname)()
         players_image = await database_sync_to_async(game.get_players_image)()
         players_ready = await database_sync_to_async(game.get_players_ready)()
