@@ -33,7 +33,7 @@ schema_view = get_schema_view( # API 문서를 위한 스키마 뷰를 생성합
 
 from django.contrib import admin
 from django.urls import path, include
-from connect.views import InviteView
+from connect.views import InviteView, InviteRefuseView
 
 urlpatterns = [
     #Swagger UI를 API 문서를 위해 렌더링하도록 지정합니다
@@ -42,4 +42,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('connect/invite/', InviteView.as_view(), name='invite'),
+    path('connect/invite/refuse/', InviteRefuseView.as_view(), name='invite_refuse'),
 ]
