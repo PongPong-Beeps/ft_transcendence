@@ -105,6 +105,8 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                 "receiver": receiver_user.nickname,
                 "game_type" : game.type,
                 "game_mode" : game.mode,
+                "sender_id" : sender_id,
+                "receiver_id" : receiver_id,
             })
         )
     
