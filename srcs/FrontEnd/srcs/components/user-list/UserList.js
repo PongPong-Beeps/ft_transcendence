@@ -10,7 +10,7 @@ import { WebSocketManager } from "../../utils/webSocketManager.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocket } ws
+ * @param { WebSocketManager } wsManager
  */
 
 export default function UserList($container, wsManager) {
