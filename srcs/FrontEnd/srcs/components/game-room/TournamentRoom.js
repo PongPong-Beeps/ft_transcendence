@@ -21,7 +21,7 @@ export default function TournamentRoom($container, difficulty) {
                 <div class="game-room-title-container">
                     <button class="game-room-back-btn non-outline-btn"><</button>
                     <div class="game-room-title">게임방</div>
-                    <div class="game-room-difficulty">난이도 : ${difficulty === "easy" ? "쉬움" : "어려움"}</div>
+                    <div class="game-room-detail">난이도 : ${difficulty === "easy" ? "쉬움" : "어려움"}</div>
                 </div>
                 <div class="game-room-player-container">
                     ${PlayerInfo()}

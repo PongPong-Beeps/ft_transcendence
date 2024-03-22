@@ -7,7 +7,7 @@ export default function HistoryTab(historyData) {
         <tr>
             <td>${item.date}</td>
             <td>${item.opponent}</td>
-            <td>${item.matchType === "1vs1" ? '<img src="../../../assets/image/vs.png" alt="vs">' : '<img src="../../../assets/image/tournament.png" alt="tournament">'}</td>
+            <td>${item.matchType === "1vs1" ? '<img src="../../../assets/image/one_to_one.png" alt="vs">' : '<img src="../../../assets/image/tournament.png" alt="tournament">'}</td>
             <td style="color: ${item.result === "승" ? '#2A46D9' : '#E73C3C'}">${item.result}</td>
         </tr>
     `).join('');

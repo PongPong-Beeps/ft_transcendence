@@ -7,7 +7,7 @@ import getCookie from "../../utils/cookie.js";
 
 export default function GameSettings($container) {
     const typeOption = [
-        { label: 'one_to_one', image: '../../../assets/image/vs.png' },
+        { label: 'one_to_one', image: '../../../assets/image/one_to_one.png' },
         { label: 'tournament', image: '../../../assets/image/tournament.png' }
     ];
 
@@ -77,29 +77,9 @@ export default function GameSettings($container) {
             const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
             ws.onopen = function(event) {
                 console.log("게임 웹 소켓 생성 완료");
-                const wsManager = new WebSocketManager(ws);
+                navigate('game-room', new WebSocketManager(ws));
             }
         });
-
-        // $container.querySelectorAll('.game-settings-button').forEach(button => {
-        //     button.addEventListener('click', () => {
-        //         const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
-        //         if (selectedOptions.length < 2) {
-        //             $container.querySelector('#game-settings-warning-message').style.display = 'block';
-        //             return;
-        //         }
-        //
-        //         const selectedType = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
-        //         const selectedMode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
-        //
-        //         // 테스트용
-        //         if (button.id === 'create-room-btn') console.log("방 만들기");
-        //         else if (button.id === 'quick-start-btn') console.log("빠른 시작");
-        //
-        //         const data = { "type": selectedType, "mode": selectedMode }
-        //         navigate(`game-room`, data);
-        //     });
-        // });
     };
 
     const init = () => {
