@@ -5,7 +5,11 @@ import {importCss} from "../../utils/importCss.js";
 import {WebSocketManager} from "../../utils/webSocketManager.js";
 import getCookie from "../../utils/cookie.js";
 
-export default function GameSettings($container) {
+/**
+ * @param { HTMLElement } $container
+ * @param { WebSocketManager } wsManager
+ */
+export default function GameSettings($container, wsManager) {
     const typeOption = [
         { label: 'one_to_one', image: '../../../assets/image/one_to_one.png' },
         { label: 'tournament', image: '../../../assets/image/tournament.png' }
@@ -77,7 +81,8 @@ export default function GameSettings($container) {
             const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
             ws.onopen = function(event) {
                 console.log("게임 웹 소켓 생성 완료");
-                navigate('game-room', new WebSocketManager(ws));
+                const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
+                navigate('game-room', data);
             }
         });
     };

@@ -12,7 +12,6 @@ import { WebSocketManager } from "../../utils/webSocketManager.js";
  * @param { HTMLElement } $container
  * @param { WebSocketManager } wsManager
  */
-
 export default function UserList($container, wsManager) {
     let id;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');

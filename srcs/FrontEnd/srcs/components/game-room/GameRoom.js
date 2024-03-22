@@ -7,9 +7,10 @@ import UserCell from "../user-list/UserCell.js";
 
 /**
  * @param {HTMLElement} $container
- * @param { WebSocketManager } wsManager
+ * @param { [WebSocketManager] } wsManagers
  */
-export default function GameRoom($container, wsManager) {
+export default function GameRoom($container, wsManagers) {
+    const { gameWsManager, connWsManager } = wsManagers;
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
 
     const init = () => {
@@ -50,12 +51,12 @@ export default function GameRoom($container, wsManager) {
                 new ExitConfirmation($container);
             } else if (event.target.closest('.game-room-ready-btn')) {
                 console.log("hi")
-                wsManager.sendMessage({ "type" : "ready" });
+                gameWsManager.sendMessage({ "type" : "ready" });
             }
         });
     }
 
-    wsManager.addMessageHandler(function (data) {
+    gameWsManager.addMessageHandler(function (data) {
         if (data.type && data.mode) {
             $container.querySelector('.game-room-detail').innerHTML = `
                 타입:<img style="width: 30px" src="../../../assets/image/${data.type}.png" alt="type">  모드: ${data.mode}
