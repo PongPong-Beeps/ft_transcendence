@@ -139,36 +139,30 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
                 self.room_group_name, {"type": "game_status"}
             )
-                
+    
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
         players_nickname = await database_sync_to_async(game.get_players_nickname)()
         players_image = await database_sync_to_async(game.get_players_image)()
         players_ready = await database_sync_to_async(game.get_players_ready)()
+        players_info = []
+        for i in range(4) :
+            player_info = {}
+            player_info["nickname"] = players_nickname[i]
+            player_info["image"] = players_image[i]
+            player_info["ready"] = players_ready[i]
+            players_info.append(player_info)
+        
         text_data = {
             'type': game.type,
             'mode': game.mode,
-            
-            'p1' : players_nickname[0],
-            'p2' : players_nickname[1],
-            'p3' : players_nickname[2],
-            'p4' : players_nickname[3],
-            
-            'p1_img' : players_image[0],
-            'p2_img' : players_image[1],
-            'p3_img' : players_image[2],
-            'p4_img' : players_image[3],
-            
-            'p1_ready' : players_ready[0],
-            'p2_ready' : players_ready[1],
-            'p3_ready' : players_ready[2],
-            'p4_ready' : players_ready[3],
-            
+            "players" : players_info,
+
             'status': '200',
             'message': 'Connected to game room.',
             'room_group_name': self.room_group_name,
             'is_full': game.is_full,
-        }
+        }        
         try:
             await self.send(text_data=json.dumps(text_data))
         except Exception as e:
