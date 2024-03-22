@@ -1,101 +1,128 @@
-.container, .container-lg, .container-md, .container-sm, .container-xl {
-  max-width: none; /* 부트스트랩 포함 최대 너비 제거 */
+.container,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+  max-width: 100%;
 }
 
 .container {
   width: 100%;
   height: 100%;
-  padding: 0; /* 패딩 제거 */
-  margin: 0; /* 마진 제거 */
+  padding: 0;
+  margin: 0;
 }
+
 #Chat {
+  /* width: 58.5vw; */
   width: 100%;
-  height: 100%;
-  padding: 0; /* 패딩 제거 */
-  margin: 0; /* 마진 제거 */
-  max-width: none;
+  height: 26vh;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
 .chat-box {
   width: inherit;
   height: 100%;
-  background-color: #779630; /* 채팅창 배경 */
-  border-radius: 20px; /* 테두리 모서리를 둥글게 만듦 */
-  padding: 10px; /* 내부 여백 추가 */
-  margin: 0; /* 여백 제거 */
-  box-sizing: border-box; /* 내부 여백과 테두리를 요소의 너비와 높이에 포함 */
+  background-color: #779630;
+  border-radius: 20px;
+  padding: 10px;
+  margin: 0;
+  box-sizing: border-box;
   position: relative;
   border: none;
 }
+
 .input-group {
-  position: absolute; /* 상대적 위치 지정 */
-  bottom: 10px; /* 하단에 배치 */
+  position: absolute;
+  bottom: 10px;
   left: 10px;
   right: 10px;
-  max-width: calc(100% - 20px); /* 최대 너비 지정 */
+  max-width: calc(100% - 20px);
   max-height: calc(100% - 20px);
 }
-  #chat-messages {
-    color: white; /* 채팅 글자색 */
-    height: 85%; /* 채팅창의 초기 높이 */
-    max-height: 100%; /* 채팅창의 최대 높이 */
-    overflow-y: auto; /* 스크롤바 자동 표시 */
-    margin-bottom: 10px
+
+#chat-messages {
+  color: white;
+  width: 100%;
+  height: 85%;
+  max-height: 100%;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  word-wrap: break-word; 
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#chat-messages p {
+  word-wrap: break-word;
+}
+
+#chat-messages::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 12px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+  background-color: #D3E95A;
+  border-radius: 12px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+  background-color: #5C7320;
+  border-radius: 12px;
+}
+
+#message-input {
+  background-color: #5C7320;
+  color: white;
+  border: none;
+  border-radius: 0 15px 15px 0;
+}
+
+#message-input::placeholder {
+  color: #8b993c;  /* 색상을 변경하세요 */
+}
+
+#message-inpout.form-control.placeholder {
+  color: #86a635;
+}
+
+#send-button {
+  font-family: "DNF Bit Bit v2", serif;
+  font-size: 1em;
+  color: #5C7320;
+  background-color: #D3E95A;
+  margin-left: 10px;
+  border-color: transparent;
+  border-radius: 15px;
+  transition: 0.1s ease-in-out;
+  outline: none;
+}
+
+#send-button:active {
+  transform: scale(0.95);
+}
+
+#chat-toggle-button {
+  background-color: #5C7320;
+  color: #D3E95A;
+  border-color: transparent;
+  overflow: hidden;
+  border-radius: 15px 0 0 15px;
+}
+
+@keyframes blink {
+  0%, 100% { 
+    color: #D3E95A; 
   }
-  
-  /* 입력창 스타일 */
-  #message-input {
-    background-color: #5C7320; /* 입력창 배경색 */
-    color: white; /* 글자 색상 */
-    border: none; /* 테두리 없음 */
-    border-radius: 0 20px 20px 0;
+  50% { 
+    color: #ffffff; 
   }
-  
-  /* 전송 버튼 스타일 */
-  #send-button {
-    font-family: "DNF Bit Bit v2", serif;
-    font-size: 1em;
-    color: #5C7320; /* 버튼 글자색 */
-    background-color: #D3E95A; /* 배경색 */
-    margin-left: 10px;
-    border-radius: 20px;
-    /* border: none; 테두리 없음 */
-  }
-  
-  /* 드롭다운 메뉴 스타일 */
-  .dropdown-menu {
-    background-color: #D3E95A; /* 배경색 지정 */
-  }
-  
-  .dropdown-item {
-    color: white; /* 글자색 지정 */
-  }
-  
-  .dropdown-toggle {
-    background-color: #D3E95A; /* 배경색 투명하게 */
-    color: #5C7320; /* 글자색 지정 */
-    font-family: "DNF Bit Bit v2", serif;
-    font-size: 1em;
-    border: none; /* 테두리 없음 */
-    border-radius: 20px;
-  }
-  
-  /* 스크롤 막대 스타일 */
-  #chat-messages::-webkit-scrollbar {
-    width: 10px;
-    border-radius: 12px;
-  }
-  
-  /* 스크롤 바 스타일 */
-  #chat-messages::-webkit-scrollbar-thumb {
-    background-color: #D3E95A;
-    border-radius: 12px;
-  }
-  
-  /* 스크롤 바 배경 스타일 */
-  #chat-messages::-webkit-scrollbar-track {
-    background-color: #5C7320;
-    border-radius: 12px;
-  }
-  
+}
+
+#chat-toggle-button:hover {
+  animation: blink 1s linear infinite;
+}
