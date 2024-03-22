@@ -3,6 +3,7 @@ import { BACKEND, fetchWithAuth } from "../api.js";
 
 /**
  * @param {HTMLElement} $container
+ * @param { WebSocketManager } wsManager
  */
 export default function Chat($container, wsManager) {
     let myId = '';

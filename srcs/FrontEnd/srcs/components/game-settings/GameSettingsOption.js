@@ -1,13 +1,13 @@
-export default function GameSettingsOption(category, options) {
-    const optionsHtml = options.map(option => `
-        <button class="game-settings-option-item non-outline-btn" data-selected="false" data-label="${option.label}" data-category="${category}">
-            <img src="${option.image}" alt="${option.label}"/>
+export default function GameSettingsOption(option, items) {
+    const optionsHtml = items.map(item => `
+        <button class="game-settings-option-item non-outline-btn" data-selected="false" data-label="${item.label}" data-option="${option}">
+            <img src="${item.image}" alt="${item.label}"/>
         </button>
     `).join('');
 
     return `
         <div class="game-settings-option">
-            <div class="game-settings-option-title">${category}</div>
+            <div class="game-settings-option-title">${option === "type" ? "타입" : "모드"}</div>
             <div class="game-settings-option-item-container">
                 ${optionsHtml}
             </div>
