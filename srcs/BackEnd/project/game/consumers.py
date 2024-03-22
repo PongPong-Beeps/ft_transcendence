@@ -67,32 +67,19 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def remove_player_and_check_game(self, client):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        for player_slot in ['player1', 'player2', 'player3', 'player4']:
-            if await database_sync_to_async(getattr)(game, player_slot) == client:
-                await database_sync_to_async(setattr)(game, player_slot, None)
-                await database_sync_to_async(game.save)()
-                await database_sync_to_async(game.check_full)()
-                break
-            
-        if await database_sync_to_async(getattr)(game, 'player1') is None and \
-        await database_sync_to_async(getattr)(game, 'player2') is None and \
-        await database_sync_to_async(getattr)(game, 'player3') is None and \
-        await database_sync_to_async(getattr)(game, 'player4') is None:
-            await database_sync_to_async(game.delete)()
+        await database_sync_to_async(game.exit_player)(client)
         
     async def create_room(self, client):
-        game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'], player1=client)
+        game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'])
         await database_sync_to_async(game.save)()
+        await database_sync_to_async(game.entry_player)(client) #플레이어 입장
         self.room_group_name = str(game.id)
 
     async def quick_start(self, client):
         game_queryset = await database_sync_to_async(Game.objects.filter)(type=self.scope['type'], mode=self.scope['mode'], is_full=False)
         game = await database_sync_to_async(game_queryset.first)()
         if game:
-            empty_slot = await game.get_empty_player_slot()
-            await database_sync_to_async(setattr)(game, empty_slot, client)
-            await database_sync_to_async(game.save)()
-            await database_sync_to_async(game.check_full)()
+            await database_sync_to_async(game.entry_player)(client)
             self.room_group_name = str(game.id)
         else:
             await self.create_room(client)
@@ -102,16 +89,12 @@ class GameConsumer(AsyncWebsocketConsumer):
             #초대장이 여러개일 경우도 생각해서 배열로 받음 
             invitation_queryset = await database_sync_to_async(InvitationQueue.objects.filter)(receiver_id=user.id)
             invitation = await database_sync_to_async(invitation_queryset.first)() #그중 젤 오래된 초대장을 받음
-            sender_id = invitation.sender_id #초대한 사람의 id
-            sender_user = await database_sync_to_async(User.objects.get)(id=sender_id) #초대한 사람의 user
-            sender_client = await database_sync_to_async(Client.objects.get)(user=sender_user) #초대한 사람의 client
             
-            #모든 게임방 중에 sender가 들어있는 game방을 찾기
-            games = await database_sync_to_async(lambda: list(Game.objects.all()))()
-            for game in games:
-                if await database_sync_to_async(game.is_player)(sender_client):
-                    break
-
+            game_id = invitation.game_id #초대장이 속한 게임의 id
+            game = await database_sync_to_async(Game.objects.get)(id=game_id) #초대장이 속한 게임
+            
+            await database_sync_to_async(invitation.delete)() #초대장 삭제
+            
             if game.is_full:
                 await self.accept()
                 await self.send(text_data=json.dumps({
@@ -121,10 +104,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.close(4001)
                 return 'fail'
             else:
-                empty_slot = await game.get_empty_player_slot()
-                await database_sync_to_async(setattr)(game, empty_slot, client)
-                await database_sync_to_async(game.save)()
-                await database_sync_to_async(game.check_full)()
+                await database_sync_to_async(game.entry_player)(client)
                 self.room_group_name = str(game.id)
                 return 'success'
         except Game.DoesNotExist:
@@ -151,65 +131,38 @@ class GameConsumer(AsyncWebsocketConsumer):
             
     async def ready(self, event):
         user = self.scope['user']
+        client = await database_sync_to_async(Client.objects.get)(user=user)
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        for player in ['player1', 'player2', 'player3', 'player4']:
-            client = await database_sync_to_async(getattr)(game, player)
-            if client :
-                if await database_sync_to_async(getattr)(client, 'user') == user:
-                    player_num = player[6]
-                    break
-        p_ready = 'p' + player_num + '_ready'
-        is_ready = await database_sync_to_async(getattr)(game, p_ready)
-        
-        if is_ready == True :
-            await database_sync_to_async(setattr)(game, p_ready, False)
-        else :
-            await database_sync_to_async(setattr)(game, p_ready, True)
-            
-        await database_sync_to_async(game.save)()
+    
+        await database_sync_to_async(game.do_ready)(client)
         
         await self.channel_layer.group_send(
                 self.room_group_name, {"type": "game_status"}
             )
-
-
-    async def get_player(self, game, player):
-        client = await database_sync_to_async(getattr)(game, player) if await database_sync_to_async(getattr)(game, player) else None
-        if client :
-            user = await database_sync_to_async(getattr)(client, 'user') if await database_sync_to_async(getattr)(client, 'user') else None
-            if user :
-                return user.nickname
-        return None
-    
-    async def get_image_data(self, game, player):
-        player_client = await database_sync_to_async(getattr)(game, player) if await database_sync_to_async(getattr)(game, player) else None
-        if player_client :
-            player_user = await database_sync_to_async(getattr)(player_client, 'user') if await database_sync_to_async(getattr)(player_client, 'user') else None
-            if player_user :
-                image_data = await database_sync_to_async(get_image)(player_user)
-                return image_data
-        return None
                 
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        players_nickname = await database_sync_to_async(game.get_players_nickname)()
+        players_image = await database_sync_to_async(game.get_players_image)()
+        players_ready = await database_sync_to_async(game.get_players_ready)()
         text_data = {
             'type': game.type,
             'mode': game.mode,
             
-            'p1' : await self.get_player(game, 'player1'),
-            'p2' : await self.get_player(game, 'player2'),
-            'p3' : await self.get_player(game, 'player3'),
-            'p4' : await self.get_player(game, 'player4'),
+            'p1' : players_nickname[0],
+            'p2' : players_nickname[1],
+            'p3' : players_nickname[2],
+            'p4' : players_nickname[3],
             
-            'p1_img' : await self.get_image_data(game, 'player1'),
-            'p2_img' : await self.get_image_data(game, 'player2'),
-            'p3_img' : await self.get_image_data(game, 'player3'),
-            'p4_img' : await self.get_image_data(game, 'player4'),
+            'p1_img' : players_image[0],
+            'p2_img' : players_image[1],
+            'p3_img' : players_image[2],
+            'p4_img' : players_image[3],
             
-            'p1_ready' : game.p1_ready,
-            'p2_ready' : game.p2_ready,
-            'p3_ready' : game.p3_ready,
-            'p4_ready' : game.p4_ready,
+            'p1_ready' : players_ready[0],
+            'p2_ready' : players_ready[1],
+            'p3_ready' : players_ready[2],
+            'p4_ready' : players_ready[3],
             
             'status': '200',
             'message': 'Connected to game room.',
