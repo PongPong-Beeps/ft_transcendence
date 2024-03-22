@@ -40,6 +40,11 @@ export default function UserList($container, wsManager) {
         friendsListTab.innerHTML = getFriendList()
             .map(friend => FriendCell(friend))
             .join('');
+        if (location.pathname === '/tournament-room') {
+            $container.querySelectorAll('.invite-btn').forEach(button => {
+                button.style.display = 'block';
+            });
+        }
     };
 
     this.renderAllUserList = () => {
