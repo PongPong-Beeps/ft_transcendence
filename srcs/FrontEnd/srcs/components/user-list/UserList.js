@@ -10,7 +10,7 @@ import { WebSocketManager } from "../../utils/webSocketManager.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocketManager } wsManager
+ * @param { [WebSocketManager] } wsManager
  */
 export default function UserList($container, wsManager) {
     let id;
@@ -88,7 +88,27 @@ export default function UserList($container, wsManager) {
             });
             document.dispatchEvent(event);
         } else if (event.target.matches('.invite-btn')) {
-            alert(`${targetId} 초대`);
+            fetchWithAuth(`${BACKEND}/connect/invite/`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    sender: id,
+                    receiver: parseInt(targetId),
+                })
+            })
+            .then(response => {
+                if (response) {
+                    const event = new CustomEvent('inviteUser', {
+                        detail: {
+                            sender: id,
+                            receiver: parseInt(targetId),
+                        }
+                    });
+                    document.dispatchEvent(event);
+                } else {
+                    console.error('Invite request failed');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         } else {
             new ProfileModal($container, wsManager, id, targetId, false);
         }

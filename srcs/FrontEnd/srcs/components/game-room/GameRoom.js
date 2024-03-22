@@ -4,6 +4,7 @@ import {importCss} from "../../utils/importCss.js";
 import ErrorPage from "../../pages/ErrorPage.js";
 import useState from "../../utils/useState.js";
 import UserCell from "../user-list/UserCell.js";
+import InviteModal from "../../pages/InviteModal.js";
 
 /**
  * @param {HTMLElement} $container
@@ -54,7 +55,19 @@ export default function GameRoom($container, wsManagers) {
                 gameWsManager.sendMessage({ "type" : "ready" });
             }
         });
+        document.addEventListener('inviteUser', (event) => {
+            const {sender, receiver} = event.detail;
+            connWsManager.sendMessage({ "type" : "invite", "sender" : sender, "receiver" : receiver });
+        });
     }
+
+    connWsManager.addMessageHandler(function (data) {
+        console.log("connWsManagerHandler", data);
+        if (data.type === "invited") {
+            const {sender, receiver, game_type, game_mode, sender_id, receiver_id} = data;
+            new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id);
+        }
+    });
 
     gameWsManager.addMessageHandler(function (data) {
         if (data.type && data.mode) {
