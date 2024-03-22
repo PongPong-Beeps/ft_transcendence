@@ -17,6 +17,9 @@ clean:
 fclean: clean
 	docker system prune --volumes --all --force
 
+delete:
+	rm -rf $(DB_VOLUME)
+
 re:
 	make fclean
 	make all
