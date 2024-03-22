@@ -87,3 +87,19 @@ class Game(models.Model):
                 self.delete()
         except :
             print(f'player {client.user} does not exist')
+            
+    def verify_players(self):
+        print('start verify players')
+        for player in self.players.all():
+            try :
+                getattr(player, 'client')
+                print('real? ', player.client.user)
+            except AttributeError:
+                print('AttributeError')
+                player.delete() #player 객체 삭제하면 자동으로 players에서도 삭제됨
+                self.check_full() #플레이어가 나가면 게임의 is_full 상태도 변경
+                self.save()
+                print('player delete ok')
+                if self.players.count() == 0: #플레이어가 없으면 게임 삭제
+                    self.delete()
+                    print('room delete ok')
