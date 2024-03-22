@@ -8,3 +8,4 @@ class Client(models.Model):
 class InvitationQueue(models.Model):
     sender_id = models.IntegerField()
     receiver_id = models.IntegerField()
+    game_id = models.IntegerField()
