@@ -2,6 +2,7 @@ import {navigate} from "../utils/navigate.js";
 import {importCss} from "../utils/importCss.js";
 import getCookie from "../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../api.js";
+import { WebSocketManager } from "../utils/webSocketManager.js";
 
 /**
  * @param {HTMLElement} $container
@@ -30,10 +31,11 @@ export default function LoginPage($container) {
         if (getCookie("access_token")) {
             fetchWithAuth(`${BACKEND}`)
                 .then(data => {
-                    let ws = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const ws = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const wsManager = new WebSocketManager(ws);
                     ws.onopen = function(event) {
                         console.log("웹 소켓 생성 완료");
-                        navigate('lobby', ws);
+                        navigate('lobby', wsManager);
                     }
                     ws.onclose = function(event) {
                         console.log("웹 소켓 닫아용");

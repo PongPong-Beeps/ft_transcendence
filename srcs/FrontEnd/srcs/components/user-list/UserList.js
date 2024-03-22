@@ -6,13 +6,15 @@ import UserCell from "./UserCell.js";
 import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
+import { WebSocketManager } from "../../utils/webSocketManager.js";
 
 /**
  * @param { HTMLElement } $container
  * @param { WebSocket } ws
  */
-export default function UserList($container, ws) {
-    let myNickname;
+
+export default function UserList($container, wsManager) {
+    let id;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
 
@@ -38,6 +40,11 @@ export default function UserList($container, ws) {
         friendsListTab.innerHTML = getFriendList()
             .map(friend => FriendCell(friend))
             .join('');
+        if (location.pathname === '/tournament-room') {
+            $container.querySelectorAll('.invite-btn').forEach(button => {
+                button.style.display = 'block';
+            });
+        }
     };
 
     this.renderAllUserList = () => {
@@ -67,15 +74,24 @@ export default function UserList($container, ws) {
     };
 
     const handleUserListCellClick = (event) => {
-        const userCell = event.target.closest('[data-nickname]');
+        const userCell = event.target.closest('[data-id]');
         if (!userCell) return; // margin으로 인한 빈 공간 클릭했을 때
-        const nickname = userCell.getAttribute('data-nickname');
+        const targetId = userCell.getAttribute('data-id');
+        const targetNickname = userCell.querySelector('.nickname').innerText;
         if (event.target.matches('.dm-btn')) {
-            alert(`${nickname}에게 귓속말`);
+            const event = new CustomEvent('dmMessage', {
+                detail: {
+                    type: "dm_chat",
+                    receiver: parseInt(targetId),
+                    nickname: targetNickname,
+                    focusInput: true
+                } 
+            });
+            document.dispatchEvent(event);
         } else if (event.target.matches('.invite-btn')) {
-            alert(`${nickname} 초대`);
+            alert(`${targetId} 초대`);
         } else {
-            new ProfileModal($container, ws, myNickname, nickname, false);
+            new ProfileModal($container, wsManager, id, targetId, false);
         }
     };
 
@@ -101,17 +117,19 @@ export default function UserList($container, ws) {
     const setupUserListData = () => {
         fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
-                myNickname = data.nickname;
-                ws.send(JSON.stringify({ type: "friend_list", sender: myNickname }));
+                id = data.id;
+                wsManager.sendMessage({ type: "friend_list", sender: id });
+
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);
                 new ErrorPage($container, error.status);
             });
-        ws.onmessage = function(event) {
-            setFriendList(JSON.parse(event.data).friendList);
-            console.log(getFriendList());
-        }
+        wsManager.addMessageHandler(function(data) {
+            if (data.friendList) {
+                setFriendList(data.friendList);
+            }
+        });
     }
 
     importCss("assets/css/user-list.css");

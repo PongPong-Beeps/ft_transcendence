@@ -23,7 +23,7 @@ class UserListView(APIView):
         users = User.objects.all()
         my_nickname = request.user.nickname #내 닉네임 추출
         # 각 사용자의 닉네임을 'nickname' 키를 가진 딕셔너리로 변환            # 내 닉네임은 제외
-        user_list = [{"nickname": user.nickname} for user in users if user.nickname != my_nickname]
+        user_list = [{"id": user.id,"nickname": user.nickname} for user in users if user.nickname != my_nickname]
         # 'userList' 키 아래에 사용자 리스트를 포함하는 JSON 객체로 응답 구성
         response_data = {"userList": user_list}
         return Response(response_data)
@@ -52,12 +52,12 @@ class BlockUserView(APIView):
     def post(self, request):
         try:
             user_me = User.objects.get(id=request.user.id)
-            target = request.data.get('nickname')
-            user_target = User.objects.get(nickname=target)
+            target_id = request.data.get('id')
+            user_target = User.objects.get(id=target_id)
             user_me.blacklist.add(user_target)  # Add the target to the blacklist
-            return Response({"message": f"{target}이(가) 정상적으로 블랙리스트 처리 되었습니다"}, status = 200)
+            return Response({"message": f"{user_target.nickname}이(가) 정상적으로 블랙리스트 처리 되었습니다"}, status = 200)
         except User.DoesNotExist:
-            return Response({"error": f"{target}사용자가 존재하지 않습니다."}, status=400)
+            return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=400)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
@@ -71,13 +71,12 @@ class UnblockUserView(APIView):
     def post(self, request):
         try :
             user_me = User.objects.get(id=request.user.id)
-            target = request.data.get('nickname')
-            print("target: ", target)
-            user_target = User.objects.get(nickname=target)
+            target_id = request.data.get('id')
+            user_target = User.objects.get(id=target_id)
             user_me.blacklist.remove(user_target)  # Remove the target from the blacklist
-            return Response({"message": f"{target}이(가) 정상적으로 블랙리스트에서 제거되었습니다"}, status=200)
+            return Response({"message": f"{user_target.nickname}이(가) 정상적으로 블랙리스트에서 제거되었습니다"}, status=200)
         except User.DoesNotExist:
-            return Response({"error": f"{target}사용자가 존재하지 않습니다."}, status=400)
+            return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=400)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
@@ -94,6 +93,7 @@ class CurrentUserView(APIView):
         print(user)
         response_data = {
                 "image" : get_image(user), #user/me 이미지
+                "id" : user.id,
                 "nickname": user.nickname,
         }
         return Response(response_data)
@@ -183,7 +183,7 @@ class UserInfoView(APIView):
             "total": int(total_winning_percentage),
             "easy": int(easy_winning_percentage),
             "hard": int(hard_winning_percentage),
-            "freind": data['is_friend'], #친구인지 여부
+            "friend": data['is_friend'], #친구인지 여부
             "block": data['is_blocked'], #블랙리스트에 있는지 여부
         }
         return response_data
@@ -212,8 +212,8 @@ class UserInfoView(APIView):
     )
     # get 이면 나의 프로필 정보 리턴
     def post(self, request):
-        target = request.data.get('nickname')
-        user_target = User.objects.get(nickname=target)
+        target_id = request.data.get('id')
+        user_target = User.objects.get(id=target_id)
         
         # 현재 로그인한 나의 정보
         user_id = request.user.id
@@ -226,9 +226,9 @@ class UserInfoView(APIView):
         }
         
         #친구인지 여부, 블랙리스트에 있는지 여부
-        if user_me.friendlist.filter(nickname=target).exists():
+        if user_me.friendlist.filter(id=target_id).exists():
             data['is_friend'] = True
-        if user_me.blacklist.filter(nickname=target).exists():
+        if user_me.blacklist.filter(id=target_id).exists():
             data['is_blocked'] = True
             
         response_data = self.calculate_user_info(user_target, data)
@@ -256,8 +256,8 @@ class MatchHistoryView(APIView):
         responses={200: MatchHistorySerializer(many=True)}
     )
     def post(self, request): #상대 프로필 - 전적
-        target_nickname = request.data.get('nickname')
-        target_user = User.objects.get(nickname=target_nickname)
+        target_id = request.data.get('id')
+        target_user = User.objects.get(id=target_id)
         target_match = MatchHistory.objects.filter(user=target_user)
         serializer = MatchHistorySerializer(target_match, many=True)
         response_data = {"history" : serializer.data}
@@ -332,7 +332,7 @@ def get_image(user):
         image_file = user.image_file
         with open(image_file.path, "rb") as f:
             image_data = f.read()
-        image_base64 = base64.b64encode(image_data)
+        image_base64 = base64.b64encode(image_data).decode('utf-8')
         # print("image_base64: ", image_base64)
 
         return image_base64
