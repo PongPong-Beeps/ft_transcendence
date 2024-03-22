@@ -5,9 +5,9 @@ import ErrorPage from "../../pages/ErrorPage.js";
 
 /**
  * @param {HTMLElement} $container
- * @param { Object } data
+ * @param { WebSocket } ws
  */
-export default function VsRoom($container, data) {
+export default function GameRoom($container, ws) {
     const init = () => {
         $container.querySelectorAll('.invite-btn').forEach(button => {
             button.style.display = 'block';
@@ -20,7 +20,7 @@ export default function VsRoom($container, data) {
                 <div class="game-room-title-container">
                     <button class="game-room-back-btn non-outline-btn"><</button>
                     <div class="game-room-title">게임방</div>
-                    <div class="game-room-difficulty">타입 : ${data.type === "one-to-one" ? "1:1" : "토너먼트"} 모드 : ${data.mode === "easy" ? "쉬움" : "어려움"}</div>
+                    <div class="game-room-difficulty">타입 :  모드 : </div>
                 </div>
                 <div class="game-room-player-container">
                     ${PlayerInfo()}
@@ -34,11 +34,6 @@ export default function VsRoom($container, data) {
         $container.querySelector('.game-room-back-btn').addEventListener('click', () => {
             new ExitConfirmation($container);
         });
-    }
-
-    if (data === undefined) {
-        new ErrorPage($container);
-        return;
     }
 
     importCss("assets/css/game-room.css")

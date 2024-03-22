@@ -73,7 +73,8 @@ export default function GameSettings($container) {
                 if (button.id === 'create-room-btn') console.log("방 만들기");
                 else if (button.id === 'quick-start-btn') console.log("빠른 시작");
 
-                navigate(`${selectedType}-room`, selectedMode);
+                const data = { "type": selectedType, "mode": selectedMode }
+                navigate(`game-room`, data);
             });
         });
     };
