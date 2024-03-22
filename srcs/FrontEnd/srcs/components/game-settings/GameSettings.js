@@ -2,6 +2,8 @@
 import { navigate } from "../../utils/navigate.js";
 import GameSettingsOption from "./GameSettingsOption.js";
 import {importCss} from "../../utils/importCss.js";
+import {WebSocketManager} from "../../utils/webSocketManager.js";
+import getCookie from "../../utils/cookie.js";
 
 export default function GameSettings($container) {
     const typeOption = [
@@ -27,8 +29,8 @@ export default function GameSettings($container) {
                     ${GameSettingsOption("mode", modeOption)}
                 </div>
                 <div id="game-settings-button-container">
-                    <button id="create-room-btn" class="game-settings-button green-btn non-outline-btn">방 만들기</button>
-                    <button id="quick-start-btn" class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
+                    <button id="create-room-btn" data-label="create_room" class="game-settings-button green-btn non-outline-btn">방 만들기</button>
+                    <button id="quick-start-btn" data-label="quick_start" class="game-settings-button red-btn non-outline-btn">빠른 시작</button>
                 </div>
             </div>
         `;
@@ -58,25 +60,46 @@ export default function GameSettings($container) {
             target.classList.toggle('selected', !isSelected);
         });
 
-        $container.querySelectorAll('.game-settings-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
-                if (selectedOptions.length < 2) {
-                    $container.querySelector('#game-settings-warning-message').style.display = 'block';
-                    return;
-                }
+        $container.querySelector('#game-settings-button-container').addEventListener('click', (event) => {
+            const target = event.target.closest('.game-settings-button');
+            if (!target) return;
+            // 모든 옵션이 선택되었는지 확인
+            const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
+            if (selectedOptions.length < 2) {
+                $container.querySelector('#game-settings-warning-message').style.display = 'block';
+                return;
+            }
 
-                const selectedType = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
-                const selectedMode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
-
-                // 테스트용
-                if (button.id === 'create-room-btn') console.log("방 만들기");
-                else if (button.id === 'quick-start-btn') console.log("빠른 시작");
-
-                const data = { "type": selectedType, "mode": selectedMode }
-                navigate(`game-room`, data);
-            });
+            const category = target.dataset.label
+            const type = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
+            const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
+            // 웹 소켓 생성
+            const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
+            ws.onopen = function(event) {
+                console.log("게임 웹 소켓 생성 완료");
+                const wsManager = new WebSocketManager(ws);
+            }
         });
+
+        // $container.querySelectorAll('.game-settings-button').forEach(button => {
+        //     button.addEventListener('click', () => {
+        //         const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
+        //         if (selectedOptions.length < 2) {
+        //             $container.querySelector('#game-settings-warning-message').style.display = 'block';
+        //             return;
+        //         }
+        //
+        //         const selectedType = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
+        //         const selectedMode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
+        //
+        //         // 테스트용
+        //         if (button.id === 'create-room-btn') console.log("방 만들기");
+        //         else if (button.id === 'quick-start-btn') console.log("빠른 시작");
+        //
+        //         const data = { "type": selectedType, "mode": selectedMode }
+        //         navigate(`game-room`, data);
+        //     });
+        // });
     };
 
     const init = () => {
