@@ -26,6 +26,9 @@ export default function GameRoom($container, wsManager) {
                     ${PlayerInfo()}
                     ${PlayerInfo()}
                 </div>
+                <div class="game-room-ready-button-container">
+                    <button class="game-room-ready-btn red-btn">준비하기</button>
+                </div>
             </div>
         `;
     }
@@ -35,26 +38,6 @@ export default function GameRoom($container, wsManager) {
             new ExitConfirmation($container);
         });
     }
-
-    // {
-    //     "type" : "one_to_one" or "tournament",
-    //     "mode" : "easy" or "hard",
-    //
-    //     "p1" : "nickname",
-    //     "p2" : "nickname",
-    //     "p3" : "nickname",
-    //     "p4" : "nickname",
-    //
-    //     "p1_img" : img_binary,
-    //     "p2_img" : img_binary,
-    //     "p3_img" : img_binary,
-    //     "p4_img" : img_binary,
-    //
-    //     "p1_ready" : True or False,
-    //     "p2_ready" : True or False,
-    //     "p3_ready" : True or False,
-    //     "p4_ready" : True or False,
-    // }
 
     wsManager.addMessageHandler(function (data) {
         if (data.type && data.mode) {

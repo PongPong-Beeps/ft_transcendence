@@ -8,6 +8,7 @@ export default function PlayerInfo() {
                 </div>
             </div>
             <div class="game-room-player-nickname">닉네임</div>
+            <div class="game-room-player-ready">ready</div>
         </div>
     `;
 }
