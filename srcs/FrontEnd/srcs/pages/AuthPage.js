@@ -54,6 +54,10 @@ export default function AuthPage($container) {
                     ws.onclose = function(event) {
                         console.log("웹 소켓 닫아용");
                     }
+                    wsManager.addMessageHandler(function(data) {
+                        if (data.status === 4003)
+                            new ErrorPage($container, 4003);
+                    });
                 }
             })
             .catch(error => {

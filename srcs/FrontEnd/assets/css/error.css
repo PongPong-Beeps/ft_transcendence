@@ -17,5 +17,6 @@
 #error_message {
     font-family: "DNF Bit Bit v2", serif;
     font-size: 3em;
+    text-align: center;
     color: #5B7320;
 }
