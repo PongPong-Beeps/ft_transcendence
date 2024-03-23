@@ -1,0 +1,108 @@
+#invite-modal-background {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#invite-modal-container {
+    width: 600px;
+    height: 600px;
+    background-color: #83A644;
+    border-radius: 30px;
+    display: grid;
+    grid-template-areas:
+    'title'
+    'content-container'
+    'button-container';
+    grid-template-rows: 1fr 8fr 1fr;
+    padding: 30px;
+    gap: 10px;
+}
+
+#invite-modal-title {
+    grid-area: title;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 1em;
+    text-align: center;
+    color: white;
+}
+
+#invite-modal-content-container {
+    grid-area: content-container;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    background-color: #38631D;
+    color: white;
+}
+
+#invite-message {
+    font-size: 1.2em;
+    font-family: "DNF Bit Bit v2", serif;
+    text-align: center;
+    color: white;
+}
+
+#invite-game-info-container {
+    width: 95%;
+    height: 95%;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    background-color: #83A644;
+    gap: 5%;
+}
+
+#invite-game-info-box-container {
+    width: 95%;
+    height: 60%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #779630;
+}
+
+.invite-game-info-box-img {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 1.2em;
+    font-family: "DNF Bit Bit v2", serif;
+}
+
+.invite-game-info-box-img img {
+    align-self: center;
+    margin-top: 10px;
+    width: 60%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#invite-modal-button-container {
+    grid-area: button-container;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+#invite-modal-button-container > button {
+    font-size: 1em;
+    border: 4px solid #5C7320;
+    border-radius: 10px;
+    width: 150px;
+    height: 45px;
+    outline: none;
+}

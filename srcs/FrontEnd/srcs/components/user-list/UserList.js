@@ -7,6 +7,7 @@ import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
+import InviteModal from "../../pages/InviteModal.js";
 
 /**
  * @param { HTMLElement } $container
@@ -138,7 +139,6 @@ export default function UserList($container, wsManager) {
             .then(data => {
                 id = data.id;
                 wsManager.sendMessage({ type: "friend_list", sender: id });
-
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);
@@ -147,6 +147,15 @@ export default function UserList($container, wsManager) {
         wsManager.addMessageHandler(function(data) {
             if (data.friendList) {
                 setFriendList(data.friendList);
+            }
+        });
+    }
+
+    if (wsManager) {
+        wsManager.addMessageHandler(function (data) {
+            if (data.type === "invited") {
+                const {sender, receiver, game_type, game_mode, sender_id, receiver_id} = data;
+                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id);
             }
         });
     }

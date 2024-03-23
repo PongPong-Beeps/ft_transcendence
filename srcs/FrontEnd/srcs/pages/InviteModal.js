@@ -1,3 +1,4 @@
+import { BACKEND, fetchWithAuth } from "../api.js";
 import { importCss } from "../utils/importCss.js";
 /**
  *@param { HTMLElement } $container
@@ -12,14 +13,28 @@ export default function InviteModal($container, sender, receiver, game_type, gam
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
-            page.innerHTML += `
-                <div id="invite-modal-background" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;">
+            page.innerHTML = `
+                <div id="invite-modal-background">
                     <div id="invite-modal-container">
-                        <div id="invite-modal-title">${sender}가 ${game_mode}난이도의 ${game_type}게임으로 초대했습네다</div>
-                        <div id="invite-modal-button-container">
-                            <button class="red-btn" id="invite-modal-deny-btn">거절</button>
-                            <button class="grreen-btn" id="invite-modal-accept-btn">참가</button>
+                        <div id="invite-modal-title">초대장</div>
+                        <div id="invite-modal-content-container">
+                        <div id="invite-info-container"></div>
+                            <div id=invite-game-info-container>
+                                <div id="invite-message">${sender}님으로부터 게임 초대가 왔습니다.</div>
+                                <div id="invite-game-info-box-container">
+                                    <div class="invite-game-info-box-img">게임종류
+                                        <img src="../../assets/image/${game_type}.png" alt="game-type">
+                                    </div>
+                                    <div class="invite-game-info-box-img">난이도
+                                        <img src="../../assets/image/${game_mode}.png" alt="game-mode">
+                                    </div>
+                                </div>
+                                <div id="invite-message">게임에 참가하시겠습니까?</div>
+                            </div>
                         </div>
+                    <div id="invite-modal-button-container">
+                        <button class="green-btn" id="invite-modal-accept-btn">참가</button>
+                        <button class="red-btn" id="invite-modal-refuse-btn">거절</button>
                     </div>
                 </div>
             `;
@@ -27,28 +42,37 @@ export default function InviteModal($container, sender, receiver, game_type, gam
         }
     };
 
-    const handleImgUploadErrorEvent = (event) => {
-        if (event.target.closest('#img-upload-error-check-btn')) {
-            const errorBackground = $container.querySelector('#img-upload-error-background');
-            if (errorBackground) {
-                errorBackground.remove();
-                const errorBackgroundElement = $container.querySelector('#img-upload-error-background');
-                if (errorBackgroundElement) {
-                    errorBackgroundElement.removeEventListener('click', handleImgUploadErrorEvent);
-                }
-                setupEventListener();
-            }
-        }
-    };
-
     const setupEventListener = () => {
-        const errorBackgroundElement = $container.querySelector('#img-upload-error-background');
-        if (errorBackgroundElement) {
-            errorBackgroundElement.addEventListener('click', handleImgUploadErrorEvent);
-        }
+        $container.querySelector('#invite-modal-refuse-btn').addEventListener('click', () => {
+            fetchWithAuth(`${BACKEND}/connect/invite/refuse/`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    sender: sender_id,
+                    receiver: receiver_id,
+                })
+            })
+            .then(response => {
+                if (response) {
+                    console.log("invite refused");
+                }
+                $container.querySelector('#page').style.display = 'none';
+            })
+            .catch(error => console.error("[ inviteModal ] " + error.message));
+        }); 
+
+        $container.querySelector('#invite-modal-accept-btn').addEventListener('click', () => {
+            $container.querySelector('#page').style.display = 'none';
+            document.dispatchEvent(new CustomEvent('inviteUser', {
+                detail: {
+                    token : getCookie("accessToken"), 
+                    category : "invite",
+                }
+            }));
+            $container.querySelector('#page').style.display = 'none';
+        });
     };
 
-    importCss("assets/css/img-upload-error.css");
+    importCss("assets/css/invite-modal.css");
     render();
     setupEventListener();
 }
