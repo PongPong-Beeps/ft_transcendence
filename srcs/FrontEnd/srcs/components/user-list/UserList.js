@@ -155,7 +155,7 @@ export default function UserList($container, wsManager) {
         wsManager.addMessageHandler(function (data) {
             if (data.type === "invited") {
                 const {sender, receiver, game_type, game_mode, sender_id, receiver_id} = data;
-                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id);
+                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, wsManager);
             }
         });
     }

@@ -1,5 +1,9 @@
 import { BACKEND, fetchWithAuth } from "../api.js";
 import { importCss } from "../utils/importCss.js";
+import { navigate } from "../utils/navigate.js";
+import getCookie from "../utils/cookie.js";
+import { WebSocketManager } from "../utils/webSocketManager.js";
+
 /**
  *@param { HTMLElement } $container
  *@param { string } sender
@@ -9,7 +13,7 @@ import { importCss } from "../utils/importCss.js";
  *@param { string } sender_id
  *@param { string } receiver_id
 */
-export default function InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id) {
+export default function InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, wsManager) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -62,12 +66,12 @@ export default function InviteModal($container, sender, receiver, game_type, gam
 
         $container.querySelector('#invite-modal-accept-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
-            document.dispatchEvent(new CustomEvent('inviteUser', {
-                detail: {
-                    token : getCookie("accessToken"), 
-                    category : "invite",
-                }
-            }));
+            const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=invite`);
+            ws.onopen = function(event) {
+                console.log("초대 모달에서 게임 웹 소켓 생성 완료");
+                const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
+                navigate('game-room', data);
+            };
             $container.querySelector('#page').style.display = 'none';
         });
     };
