@@ -31,6 +31,8 @@ export default function ErrorPage($container, errorCode = 0) {
                 return "페이지를 찾을 수 없습니다";
             case 500:
                 return  "서버 오류 (ㅠ ㅠ)";
+            case 4003:
+                return "다른 브라우저에서 로그인 하였습니다<br>클릭시 해당 로그인을 종료하고 다시 로그인합니다";
             default:
                 return "알 수 없는 오류입니다";
         }
