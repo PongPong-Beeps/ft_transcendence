@@ -10,6 +10,7 @@ from connect.models import InvitationQueue
 from user.models import User
 from .utils import serialize_round_players
 import asyncio
+# from .serializer import RoundSerializer
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -145,8 +146,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             game_info = {
                 "type": "game_start",
                 "round_data": round_data,
-                "game_type": game.type,  # 게임 타입 (one_to_one or tournament)
-                "game_mode": game.mode,  # 게임 모드 (easy or hard)
+                "game_type": game.type,
+                "game_mode": game.mode,
+                "game_id": game.id
             }
             await self.channel_layer.group_send(
                     self.room_group_name,
@@ -185,6 +187,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             logging.error(f"Error while sending data: {e}")
      
     async def game_start(self, event):
+        game_id = event["game_id"]
+        game = await database_sync_to_async(Game.objects.get)(id=game_id)
+        
         await self.send(text_data=json.dumps({
             'type': "game_start",
             'game_type': event["game_type"],
@@ -193,9 +198,18 @@ class GameConsumer(AsyncWebsocketConsumer):
         }))
         
         await asyncio.sleep(10)
+        """
+        이 부분에서 직접 count를 보내줄 수 있다.
+        """
+        await self.process_game_ing(game)
         
-        ## 예시 코드 ##
-        while True:
+        
+    async def process_game_ing(self, game):
+        """
+        게임 진행 중 상태를 처리하는 함수.
+        게임이 진행 중인 round를 가져와서 처리.
+        """
+        while game.is_gameRunning:
             await self.send(text_data=json.dumps({
                 'type': "game_ing",
             }))
