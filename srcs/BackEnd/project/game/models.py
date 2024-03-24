@@ -1,7 +1,8 @@
 from django.db import models
 from connect.models import Client
 from channels.db import database_sync_to_async
-from user.views import get_image    
+from user.views import get_image
+
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
@@ -103,3 +104,9 @@ class Game(models.Model):
                 if self.players.count() == 0: #플레이어가 없으면 게임 삭제
                     self.delete()
                     print('room delete ok')
+    
+    def all_players_ready(self):
+        if self.is_full:
+            return all(player.is_ready for player in self.players.all())
+        else:
+            return False
