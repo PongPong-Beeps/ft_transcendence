@@ -4,7 +4,7 @@ import {navigate} from "../utils/navigate.js";
 /**
  * @param { HTMLElement } $container
  */
-export default function ExitConfirmation($container) {
+export default function ExitConfirmation($container, gameWsManager) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -25,6 +25,7 @@ export default function ExitConfirmation($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
+            gameWsManager.ws.close();
             navigate("lobby");
         });
 
