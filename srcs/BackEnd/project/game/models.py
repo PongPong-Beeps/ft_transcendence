@@ -2,19 +2,22 @@ from django.db import models
 from connect.models import Client
 from channels.db import database_sync_to_async
 from user.views import get_image
+from user.models import User
 
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
 
 class Game(models.Model):
-    score_a = models.IntegerField(default=0)
-    score_b = models.IntegerField(default=0)
+    is_gameRunning = models.BooleanField(default=False)
     
     type = models.CharField(max_length=20) #one_to_one or "tournament"
     mode = models.CharField(max_length=20) #easy or hard
-    
     players = models.ManyToManyField(Player, related_name='player_as_game')
+    
+    round1 = models.ForeignKey('Round', on_delete=models.SET_NULL, null=True, blank=True, related_name='game_round1')
+    round2 = models.ForeignKey('Round', on_delete=models.SET_NULL, null=True, blank=True, related_name='game_round2')
+    round3 = models.ForeignKey('Round', on_delete=models.SET_NULL, null=True, blank=True, related_name='game_round3')
 
     is_full = models.BooleanField(default=False)
     
@@ -110,3 +113,64 @@ class Game(models.Model):
             return all(player.is_ready for player in self.players.all())
         else:
             return False
+    
+    def initialize_rounds(self):
+        # 기존에 있는 round1, round2, round3 인스턴스가 있는지 확인하고, 있다면 삭제
+        if self.round1:
+            self.round1.delete()
+            self.round1 = None
+        if self.round2:
+            self.round2.delete()
+            self.round2 = None
+        if self.round3:
+            self.round3.delete()
+            self.round3 = None
+        players = list(self.players.all())
+        if self.type == "one_to_one":
+            # 'one_to_one' 게임 타입의 경우 한 개의 Round 인스턴스 생성
+            round1 = Round.objects.create(
+                player1=players[0].client.user, 
+                player2=players[1].client.user
+            )
+            self.round1 = round1
+        elif self.type == "tournament":
+            # 'tournament' 게임 타입의 경우 두 개의 Round 인스턴스 생성
+            round1 = Round.objects.create(
+                player1=players[0].client.user, 
+                player2=players[1].client.user
+            )
+            round2 = Round.objects.create(
+                player1=players[2].client.user, 
+                player2=players[3].client.user
+            )
+            self.round1 = round1
+            self.round2 = round2
+        self.is_gameRunning = True
+        self.save()
+    
+
+class Round(models.Model):
+    is_gameRunning = models.BooleanField(default=False)
+    
+    score1 = models.IntegerField(default=0)
+    score2 = models.IntegerField(default=0)
+    
+    player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
+    player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
+    
+    height1 = models.FloatField(default=0.0)    #player1 의 map height
+    height2 = models.FloatField(default=0.0)    #player2 의 map height
+    
+    paddle1_x = models.FloatField(default=0.0)
+    paddle1_y = models.FloatField(default=0.0)
+    paddle2_x = models.FloatField(default=0.0)
+    paddle2_y = models.FloatField(default=0.0)
+    
+    ball_1_x = models.FloatField(default=0.0)
+    ball_1_y = models.FloatField(default=0.0)
+    ball_2_x = models.FloatField(default=0.0)
+    ball_2_y = models.FloatField(default=0.0)
+    
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
+    
+    created_at = models.DateTimeField(auto_now_add=True)

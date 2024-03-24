@@ -132,6 +132,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         all_ready = await database_sync_to_async(game.all_players_ready)()
         if all_ready:
             print("All players are ready. Starting the game...")
+            await database_sync_to_async(game.initialize_rounds)()
             await self.channel_layer.group_send(
                     self.room_group_name, {"type": "game_start"}
             )
