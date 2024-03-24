@@ -9,18 +9,6 @@ import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
 
-# 프론트에서 쿼리로 전달 : category, type, mode
-# category = "create_room" or "invite" or "quick_start" 
-# type = models.CharField(max_length=20) #one_to_one or "tournament"
-# mode = models.CharField(max_length=20) #easy or hard
-
-# api Query
-# {
-#     "category": "create_room" or "invite" or "quick_start" ,
-#     "type" = "one_to_one" or "tournament",
-#     "mode" = "easy or hard",
-# }
-
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user = self.scope['user']
@@ -67,7 +55,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def remove_player_and_check_game(self, client):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
+        # await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
         await database_sync_to_async(game.exit_player)(client)
         
     async def create_room(self, client):
@@ -140,6 +128,15 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
                 self.room_group_name, {"type": "game_status"}
             )
+        
+        all_ready = await database_sync_to_async(game.all_players_ready)()
+        if all_ready:
+            print("All players are ready. Starting the game...")
+            await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "game_start"}
+            )
+        else:
+            print("Not all players are ready.")
     
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
@@ -169,3 +166,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps(text_data))
         except Exception as e:
             logging.error(f"Error while sending data: {e}")
+     
+    async def game_start(self, event):
+        await self.send(text_data=json.dumps({
+            'message': "game start!!"
+        }))   

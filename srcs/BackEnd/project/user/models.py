@@ -4,29 +4,14 @@ class User(models.Model):
     nickname = models.CharField(max_length=20)
     email = models.EmailField(unique=True)
 
-    #Many To Many = 이 모델의 인스턴스는 다른 여러 인스턴스를 블랙리스트에 넣을 수 있다.
-    #'self' = 같은 모델의 인스턴스를 가리킨다.
-    #'blank=True' = 블랙리스트에 아무것도 넣지 않아도 된다.
-    #symmetrical=False = 블랙리스트에 상대방이 나를 블랙리스트에 넣었을 때, 나도 상대방을 블랙리스트에 넣지 않아도 된다.
-    #related_name = 이부분이 없으면 blacklist와 firendlist가 같은 이름을 가지게 되어서 충돌이 일어난다.
-    #또한 필드이름과 related_name이 같으면 충돌이 일어난다. ex) blacklist = models.ManyToManyField(related_name='blacklist')
     blacklist = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='_blacklist') # 블랙리스트
     friendlist = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='_friendlist') # 친구 목록
     
-    #upload_to : 파일이 저장될 경로를 지정하는 매개변수 , 
-    #하지만 views에서 default_storage.save()를 사용하여 'user_images/ + user.nickname + /'로 저장할 예정
-    #blank=True : 폼에서 빈칸으로 제출해도 되는지 여부
-    #null=True : 데이터베이스에 NULL값을 저장할 수 있는지 여부
     image_file = models.ImageField(upload_to='user_images/', blank=True, null=True) # 프로필 사진
-    
-    # is_online = models.BooleanField(default=False)
-    # login_type = models.CharField(max_length=50)
-
-    # REQUIRED_FIELDS = ['email']  # 사용자 생성 시 필수로 입력해야 하는 필드
 
     def __str__(self):
         return self.nickname
-
+    
 
 class MatchHistory(models.Model) :
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='match_history')
