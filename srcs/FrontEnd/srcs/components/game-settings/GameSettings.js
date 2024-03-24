@@ -84,6 +84,9 @@ export default function GameSettings($container, wsManager) {
                 const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
                 navigate('game-room', data);
             }
+            ws.onclose = function(event) {
+                console.log("게임 웹 소켓 닫힘");
+            }
         });
     };
 
