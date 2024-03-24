@@ -174,3 +174,21 @@ class Round(models.Model):
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
     
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def get_players(self):
+        players = []
+        if self.player1_id:
+            try:
+                player1 = User.objects.get(pk=self.player1_id)
+                players.append(player1)
+            except User.DoesNotExist:
+                print("Player1 does not exist.")
+        
+        if self.player2_id:
+            try:
+                player2 = User.objects.get(pk=self.player2_id)
+                players.append(player2)
+            except User.DoesNotExist:
+                print("Player2 does not exist.")
+        
+        return players

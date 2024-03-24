@@ -8,6 +8,8 @@ from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
+from .utils import serialize_round_players
+import asyncio
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -133,8 +135,22 @@ class GameConsumer(AsyncWebsocketConsumer):
         if all_ready:
             print("All players are ready. Starting the game...")
             await database_sync_to_async(game.initialize_rounds)()
+            round1_data = await serialize_round_players(game.round1)
+            round2_data = await serialize_round_players(game.round2)
+            round_data = {
+                'round1': round1_data,
+                'round2': round2_data,
+            }
+            
+            game_info = {
+                "type": "game_start",
+                "round_data": round_data,
+                "game_type": game.type,  # 게임 타입 (one_to_one or tournament)
+                "game_mode": game.mode,  # 게임 모드 (easy or hard)
+            }
             await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "game_start"}
+                    self.room_group_name,
+                    game_info
             )
         else:
             print("Not all players are ready.")
@@ -170,5 +186,17 @@ class GameConsumer(AsyncWebsocketConsumer):
      
     async def game_start(self, event):
         await self.send(text_data=json.dumps({
-            'message': "game start!!"
-        }))   
+            'type': "game_start",
+            'game_type': event["game_type"],
+            'game_mode': event["game_mode"],
+            'round_data': event["round_data"],
+        }))
+        
+        await asyncio.sleep(10)
+        
+        ## 예시 코드 ##
+        while True:
+            await self.send(text_data=json.dumps({
+                'type': "game_ing",
+            }))
+            await asyncio.sleep(0.001)
