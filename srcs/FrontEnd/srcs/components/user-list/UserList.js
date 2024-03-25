@@ -7,10 +7,11 @@ import useState from "../../utils/useState.js";
 import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
+import InviteModal from "../../pages/InviteModal.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocketManager } wsManager
+ * @param { [WebSocketManager] } wsManager
  */
 export default function UserList($container, wsManager) {
     let id;
@@ -92,7 +93,27 @@ export default function UserList($container, wsManager) {
             });
             document.dispatchEvent(event);
         } else if (event.target.matches('.invite-btn')) {
-            alert(`${targetId} 초대`);
+            fetchWithAuth(`${BACKEND}/connect/invite/`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    sender: id,
+                    receiver: parseInt(targetId),
+                })
+            })
+            .then(response => {
+                if (response) {
+                    const event = new CustomEvent('inviteUser', {
+                        detail: {
+                            sender: id,
+                            receiver: parseInt(targetId),
+                        }
+                    });
+                    document.dispatchEvent(event);
+                } else {
+                    console.error('Invite request failed');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         } else {
             new ProfileModal($container, wsManager, id, targetId, false);
         }
@@ -122,7 +143,6 @@ export default function UserList($container, wsManager) {
             .then(data => {
                 id = data.id;
                 wsManager.sendMessage({ type: "friend_list", sender: id });
-
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);
@@ -131,6 +151,15 @@ export default function UserList($container, wsManager) {
         wsManager.addMessageHandler(function(data) {
             if (data.friendList) {
                 setFriendList(data.friendList);
+            }
+        });
+    }
+
+    if (wsManager) {
+        wsManager.addMessageHandler(function (data) {
+            if (data.type === "invited") {
+                const {sender, receiver, game_type, game_mode, sender_id, receiver_id} = data;
+                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, wsManager);
             }
         });
     }

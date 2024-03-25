@@ -26,9 +26,8 @@ export default function ExitConfirmation($container, gameWsManager = undefined) 
 
     const setupEventListener = () => {
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
-            if (gameWsManager) {
+            if (gameWsManager)
                 gameWsManager.ws.close();
-            }
             navigate("lobby");
         });
 
