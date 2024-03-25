@@ -71,7 +71,11 @@ export default function GameRoom($container, wsManagers) {
                     타입:<img style="width: 30px" src="../../../assets/image/${data.type}.png" alt="type">  모드: ${data.mode}
                 `;
             }
-            setPlayers(data.players);
+            if (data.type === 'one_to_one') {
+                setPlayers([data.players[0], data.players[1]]);
+            } else {
+                setPlayers(data.players);
+            }
         }
     });
     
