@@ -120,6 +120,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "game_status"}
             )
+        elif type == 'game_init':
+            width = text_data_json.get("width")
+            height = text_data_json.get("height")
+            if width is not None and height is not None:
+                await self.handle_game_init(self.scope['user'], width, height)
+            else:
+                print("Width and height must be provided for game initialization.")
             
     async def ready(self, event):
         user = self.scope['user']
@@ -185,6 +192,17 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps(text_data))
         except Exception as e:
             logging.error(f"Error while sending data: {e}")
+        
+    async def handle_game_init(self, user, width, height):
+        try:
+            client = await database_sync_to_async(Client.objects.get)(user=user)
+            game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+            await database_sync_to_async(game.initialize_player_size)(client, width, height)
+        except Client.DoesNotExist:
+            print("Client does not exist.")
+        except Game.DoesNotExist:
+            print("Game does not exist.")
+        
      
     async def game_start(self, event):
         game_id = event["game_id"]
