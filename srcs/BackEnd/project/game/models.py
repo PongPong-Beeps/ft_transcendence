@@ -23,6 +23,15 @@ class Game(models.Model):
 
     is_full = models.BooleanField(default=False)
     
+    def delete(self, *args, **kwargs):
+        if self.round1:
+            self.round1.delete()
+        if self.round2:
+            self.round2.delete()
+        if self.round3:
+            self.round3.delete()
+        super().delete(*args, **kwargs)
+    
     def is_player(self, client) : #지금 필요없는데, 필요하면 쓰면될듯?
         status = self.players.filter(client=client).exists()
         if status :
@@ -158,9 +167,15 @@ class Game(models.Model):
             player.width = width
             player.save()
     
+    def get_next_round(self):
+        rounds = [self.round1, self.round2, self.round3]
+        for round in rounds:
+            if round and not round.is_gameEnded:
+                return round
+        return None
 
 class Round(models.Model):
-    is_gameRunning = models.BooleanField(default=False)
+    is_gameEnded = models.BooleanField(default=False)
     
     score1 = models.IntegerField(default=0)
     score2 = models.IntegerField(default=0)
