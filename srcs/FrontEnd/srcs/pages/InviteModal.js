@@ -20,7 +20,9 @@ export default function InviteModal($container, sender, receiver, game_type, gam
             page.innerHTML = `
                 <div id="invite-modal-background">
                     <div id="invite-modal-container">
-                        <div id="invite-modal-title">초대장</div>
+                        <div id="invite-modal-title">
+                            <img src="../../assets/image/invitation.png" alt="초대장" style="width: 100px;">
+                        </div>
                         <div id="invite-modal-content-container">
                         <div id="invite-info-container"></div>
                             <div id=invite-game-info-container>
