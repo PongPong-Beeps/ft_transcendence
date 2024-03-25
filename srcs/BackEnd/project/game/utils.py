@@ -1,5 +1,5 @@
 from channels.db import database_sync_to_async
-import json
+from user.views import get_image
 
 async def serialize_round_players(round):
     if not round:
@@ -12,10 +12,12 @@ async def serialize_round_players(round):
         'player1': {
             'id': player1.id if player1 else None,
             'nickname': player1.nickname if player1 else None,
+            'image': get_image(player1) if player1 else None,
         },
         'player2': {
             'id': player2.id if player2 else None,
             'nickname': player2.nickname if player2 else None,
+            'image': get_image(player2) if player2 else None,
         },
     }
 
