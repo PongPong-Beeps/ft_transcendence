@@ -26,7 +26,9 @@ export default function Header($container, wsManager) {
     }
 
     const setupEventListener = () => {
-        $container.querySelector('#logout-btn').addEventListener('click', () => {
+        const logoutButton = $container.querySelector('#logout-btn');
+        if (!logoutButton) return;
+        logoutButton.addEventListener('click', () => {
            fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
                .then(data => {
                    console.log("[ logout ] 완료");

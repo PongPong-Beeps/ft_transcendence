@@ -3,8 +3,9 @@ import {navigate} from "../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
+ * @param { WebSocketManager } gameWsManager
  */
-export default function ExitConfirmation($container, gameWsManager) {
+export default function ExitConfirmation($container, gameWsManager = undefined) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {

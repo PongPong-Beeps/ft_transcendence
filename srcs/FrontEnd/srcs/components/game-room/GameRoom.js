@@ -20,7 +20,9 @@ export default function GameRoom($container, wsManagers) {
     }
 
     const render = () => {
-        $container.querySelector('#main').innerHTML = `
+        const main = $container.querySelector('#main');
+        if (!main) return;
+        main.innerHTML = `
             <div class="game-room-container">
                 <div class="game-room-title-container">
                     <button class="game-room-back-btn non-outline-btn"><</button>
@@ -63,12 +65,16 @@ export default function GameRoom($container, wsManagers) {
 
     gameWsManager.addMessageHandler(function (data) {
         if (data.type && data.mode) {
-            $container.querySelector('.game-room-detail').innerHTML = `
-                타입:<img style="width: 30px" src="../../../assets/image/${data.type}.png" alt="type">  모드: ${data.mode}
-            `;
+            const gameRoomDetail = $container.querySelector('.game-room-detail');
+            if (gameRoomDetail) {
+                gameRoomDetail.innerHTML = `
+                    타입:<img style="width: 30px" src="../../../assets/image/${data.type}.png" alt="type">  모드: ${data.mode}
+                `;
+            }
             setPlayers(data.players);
         }
     });
+    
     importCss("assets/css/game-room.css")
     init();
     render();

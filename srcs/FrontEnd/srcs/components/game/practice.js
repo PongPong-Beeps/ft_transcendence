@@ -185,7 +185,9 @@ export default function Practice($container) {
     };
 
     const render = () => {
-        $container.querySelector('#main').innerHTML = `
+        const main = $container.querySelector('#main');
+        if (!main) return;
+        main.innerHTML = `
             <div class="game-container">
                 <div class="game-title-container">
                     <button class="game-back-btn non-outline-btn">< 로비로 돌아가기</button>
@@ -201,29 +203,37 @@ export default function Practice($container) {
             </div>
         `;
         const easyButton = $container.querySelector('#easy-btn');
-        easyButton.classList.add('selected');
+        if (easyButton) {
+            easyButton.classList.add('selected');
+        }
     };
 
     const setupEventListener = () => {
-        $container.querySelector('.game-back-btn').addEventListener('click', () => {
-           new ExitConfirmation($container);
-        });
+        const gameBackButton = $container.querySelector('.game-back-btn');
+        if (gameBackButton) {
+            gameBackButton.addEventListener('click', () => {
+                new ExitConfirmation($container);
+            });
+        }
 
-        $container.querySelector('#game-mode-button-container').addEventListener('click', (event) => {
-            // 클릭된 요소가 게임 모드 버튼인지 확인
-            if (event.target.matches('#easy-btn') || event.target.matches('#hard-btn')) {
-                gameMode = event.target.matches('#easy-btn') ? 'easy' : 'hard';
-                $container.querySelectorAll('.game-mode-btn').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                event.target.classList.add('selected');
-                cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
-                for (const key in keys) {
-                    keys[key] = false;
+        const gameModeButtonContainer = $container.querySelector('#game-mode-button-container');
+        if (gameModeButtonContainer) {
+            gameModeButtonContainer.addEventListener('click', (event) => {
+                // 클릭된 요소가 게임 모드 버튼인지 확인
+                if (event.target.matches('#easy-btn') || event.target.matches('#hard-btn')) {
+                    gameMode = event.target.matches('#easy-btn') ? 'easy' : 'hard';
+                    $container.querySelectorAll('.game-mode-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    event.target.classList.add('selected');
+                    cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
+                    for (const key in keys) {
+                        keys[key] = false;
+                    }
+                    gameInit(); // 게임 초기화
                 }
-                gameInit(); // 게임 초기화
-            }
-        });
+            });
+        }
 
         document.addEventListener('keydown', (event) => {
             switch (event.code) {

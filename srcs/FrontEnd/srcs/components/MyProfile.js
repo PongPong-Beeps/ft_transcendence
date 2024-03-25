@@ -16,7 +16,9 @@ export default function MyProfile($container, ws) {
     let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
 
     const render = () => {
-        $container.querySelector('#profile').innerHTML = `
+        const profile = $container.querySelector('#profile');
+        if (!profile) return;
+        profile.innerHTML = `
             <div id="profile-container">
                 <div id="profile-image"><img id="profile-img" src="" alt="" width="100%" height="100%"></div>
                 <div id="profile-detail">
@@ -28,9 +30,12 @@ export default function MyProfile($container, ws) {
     }
 
     const setupEventListener = () => {
-        $container.querySelector('#profile-btn').addEventListener('click', () => {
-            new ProfileModal($container, ws, id, id, true, setNickname, setProfileImage);
-        });
+        const profileButton = $container.querySelector('#profile-btn');
+        if (profileButton) {
+            profileButton.addEventListener('click', () => {
+                new ProfileModal($container, ws, id, id, true, setNickname, setProfileImage);
+            });
+        }
     }
 
     this.renderNickname = () => {
