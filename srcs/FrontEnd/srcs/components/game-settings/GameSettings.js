@@ -21,7 +21,9 @@ export default function GameSettings($container, wsManager) {
     ];
 
     const render = () => {
-        $container.querySelector('#main').innerHTML = `
+        const main = $container.querySelector('#main');
+        if (!main) return;
+        main.innerHTML = `
             <div id="game-settings-container">
                 <div id="game-settings-title-container">
                     <div id="game-settings-title">게임 설정</div>
@@ -41,53 +43,62 @@ export default function GameSettings($container, wsManager) {
     };
 
     const setupEventListener = () => {
-        $container.querySelector('#practice-btn').addEventListener('click', () => {
-           navigate('practice');
-        });
-
-        $container.querySelector('#game-settings-option-container').addEventListener('click', (event) => {
-            const target = event.target.closest('.game-settings-option-item');
-            if (!target) return;
-
-            const isSelected = target.getAttribute('data-selected') === 'true';
-            const option = target.getAttribute('data-option');
-
-            // 같은 카테고리 내의 다른 아이템들의 선택 상태를 해제
-            const sameCategoryItems = $container.querySelectorAll(`.game-settings-option-item[data-option="${option}"]`);
-            sameCategoryItems.forEach(item => {
-                item.setAttribute('data-selected', 'false');
-                item.classList.remove('selected');
+        const practiceButton = $container.querySelector('#practice-btn');
+        if (practiceButton) {
+            practiceButton.addEventListener('click', () => {
+                navigate('practice');
             });
+        }
 
-            // 현재 아이템의 선택 상태를 업데이트
-            target.setAttribute('data-selected', String(!isSelected));
-            target.classList.toggle('selected', !isSelected);
-        });
+        const gameSettingsOptionContainer = $container.querySelector('#game-settings-option-container');
+        if (gameSettingsOptionContainer) {
+            gameSettingsOptionContainer.addEventListener('click', (event) => {
+                const target = event.target.closest('.game-settings-option-item');
+                if (!target) return;
 
-        $container.querySelector('#game-settings-button-container').addEventListener('click', (event) => {
-            const target = event.target.closest('.game-settings-button');
-            if (!target) return;
-            // 모든 옵션이 선택되었는지 확인
-            const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
-            if (selectedOptions.length < 2) {
-                $container.querySelector('#game-settings-warning-message').style.display = 'block';
-                return;
-            }
+                const isSelected = target.getAttribute('data-selected') === 'true';
+                const option = target.getAttribute('data-option');
 
-            const category = target.dataset.label
-            const type = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
-            const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
-            // 웹 소켓 생성
-            const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
-            ws.onopen = function(event) {
-                console.log("게임 웹 소켓 생성 완료");
-                const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
-                navigate('game-room', data);
-            }
-            ws.onclose = function(event) {
-                console.log("게임 웹 소켓 닫힘");
-            }
-        });
+                // 같은 카테고리 내의 다른 아이템들의 선택 상태를 해제
+                const sameCategoryItems = $container.querySelectorAll(`.game-settings-option-item[data-option="${option}"]`);
+                sameCategoryItems.forEach(item => {
+                    item.setAttribute('data-selected', 'false');
+                    item.classList.remove('selected');
+                });
+
+                // 현재 아이템의 선택 상태를 업데이트
+                target.setAttribute('data-selected', String(!isSelected));
+                target.classList.toggle('selected', !isSelected);
+            });
+        }
+
+        const gameSettingsButtonContainer = $container.querySelector('#game-settings-button-container');
+        if (gameSettingsButtonContainer) {
+            gameSettingsButtonContainer.addEventListener('click', (event) => {
+                const target = event.target.closest('.game-settings-button');
+                if (!target) return;
+                // 모든 옵션이 선택되었는지 확인
+                const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
+                if (selectedOptions.length < 2) {
+                    $container.querySelector('#game-settings-warning-message').style.display = 'block';
+                    return;
+                }
+
+                const category = target.dataset.label
+                const type = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
+                const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
+                // 웹 소켓 생성
+                const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
+                ws.onopen = function(event) {
+                    console.log("게임 웹 소켓 생성 완료");
+                    const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
+                    navigate('game-room', data);
+                }
+                ws.onclose = function(event) {
+                    console.log("게임 웹 소켓 닫힘");
+                }
+            });
+        }
     };
 
     const init = () => {

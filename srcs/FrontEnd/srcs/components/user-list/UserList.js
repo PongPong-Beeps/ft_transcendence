@@ -18,7 +18,9 @@ export default function UserList($container, wsManager) {
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
 
     const render = () => {
-        $container.querySelector('#menu').innerHTML = `
+        const menu = $container.querySelector('#menu');
+        if (!menu) return;
+        menu.innerHTML = `
             <div id="user-list-container">
                 <div id="user-list-button-container">
                     <button class="user-list-button non-outline-btn" id="friend-btn">친구</button>
@@ -31,7 +33,9 @@ export default function UserList($container, wsManager) {
             </div>
         `;
         const friendButton = $container.querySelector('#friend-btn');
-        toggleUserListByButton(friendButton); // 초기 설정
+        if (friendButton) {
+            toggleUserListByButton(friendButton); // 초기 설정
+        }
     }
 
     this.renderFriendList = () => {
