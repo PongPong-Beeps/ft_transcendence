@@ -37,10 +37,17 @@ export default function Practice($container) {
     }
 
     function getRandomDirection() {
-        let angle = Math.random() * Math.PI / 2 - Math.PI / 4;
+        // 20도에서 40도 사이의 각도를 라디안으로 변환
+        let minAngle = 20 * Math.PI / 180;
+        let maxAngle = 40 * Math.PI / 180;
+        // 랜덤 각도 생성
+        let angle = Math.random() * (maxAngle - minAngle) + minAngle;
+        // 무작위로 방향 뒤집기
+        let dirX = Math.cos(angle) * (Math.random() < 0.5 ? -1 : 1);
+        let dirY = Math.sin(angle) * (Math.random() < 0.5 ? -1 : 1);
         return {
-            dirX: Math.cos(angle),
-            dirY: Math.sin(angle)
+            dirX: dirX,
+            dirY: dirY
         };
     }
     const  initGameObjects = (resetScores = false) => {
