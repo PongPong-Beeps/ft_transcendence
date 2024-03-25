@@ -7,6 +7,8 @@ from user.models import User
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
+    height = models.FloatField(default=0.0)
+    width = models.FloatField(default=0.0)
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
@@ -147,6 +149,14 @@ class Game(models.Model):
             self.round2 = round2
         self.is_gameRunning = True
         self.save()
+        
+    def initialize_player_size(self, client, width, height):
+        player = self.players.filter(client=client).first()
+
+        if player:
+            player.height = height
+            player.width = width
+            player.save()
     
 
 class Round(models.Model):
@@ -158,8 +168,6 @@ class Round(models.Model):
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
     
-    height1 = models.FloatField(default=0.0)    #player1 의 map height
-    height2 = models.FloatField(default=0.0)    #player2 의 map height
     
     paddle1_x = models.FloatField(default=0.0)
     paddle1_y = models.FloatField(default=0.0)
