@@ -8,9 +8,8 @@ from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
-from .utils import serialize_round_players
+from .utils import serialize_round_players, generate_game_info
 import asyncio
-# from .serializer import RoundSerializer
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -216,19 +215,20 @@ class GameConsumer(AsyncWebsocketConsumer):
         }))
         
         await asyncio.sleep(10)
-        """
-        이 부분에서 직접 count를 보내줄 수 있다.
-        """
         await self.process_game_ing(game)
         
         
     async def process_game_ing(self, game):
-        """
-        게임 진행 중 상태를 처리하는 함수.
-        게임이 진행 중인 round를 가져와서 처리.
-        """
-        while game.is_gameRunning:
-            await self.send(text_data=json.dumps({
-                'type': "game_ing",
-            }))
+        user = self.scope['user']
+        client = await database_sync_to_async(Client.objects.get)(user=user)
+        round = await database_sync_to_async(game.get_next_round)()
+
+        players = await database_sync_to_async(game.players.filter)(client=client)
+        player = await database_sync_to_async(players.first)() 
+        
+        while round and not round.is_gameEnded:
+            # update_ball
+            # check_collision
+            game_info = generate_game_info(player, round)
+            await self.send(text_data=json.dumps(game_info))
             await asyncio.sleep(0.001)
