@@ -54,6 +54,11 @@ export default function GameRoom($container, wsManagers) {
                 gameWsManager.sendMessage({ "type" : "ready" });
             }
         });
+        document.addEventListener('inviteUser', (event) => {
+            const {sender, receiver} = event.detail;
+            connWsManager.sendMessage({ "type" : "invite", "sender" : sender, "receiver" : receiver });
+            console.log("invitation has been sent");
+        });
     }
 
     gameWsManager.addMessageHandler(function (data) {
