@@ -9,6 +9,7 @@ class Player(models.Model):
     is_ready = models.BooleanField(default=False)
     height = models.FloatField(default=0.0)
     width = models.FloatField(default=0.0)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
@@ -41,7 +42,7 @@ class Game(models.Model):
         
     def get_players_info(self):
         players_info = [{'nickname': '', 'image': '', 'ready': ''} for _ in range(4)]
-        for i, player in enumerate(self.players.all().order_by('created_at')):
+        for i, player in enumerate(self.players.all().order_by('created_at').order_by('created_at')):
             user = player.client.user
             players_info[i]['nickname'] = user.nickname
             players_info[i]['image'] = get_image(user)
