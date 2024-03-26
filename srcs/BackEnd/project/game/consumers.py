@@ -161,26 +161,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
-        players_nickname = await database_sync_to_async(game.get_players_nickname)()
-        players_image = await database_sync_to_async(game.get_players_image)()
-        players_ready = await database_sync_to_async(game.get_players_ready)()
-        players_info = []
-        for i in range(4) :
-            player_info = {}
-            player_info["nickname"] = players_nickname[i]
-            player_info["image"] = players_image[i]
-            player_info["ready"] = players_ready[i]
-            players_info.append(player_info)
+        await database_sync_to_async(game.verify_players)()
+        players_info = await database_sync_to_async(game.get_players_info)()
         
         text_data = {
             'type': "game_status",
             'game_type': game.type,
             'game_mode': game.mode,
             "players" : players_info,
-
-            'status': '200',
-            'message': 'Connected to game room.',
             'room_group_name': self.room_group_name,
             'is_full': game.is_full,
         }        
