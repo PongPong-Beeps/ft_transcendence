@@ -156,8 +156,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             players_info.append(player_info)
         
         text_data = {
-            'type': game.type,
-            'mode': game.mode,
+            'type': "game_status",
+            'game_type': game.type,
+            'game_mode': game.mode,
             "players" : players_info,
 
             'status': '200',
