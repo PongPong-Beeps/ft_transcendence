@@ -22,7 +22,7 @@ async def serialize_round_players(round):
     }
 
 
-def generate_game_info(player, round):
+def generate_round_info(player, round):
     if not player or not round:
         return {"error": "Player or round information is missing."}
     
@@ -36,14 +36,10 @@ def generate_game_info(player, round):
     new_ball2_y = round.ball_2_y + player.height
 
     game_info = {
-        "type": "game_ing",
-        "paddle1_x": new_paddle1_x,
-        "paddle1_y": new_paddle1_y,
-        "paddle2_x": new_paddle2_x,
-        "paddle2_y": new_paddle2_y,
-        "ball1_x": new_ball1_x,
-        "ball1_y": new_ball1_y,
-        "ball2_x": new_ball2_x,
-        "ball2_y": new_ball2_y,
+        "type": "round_ing",
+        "paddle1": {"x": new_paddle1_x, "y": new_paddle1_y},
+        "paddle2": {"x": new_paddle2_x, "y": new_paddle2_y},
+        "ball1": {"x": new_ball1_x, "y": new_ball1_y},
+        "ball2": {"x": new_ball2_x, "y": new_ball2_y}
     }
     return game_info
