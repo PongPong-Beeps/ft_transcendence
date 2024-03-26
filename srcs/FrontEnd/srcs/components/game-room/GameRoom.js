@@ -85,6 +85,7 @@ export default function GameRoom($container, wsManagers) {
     gameWsManager.addMessageHandler(function (data) {
         if (data.type === "game_start") {
             delete data.type;
+            data.additionalData = { "gameWsManager": gameWsManager };
             navigate('game', data);
         }
     });
