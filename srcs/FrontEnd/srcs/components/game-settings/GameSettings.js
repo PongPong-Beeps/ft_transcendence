@@ -1,8 +1,8 @@
 // GameSettings.js
 import { navigate } from "../../utils/navigate.js";
 import GameSettingsOption from "./GameSettingsOption.js";
-import {importCss} from "../../utils/importCss.js";
-import {WebSocketManager} from "../../utils/webSocketManager.js";
+import { importCss } from "../../utils/importCss.js";
+import { WebSocketManager } from "../../utils/webSocketManager.js";
 import getCookie from "../../utils/cookie.js";
 
 /**
@@ -89,14 +89,18 @@ export default function GameSettings($container, wsManager) {
                 const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
                 // 웹 소켓 생성
                 const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
-                ws.onopen = function(event) {
+                ws.onopen = function (event) {
                     console.log("게임 웹 소켓 생성 완료");
-                    const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
+                    const data = { "gameWsManager": new WebSocketManager(ws), "connWsManager": wsManager };
                     navigate('game-room', data);
                 }
-                ws.onclose = function(event) {
+                ws.onclose = function (event) {
                     console.log("게임 웹 소켓 닫힘");
                 }
+                document.addEventListener('logout', (event) => {
+                    console.log("로그아웃으로 인해 게임 웹소켓 닫아용");
+                    ws.close();
+                });
             });
         }
     };
