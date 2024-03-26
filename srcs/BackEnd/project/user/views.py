@@ -88,15 +88,22 @@ class CurrentUserView(APIView):
         responses=user_me_schema
     )
     def get(self, request):
-        user_id = request.user.id
-        user = User.objects.get(id=user_id)
-        print(user)
-        response_data = {
-                "image" : get_image(user), #user/me 이미지
-                "id" : user.id,
-                "nickname": user.nickname,
-        }
-        return Response(response_data)
+        try:
+            user_id = request.user.id
+            user = User.objects.get(id=user_id)
+            print(user)
+            response_data = {
+                    "image" : get_image(user), #user/me 이미지
+                    "id" : user.id,
+                    "nickname": user.nickname,
+            }
+            return Response(response_data)
+        except Exception as e:
+            print("error: ", e)
+            response = Response({"error": str(e)}, status=500)
+            response.delete_cookie('access_token')
+            response.delete_cookie('refresh_token')
+            return response
 
 #내 닉네임 변경
 #/api/user/me/nickname
