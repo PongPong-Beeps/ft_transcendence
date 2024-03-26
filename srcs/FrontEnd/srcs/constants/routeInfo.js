@@ -5,10 +5,10 @@ import UserList from "../components/user-list/UserList.js";
 import LoginPage from "../pages/LoginPage.js";
 import VsSchedule from "../pages/vs-schedule/VsSchedule.js";
 import AuthPage from "../pages/AuthPage.js";
-import Practice from "../components/game/practice.js";
+import Practice from "../components/game/Practice.js";
 import GameRoom from "../components/game-room/GameRoom.js";
 import PlayerList from "../components/player-list/PlayerList.js";
-import Game from "../components/game/game.js";
+import Game from "../components/game/Game.js";
 
 export const routes = [
     {path: /^\/$/, layout: "full", page: LoginPage},
