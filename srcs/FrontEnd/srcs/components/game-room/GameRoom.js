@@ -4,6 +4,7 @@ import {importCss} from "../../utils/importCss.js";
 import ErrorPage from "../../pages/ErrorPage.js";
 import useState from "../../utils/useState.js";
 import UserCell from "../user-list/UserCell.js";
+import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
 
 /**
  * @param {HTMLElement} $container
@@ -79,6 +80,13 @@ export default function GameRoom($container, wsManagers) {
         }
     });
     
+    gameWsManager.addMessageHandler(function (data) {
+        if (data.type === "game_start") {
+            const roundData = data.round_data;
+            new VsSchedule($container, roundData);
+        }
+    });
+
     importCss("assets/css/game-room.css")
     init();
     render();
