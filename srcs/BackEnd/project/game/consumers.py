@@ -8,7 +8,7 @@ from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
-from .utils import serialize_round_players, generate_game_info
+from .utils import serialize_round_players, generate_round_info
 import asyncio
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -144,14 +144,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             await database_sync_to_async(game.initialize_rounds)()
             round1_data = await serialize_round_players(game.round1)
             round2_data = await serialize_round_players(game.round2)
-            round_data = {
-                'round1': round1_data,
-                'round2': round2_data,
-            }
             
             game_info = {
                 "type": "game_start",
-                "round_data": round_data,
+                "round_data": [round1_data, round2_data],
                 "game_type": game.type,
                 "game_mode": game.mode,
                 "game_id": game.id
@@ -230,6 +226,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         while round and not round.is_gameEnded:
             # update_ball
             # check_collision
-            game_info = generate_game_info(player, round)
-            await self.send(text_data=json.dumps(game_info))
+            round_info = generate_round_info(player, round)
+            await self.send(text_data=json.dumps(round_info))
             await asyncio.sleep(0.001)
