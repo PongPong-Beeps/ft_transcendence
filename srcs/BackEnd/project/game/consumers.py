@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Game
+from .models import Game, Player
 from channels.db import database_sync_to_async
 from connect.models import Client
 from user.views import get_image #이미지를 가져오는 함수
@@ -15,6 +15,15 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
+        
+        #중복플레이어 disconnect 하게 하기        
+        double_players = await database_sync_to_async(list)(Player.objects.filter(client=client))
+        if double_players: #중복플레이어가 있을 경우
+            for double_player in double_players:
+                await self.channel_layer.send(
+                    double_player.channel_name, { "type": "double_player" }
+                )
+        
         if self.scope['category'] == "create_room":
             await self.create_room(client)
         elif self.scope['category'] == "quick_start":
@@ -33,6 +42,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name, {"type": "game_status"}
         )
     
+    async def double_player(self, event):
+        await self.send(text_data=json.dumps({
+            "status": 4002,
+            "message" : "double player connected",
+        }))
+        await self.close(4002)
+
     async def disconnect(self, close_code):
         if close_code == 4000 :
             print('Game does not exist.')
@@ -40,7 +56,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif close_code == 4001 :
             print('Game is full.')
             return
-        
+        elif close_code == 4002 :
+            print('double game connected')
+    
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
         await self.remove_player_and_check_game(client)
@@ -63,14 +81,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def create_room(self, client):
         game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'])
         await database_sync_to_async(game.save)()
-        await database_sync_to_async(game.entry_player)(client) #플레이어 입장
+        await database_sync_to_async(game.entry_player)(client, self.channel_name) #플레이어 입장
         self.room_group_name = str(game.id)
 
     async def quick_start(self, client):
         game_queryset = await database_sync_to_async(Game.objects.filter)(type=self.scope['type'], mode=self.scope['mode'], is_full=False)
         game = await database_sync_to_async(game_queryset.first)()
         if game:
-            await database_sync_to_async(game.entry_player)(client)
+            await database_sync_to_async(game.entry_player)(client, self.channel_name)
             self.room_group_name = str(game.id)
         else:
             await self.create_room(client)
@@ -95,7 +113,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.close(4001)
                 return 'fail'
             else:
-                await database_sync_to_async(game.entry_player)(client)
+                await database_sync_to_async(game.entry_player)(client, self.channel_name)
                 self.room_group_name = str(game.id)
                 return 'success'
         except Game.DoesNotExist:
