@@ -40,12 +40,12 @@ class Game(models.Model):
             return False
         
     def get_players_info(self):
-        players_info = [{'nickname': '', 'image': '', 'is_ready': ''} for _ in range(4)]
-        for i, player in enumerate(self.players.all()):
+        players_info = [{'nickname': '', 'image': '', 'ready': ''} for _ in range(4)]
+        for i, player in enumerate(self.players.all().order_by('created_at')):
             user = player.client.user
             players_info[i]['nickname'] = user.nickname
             players_info[i]['image'] = get_image(user)
-            players_info[i]['is_ready'] = player.is_ready
+            players_info[i]['ready'] = player.is_ready
         return players_info
     
     def do_ready(self, client): #플레이어가 준비/준비해제
