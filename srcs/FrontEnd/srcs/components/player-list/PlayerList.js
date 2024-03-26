@@ -7,10 +7,12 @@ export default function PlayerList($container, data) {
     const initPlayerList = () => {
         let players = [];
 
-        data.roundData.forEach(round => {
-           round.forEach(player => {
-               players.push(player);
-           })
+        data.round_data.forEach(round => {
+            if (round) {
+                round.forEach(player => {
+                    players.push(player);
+                })
+            }
         });
 
         return players;
@@ -36,7 +38,6 @@ export default function PlayerList($container, data) {
             .join('');
     }
 
-    initPlayerList();
     importCss("assets/css/player-list.css");
     render();
 }
