@@ -64,14 +64,14 @@ export default function GameRoom($container, wsManagers) {
     }
 
     gameWsManager.addMessageHandler(function (data) {
-        if (data.type && data.mode) {
+        if (data.type === "game_status") {
             const gameRoomDetail = $container.querySelector('.game-room-detail');
             if (gameRoomDetail) {
                 gameRoomDetail.innerHTML = `
-                    타입:<img style="width: 30px" src="../../../assets/image/${data.type}.png" alt="type">  모드: ${data.mode}
+                    타입:<img style="width: 30px" src="../../../assets/image/${data.game_type}.png" alt="type">  모드: ${data.game_mode}
                 `;
             }
-            if (data.type === 'one_to_one') {
+            if (data.game_type === 'one_to_one') {
                 setPlayers([data.players[0], data.players[1]]);
             } else {
                 setPlayers(data.players);
