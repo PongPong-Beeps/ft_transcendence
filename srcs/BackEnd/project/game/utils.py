@@ -7,19 +7,26 @@ async def serialize_round_players(round):
 
     player1 = await database_sync_to_async(lambda: round.player1)() if round.player1 else None
     player2 = await database_sync_to_async(lambda: round.player2)() if round.player2 else None
+    
+    serialized_players = []
+    
+    if player1:
+        serialized_player1 = {
+            'id': player1.id,
+            'nickname': player1.nickname,
+            'image': get_image(player1)
+        }
+        serialized_players.append(serialized_player1)
 
-    return {
-        'player1': {
-            'id': player1.id if player1 else None,
-            'nickname': player1.nickname if player1 else None,
-            'image': get_image(player1) if player1 else None,
-        },
-        'player2': {
-            'id': player2.id if player2 else None,
-            'nickname': player2.nickname if player2 else None,
-            'image': get_image(player2) if player2 else None,
-        },
-    }
+    if player2:
+        serialized_player2 = {
+            'id': player2.id,
+            'nickname': player2.nickname,
+            'image': get_image(player2)
+        }
+        serialized_players.append(serialized_player2)
+
+    return serialized_players
 
 
 def generate_round_info(player, round):

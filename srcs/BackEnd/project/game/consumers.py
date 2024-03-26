@@ -144,14 +144,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             await database_sync_to_async(game.initialize_rounds)()
             round1_data = await serialize_round_players(game.round1)
             round2_data = await serialize_round_players(game.round2)
-            round_data = {
-                'round1': round1_data,
-                'round2': round2_data,
-            }
             
             game_info = {
                 "type": "game_start",
-                "round_data": round_data,
+                "round_data": [round1_data, round2_data],
                 "game_type": game.type,
                 "game_mode": game.mode,
                 "game_id": game.id
