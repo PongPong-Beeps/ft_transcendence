@@ -67,10 +67,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif close_code == 4002 :
             print('double game connected')
     
-        await self.remove_player(client)
-        
         try:
             game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+            await database_sync_to_async(game.exit_player)(self.channel_name)
             if not game.is_gameRunning:
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "game_status"}
@@ -82,12 +81,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-    
-
-    async def remove_player(self, client):
-        game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        await database_sync_to_async(game.exit_player)(client)
-        await database_sync_to_async(game.verify_players)()
         
     async def create_room(self, client):
         game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'])
