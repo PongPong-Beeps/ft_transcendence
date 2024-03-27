@@ -8,12 +8,16 @@ import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
 import InviteModal from "../../pages/InviteModal.js";
+import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 
 /**
  * @param { HTMLElement } $container
  * @param { [WebSocketManager] } wsManager
  */
 export default function UserList($container, wsManager) {
+    if(hasUndefinedArgs($container, wsManager))
+        return;
+    
     let id;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');

@@ -5,12 +5,16 @@ import ErrorPage from "../../pages/ErrorPage.js";
 import useState from "../../utils/useState.js";
 import UserCell from "../user-list/UserCell.js";
 import {navigate} from "../../utils/navigate.js";
+import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 
 /**
  * @param {HTMLElement} $container
  * @param { [WebSocketManager] } wsManagers
  */
 export default function GameRoom($container, wsManagers) {
+    if (hasUndefinedArgs($container, wsManagers))
+        return;
+    
     const { gameWsManager, connWsManager } = wsManagers;
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
 

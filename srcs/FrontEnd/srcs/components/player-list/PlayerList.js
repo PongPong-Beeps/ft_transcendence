@@ -1,9 +1,12 @@
+import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 import {importCss} from "../../utils/importCss.js";
 import useState from "../../utils/useState.js";
 import PlayerCell from "./PlayerCell.js";
 
 export default function PlayerList($container, data) {
-
+    if (hasUndefinedArgs($container, data))
+        return;
+    
     const initPlayerList = () => {
         let players = [];
 

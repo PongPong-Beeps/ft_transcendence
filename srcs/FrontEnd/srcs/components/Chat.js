@@ -1,11 +1,14 @@
 import { importCss } from "../utils/importCss.js";
 import { BACKEND, fetchWithAuth } from "../api.js";
+import hasUndefinedArgs from "../utils/hasUndefinedArgs.js";
 
 /**
  * @param {HTMLElement} $container
  * @param { WebSocketManager } wsManager
  */
 export default function Chat($container, wsManager) {
+    if (hasUndefinedArgs($container, wsManager))
+        return;
     let myId = '';
     let currentType, currentReceiver;
 
