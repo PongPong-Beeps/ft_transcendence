@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Client
+from .models import Client, InvitationQueue
 from channels.db import database_sync_to_async
 from user.models import User
 from game.models import Game
@@ -46,11 +46,9 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         )
         
     async def disconnect(self, close_code):
-        user = self.scope['user']
-        
-        client = await database_sync_to_async(Client.objects.get)(channel_name=self.channel_name)
-        await database_sync_to_async(client.delete)()
-        
+        user = self.scope['user']        
+        await self.remove_clinet_and_invitation(user)
+
         if close_code == 4003 : #중복유저가 있어서 disconnect된 경우
             print("double user disconnected : ", self.channel_name)
         await self.channel_layer.group_discard(
@@ -60,6 +58,15 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
           self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
+        
+    async def remove_clinet_and_invitation(self, user):
+        client = await database_sync_to_async(Client.objects.get)(channel_name=self.channel_name)
+        await database_sync_to_async(client.delete)()
+        
+        invitations = await database_sync_to_async(list)(InvitationQueue.objects.filter(receiver_id=user.id))
+        for invitation in invitations:
+            await database_sync_to_async(invitation.delete)()
+
     
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
