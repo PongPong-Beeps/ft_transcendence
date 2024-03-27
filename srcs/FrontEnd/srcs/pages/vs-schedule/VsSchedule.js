@@ -9,8 +9,7 @@ export default function VsSchedule($container, roundData) {
     const createPlayerCard = (player) => VsScheduleUserCard(player.nickname, `data:image/png;base64,${player.image}`);
     const createVsText = (index, round) => index < round.length - 1 ? '<div class="vs-text">vs</div>' : '';
     const createRound = (round) => round.map((player, index) => `${createPlayerCard(player)}${createVsText(index, round)}`).join('');
-    const createRounds = (roundData) => roundData.filter(Array.isArray).map(round => `<div class="round">${createRound(round)}</div>`).join('');
-
+    const createRounds = (roundData) => roundData.filter(Array.isArray).map((round, index) => `<div class="round"><div class="round-number">Round ${index + 1}</div>${createRound(round)}</div>`).join('');
     const render = () => {
         const page = $container.querySelector("#page");
         if (page) {
@@ -22,8 +21,10 @@ export default function VsSchedule($container, roundData) {
 
             if (cardCount <= 2) {
                 rootStyle.setProperty('--card-height', '40vw');
+                rootStyle.setProperty('--card-font-size', '2vw');
             } else {
                 rootStyle.setProperty('--card-height', '20vw');
+                rootStyle.setProperty('--card-font-size', '1vw');
             }
         }
     };
