@@ -72,8 +72,15 @@ export default function InviteModal($container, sender, receiver, game_type, gam
             const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=invite`);
             ws.onopen = function(event) {
                 console.log("초대 모달에서 게임 웹 소켓 생성 완료");
-                const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
-                new GameRoom($container, data);
+            };
+            ws.onmessage = function(event) {
+                const response = JSON.parse(event.data);
+                if (response.status === "4000" || response.status === "4001") {
+                    $container.querySelector('#page').style.display = 'none';
+                } else {
+                    const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
+                    new GameRoom($container, data);
+                }
             };
             $container.querySelector('#page').style.display = 'none';
         });
