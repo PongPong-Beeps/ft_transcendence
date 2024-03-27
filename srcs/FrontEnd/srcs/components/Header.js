@@ -1,8 +1,8 @@
-import {importCss} from "../utils/importCss.js";
+import { importCss } from "../utils/importCss.js";
 import TestButton from "./test.js";
-import {BACKEND, fetchWithAuth} from "../api.js";
+import { BACKEND, fetchWithAuth } from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
-import {navigate} from "../utils/navigate.js";
+import { navigate } from "../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
@@ -29,16 +29,18 @@ export default function Header($container, wsManager) {
         const logoutButton = $container.querySelector('#logout-btn');
         if (!logoutButton) return;
         logoutButton.addEventListener('click', () => {
-           fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
-               .then(data => {
-                   console.log("[ logout ] 완료");
-                   wsManager.ws.close();
-                   navigate('/');
-               })
-               .catch(error => {
-                   console.error("[ logout ] " + error.message);
-                   new ErrorPage($container, error.status);
-               });
+            fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
+                .then(data => {
+                    console.log("[ logout ] 완료");
+                    wsManager.ws.close();
+                    const event = new CustomEvent('logout');
+                    document.dispatchEvent(event);
+                    navigate('/');
+                })
+                .catch(error => {
+                    console.error("[ logout ] " + error.message);
+                    new ErrorPage($container, error.status);
+                });
         });
     }
 

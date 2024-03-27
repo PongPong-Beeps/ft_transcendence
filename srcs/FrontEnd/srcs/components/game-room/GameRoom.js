@@ -4,6 +4,7 @@ import {importCss} from "../../utils/importCss.js";
 import ErrorPage from "../../pages/ErrorPage.js";
 import useState from "../../utils/useState.js";
 import UserCell from "../user-list/UserCell.js";
+import {navigate} from "../../utils/navigate.js";
 
 /**
  * @param {HTMLElement} $container
@@ -63,6 +64,7 @@ export default function GameRoom($container, wsManagers) {
         });
     }
 
+    // 게임방 정보 (타입, 모드, 플레이어 목록, ready 정보)
     gameWsManager.addMessageHandler(function (data) {
         if (data.type === "game_status") {
             const gameRoomDetail = $container.querySelector('.game-room-detail');
@@ -76,6 +78,15 @@ export default function GameRoom($container, wsManagers) {
             } else {
                 setPlayers(data.players);
             }
+        }
+    });
+
+    // 게임방 시작 (모두 ready 완료했을 때 게임, 대진표 정보)
+    gameWsManager.addMessageHandler(function (data) {
+        if (data.type === "game_start") {
+            delete data.type;
+            data.additionalData = { "gameWsManager": gameWsManager };
+            navigate('game', data);
         }
     });
     

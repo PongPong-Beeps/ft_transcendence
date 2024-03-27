@@ -3,6 +3,7 @@ import { importCss } from "../utils/importCss.js";
 import { navigate } from "../utils/navigate.js";
 import getCookie from "../utils/cookie.js";
 import { WebSocketManager } from "../utils/webSocketManager.js";
+import GameRoom from "../components/game-room/GameRoom.js";
 
 /**
  *@param { HTMLElement } $container
@@ -57,14 +58,14 @@ export default function InviteModal($container, sender, receiver, game_type, gam
                     receiver: receiver_id,
                 })
             })
-            .then(response => {
-                if (response) {
-                    console.log("invite refused");
-                }
-                $container.querySelector('#page').style.display = 'none';
-            })
-            .catch(error => console.error("[ inviteModal ] " + error.message));
-        }); 
+                .then(response => {
+                    if (response) {
+                        console.log("invite refused");
+                    }
+                    $container.querySelector('#page').style.display = 'none';
+                })
+                .catch(error => console.error("[ inviteModal ] " + error.message));
+        });
 
         $container.querySelector('#invite-modal-accept-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
@@ -72,7 +73,7 @@ export default function InviteModal($container, sender, receiver, game_type, gam
             ws.onopen = function(event) {
                 console.log("초대 모달에서 게임 웹 소켓 생성 완료");
                 const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
-                navigate('game-room', data);
+                new GameRoom($container, data);
             };
             $container.querySelector('#page').style.display = 'none';
         });

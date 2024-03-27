@@ -1,17 +1,24 @@
 import {importCss} from "../../utils/importCss.js";
 import useState from "../../utils/useState.js";
-import FriendCell from "../user-list/FriendCell.js";
 import PlayerCell from "./PlayerCell.js";
 
-export default function PlayerList($container) {
+export default function PlayerList($container, data) {
 
-    const dummy = [
-        { "nickname" : "player123" },
-        { "nickname" : "player2" },
-        { "nickname" : "player3" },
-        { "nickname" : "player4" },
-    ]
-    let [getPlayerList, setPlayerList] = useState(dummy, this, 'renderPlayerList');
+    const initPlayerList = () => {
+        let players = [];
+
+        data.round_data.forEach(round => {
+            if (round) {
+                round.forEach(player => {
+                    players.push(player);
+                })
+            }
+        });
+
+        return players;
+    };
+
+    let [getPlayerList, setPlayerList] = useState(initPlayerList(), this, 'renderPlayerList');
 
     const render = () => {
         const menu = $container.querySelector('#menu');

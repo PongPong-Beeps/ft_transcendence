@@ -1,13 +1,14 @@
 /**
+ * @param { number } id
  * @param { string } nickname
- * @parmm { string } image
+ * @param { string } image
  */
-export default function PlayerCell({ nickname, image }) {
-    image = image ? 'data:image/jpeg;base64,' + image : "../../../assets/image/cruiser.gif";
+export default function PlayerCell({ id, nickname, image }) {
+    let imageSrc = image ? 'data:image/jpeg;base64,' + image : "../../../assets/image/cruiser.gif";
     return `
         <div class="player-cell">
             <div class="player-thumbnail-container">
-                <img src="${image}" alt="nickname" />
+                <img src="${imageSrc}" alt="nickname" />
             </div>
             <div class="player-nickname">${nickname}</div>
         </div>
