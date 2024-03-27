@@ -9,6 +9,7 @@ class Player(models.Model):
     is_ready = models.BooleanField(default=False)
     height = models.FloatField(default=0.0)
     width = models.FloatField(default=0.0)
+    channel_name = models.CharField(max_length=100)
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
@@ -85,8 +86,8 @@ class Game(models.Model):
                 self.is_full = False
                 self.save()
                 
-    def entry_player(self, client): #플레이어 입장
-        player = Player.objects.create(client=client)
+    def entry_player(self, client, channel_name): #플레이어 입장
+        player = Player.objects.create(client=client, channel_name=channel_name)
         player.save()
         self.players.add(player)
         self.check_full() #플레이어가 들어오면 게임의 is_full 상태도 변경
