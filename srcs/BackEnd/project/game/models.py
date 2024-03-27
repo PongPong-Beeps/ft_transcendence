@@ -85,9 +85,9 @@ class Game(models.Model):
         self.check_full() #플레이어가 들어오면 게임의 is_full 상태도 변경
         self.save()
 
-    def exit_player(self, client): #플레이어 퇴장
+    def exit_player(self, channel_name): #플레이어 퇴장
         try :
-            player = self.players.get(client=client)
+            player = self.players.get(channel_name=channel_name)
             player.delete() #player 객체 삭제하면 자동으로 players에서도 삭제됨
             self.check_full() #플레이어가 나가면 게임의 is_full 상태도 변경
             self.save()
@@ -96,22 +96,6 @@ class Game(models.Model):
         except :
             print(f'player {client.user} does not exist')
             
-    def verify_players(self):
-        print('start verify players')
-        for player in self.players.all():
-            try :
-                getattr(player, 'client')
-                print('real? ', player.client.user)
-            except AttributeError:
-                print('AttributeError')
-                player.delete() #player 객체 삭제하면 자동으로 players에서도 삭제됨
-                self.check_full() #플레이어가 나가면 게임의 is_full 상태도 변경
-                self.save()
-                print('player delete ok')
-                if self.players.count() == 0: #플레이어가 없으면 게임 삭제
-                    self.delete()
-                    print('room delete ok')
-    
     def all_players_ready(self):
         if self.is_full:
             return all(player.is_ready for player in self.players.all())
