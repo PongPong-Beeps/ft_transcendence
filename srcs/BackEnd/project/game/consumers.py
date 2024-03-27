@@ -50,6 +50,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.close(4002)
 
     async def disconnect(self, close_code):
+        user = self.scope['user']
+        client = await database_sync_to_async(Client.objects.get)(user=user)
+        
         if close_code == 4000 :
             print('Game does not exist.')
             return
@@ -59,24 +62,22 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif close_code == 4002 :
             print('double game connected')
     
-        user = self.scope['user']
-        client = await database_sync_to_async(Client.objects.get)(user=user)
-        await self.remove_player_and_check_game(client)
+        await self.remove_player(client)
         
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "game_status"}
         )
-        
+             
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
     
 
-    async def remove_player_and_check_game(self, client):
+    async def remove_player(self, client):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        # await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
         await database_sync_to_async(game.exit_player)(client)
+        await database_sync_to_async(game.verify_players)()
         
     async def create_room(self, client):
         game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'])
@@ -179,7 +180,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        await database_sync_to_async(game.verify_players)() #player들의 접속상태 검증
+        await database_sync_to_async(game.verify_players)()
         players_nickname = await database_sync_to_async(game.get_players_nickname)()
         players_image = await database_sync_to_async(game.get_players_image)()
         players_ready = await database_sync_to_async(game.get_players_ready)()
