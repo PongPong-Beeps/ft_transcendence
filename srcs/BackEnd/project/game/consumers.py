@@ -160,21 +160,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         all_ready = await database_sync_to_async(game.all_players_ready)()
         if all_ready:
             print("All players are ready. Starting the game...")
-            await database_sync_to_async(game.initialize_rounds)()
-            round1_data = await serialize_round_players(game.round1)
-            round2_data = await serialize_round_players(game.round2)
-            
-            game_info = {
-                "type": "game_start",
-                "round_data": [round1_data, round2_data],
-                "game_type": game.type,
-                "game_mode": game.mode,
-                "game_id": game.id
-            }
-            await self.channel_layer.group_send(
-                    self.room_group_name,
-                    game_info
-            )
+            await self.process_game(game)
         else:
             print("Not all players are ready.")
     
@@ -205,21 +191,31 @@ class GameConsumer(AsyncWebsocketConsumer):
             print("Client does not exist.")
         except Game.DoesNotExist:
             print("Game does not exist.")
+            
+    async def process_game(self, game):
+        await self.process_game_start(game)
+        # await self.process_game_ing(game)
+        # await self.process_game_end(game)
         
-     
+    async def process_game_start(self, game):
+        await database_sync_to_async(game.initialize_rounds)()
+        rounds_data = await asyncio.gather(
+            serialize_round_players(game.round1),
+            serialize_round_players(game.round2)
+        )
+        game_info = {
+            "type": "game_start",
+            "game_type": game.type,
+            "game_mode": game.mode,
+            "round_data": rounds_data,
+        }
+        await self.channel_layer.group_send(
+                self.room_group_name,
+                game_info
+        )
+        
     async def game_start(self, event):
-        game_id = event["game_id"]
-        game = await database_sync_to_async(Game.objects.get)(id=game_id)
-        
-        await self.send(text_data=json.dumps({
-            'type': "game_start",
-            'game_type': event["game_type"],
-            'game_mode': event["game_mode"],
-            'round_data': event["round_data"],
-        }))
-        
-        await asyncio.sleep(10)
-        await self.process_game_ing(game)
+        await self.send(text_data=json.dumps(event))
         
         
     async def process_game_ing(self, game):
