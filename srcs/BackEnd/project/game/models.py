@@ -10,6 +10,8 @@ class Player(models.Model):
     height = models.FloatField(default=0.0)
     width = models.FloatField(default=0.0)
     channel_name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
@@ -39,25 +41,15 @@ class Game(models.Model):
             return True
         else :
             return False
-    
-    def get_players_nickname(self):
-        players_nickname = [''] * 4
-        for i, player in enumerate(self.players.all()): #enumerate : 인덱스와 값을 동시에 줌
-            players_nickname[i] = player.client.user.nickname
-        return players_nickname
-
-    def get_players_image(self):
-        players_image = [''] * 4
-        for i, player in enumerate(self.players.all()): #enumerate : 인덱스와 값을 동시에 줌
+        
+    def get_players_info(self):
+        players_info = [{'nickname': '', 'image': '', 'ready': ''} for _ in range(4)]
+        for i, player in enumerate(self.players.all().order_by('created_at').order_by('created_at')):
             user = player.client.user
-            players_image[i] = get_image(user)
-        return players_image
-    
-    def get_players_ready(self) :
-        players_ready = [''] * 4
-        for i, player in enumerate(self.players.all()): #enumerate : 인덱스와 값을 동시에 줌
-            players_ready[i] = player.is_ready
-        return players_ready
+            players_info[i]['nickname'] = user.nickname
+            players_info[i]['image'] = get_image(user)
+            players_info[i]['ready'] = player.is_ready
+        return players_info
     
     def do_ready(self, client): #플레이어가 준비/준비해제
         player = self.players.get(client=client)
