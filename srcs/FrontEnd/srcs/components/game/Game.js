@@ -1,3 +1,5 @@
+import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
+
 /**
  * @param { HTMLElement } $container
  * @param { Object } data
@@ -29,6 +31,7 @@ export default function Game($container, data) {
                "height": containerHeight
           });
      }
+
      const render = () => {
           const main = $container.querySelector('#main');
           if (!main) return;
@@ -43,5 +46,6 @@ export default function Game($container, data) {
      };
 
      render();
+     new VsSchedule($container, data.round_data);
      init();
 }
