@@ -163,12 +163,12 @@ class Game(models.Model):
     def get_next_round(self):
         rounds = [self.round1, self.round2, self.round3]
         for round in rounds:
-            if round and not round.is_gameEnded:
+            if round and not round.is_roundEnded:
                 return round
         return None
 
 class Round(models.Model):
-    is_gameEnded = models.BooleanField(default=False)
+    is_roundEnded = models.BooleanField(default=False)
     
     score1 = models.IntegerField(default=0)
     score2 = models.IntegerField(default=0)
