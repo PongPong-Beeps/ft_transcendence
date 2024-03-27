@@ -42,6 +42,18 @@ export default function UserList($container, wsManager) {
     this.renderFriendList = () => {
         const friendsListTab = $container.querySelector('#friend-list-tab');
         friendsListTab.innerHTML = getFriendList()
+            .sort((a, b) => {
+                // a가 online이고 b가 offline인 경우, a를 b보다 앞에 둠 (음수 반환)
+                if (a.is_online === true && b.is_online === false) {
+                    return -1;
+                }
+                // a가 offline이고 b가 online인 경우, b를 a보다 앞에 둠 (양수 반환)
+                if (a.is_online === false && b.is_online === true) {
+                    return 1;
+                }
+                // 그 외의 경우 순서를 변경하지 않음 (0 반환)
+                return 0;
+            })
             .map(friend => FriendCell(friend))
             .join('');
         if (location.pathname === '/game-room') {
