@@ -116,6 +116,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             else:
                 await database_sync_to_async(game.entry_player)(client, self.channel_name)
                 self.room_group_name = str(game.id)
+                await self.send(text_data=json.dumps({
+                    'status': '2000',
+                    'message': 'success.'
+                }))
                 return 'success'
         except Game.DoesNotExist:
             await self.accept()
