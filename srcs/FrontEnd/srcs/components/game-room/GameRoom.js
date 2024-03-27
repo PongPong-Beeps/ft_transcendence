@@ -62,6 +62,10 @@ export default function GameRoom($container, wsManagers) {
             connWsManager.sendMessage({ "type" : "invite", "sender" : sender, "receiver" : receiver });
             console.log("invitation has been sent");
         });
+
+        document.addEventListener('profileChanged', () => {
+            gameWsManager.sendMessage({ "type" : "game_status" });
+        });
     }
 
     // 게임방 정보 (타입, 모드, 플레이어 목록, ready 정보)

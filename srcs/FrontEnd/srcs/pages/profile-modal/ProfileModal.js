@@ -83,6 +83,7 @@ export default function ProfileModal($container, wsManager, id, targetId, isMe, 
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
             $container.querySelector('#profile-picture').src = data.image;
             setProfileImageFn(data.image);
+            document.dispatchEvent(new CustomEvent('profileChanged'));
         })
         .catch(error => {
             console.error('Error:', error);
@@ -240,6 +241,7 @@ export default function ProfileModal($container, wsManager, id, targetId, isMe, 
                     setNicknameFn(nicknameInput.value);
                     highlightInputBox(nicknameInput);
                     wsManager.sendMessage({ "type": "friend_list", "sender": id });
+                    document.dispatchEvent(new CustomEvent('profileChanged'));
                 })
                 .catch(error => {
                     switch (error.status) {
