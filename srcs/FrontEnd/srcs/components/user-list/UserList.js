@@ -54,6 +54,9 @@ export default function UserList($container, wsManager) {
     this.renderAllUserList = () => {
         const userListTab = $container.querySelector('#all-user-list-tab');
         userListTab.innerHTML = getAllUserList()
+            .filter(user => {
+                return id !== user.id;
+            })
             .map(user => UserCell(user))
             .join('');
     };
