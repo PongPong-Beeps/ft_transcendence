@@ -10,8 +10,13 @@ from connect.models import InvitationQueue
 from user.models import User
 from .utils import serialize_round_players, generate_round_info
 import asyncio
+from asyncio import Event
 
 class GameConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.game_init_received = Event() ###### EVENT
+    
     async def connect(self):
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
@@ -64,9 +69,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     
         await self.remove_player(client)
         
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "game_status"}
-        )
+        try:
+            game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+            if not game.is_gameRunning:
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "game_status"}
+                )
+        except Game.DoesNotExist:
+            print(f"Game with id {self.room_group_name} does not exist.")
              
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -145,6 +155,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.handle_game_init(self.scope['user'], width, height)
             else:
                 print("Width and height must be provided for game initialization.")
+            self.game_init_received.set() ###### EVENT   
             
     async def ready(self, event):
         user = self.scope['user']
@@ -160,13 +171,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         all_ready = await database_sync_to_async(game.all_players_ready)()
         if all_ready:
             print("All players are ready. Starting the game...")
-            await self.process_game(game)
+            asyncio.create_task(self.process_game(game))
         else:
             print("Not all players are ready.")
     
     async def game_status(self, event):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        await database_sync_to_async(game.verify_players)()
         players_info = await database_sync_to_async(game.get_players_info)()
         
         text_data = {
@@ -194,8 +204,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             
     async def process_game(self, game):
         await self.process_game_start(game)
-        # await self.process_game_ing(game)
-        # await self.process_game_end(game)
+        await self.process_game_ing(game)
+        # await self.process_game_end(game) 내부에서 game.is_gameRunning = False로 변경
         
     async def process_game_start(self, game):
         await database_sync_to_async(game.initialize_rounds)()
@@ -213,22 +223,59 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 game_info
         )
+        game.is_gameRunning = True
+        await database_sync_to_async(game.save)()
         
     async def game_start(self, event):
         await self.send(text_data=json.dumps(event))
         
         
     async def process_game_ing(self, game):
-        user = self.scope['user']
-        client = await database_sync_to_async(Client.objects.get)(user=user)
-        round = await database_sync_to_async(game.get_next_round)()
+        asyncio.create_task(self.game_init_received.wait()) ###### EVENT
+        while game.is_gameRunning:
+            next_round = await database_sync_to_async(game.get_next_round)()
+            print("next_round:", next_round) #test code
+            if next_round:
+                print("round is started") #test code
+                await self.process_round_start(next_round)
+                await self.process_round_ing(next_round)
+                print("round is end") #test code
+                await asyncio.sleep(5) #test code 
+                # await self.process_round_end(next_round)
+            else:
+                break
+        print("game is End") #test code
 
-        players = await database_sync_to_async(game.players.filter)(client=client)
-        player = await database_sync_to_async(players.first)() 
+    async def process_round_start(self, round):
+        round_info = await serialize_round_players(round)
+        round_start_info = {
+            "type": "round_start",
+            "player_data": round_info,
+        }
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            round_start_info
+        )
         
-        while round and not round.is_gameEnded:
-            # update_ball
-            # check_collision
-            round_info = generate_round_info(player, round)
-            await self.send(text_data=json.dumps(round_info))
-            await asyncio.sleep(0.001)
+    async def round_start(self, event):
+        await self.send(text_data=json.dumps(event))
+    
+    async def process_round_ing(self, round):
+        await asyncio.sleep(5)
+        while not round.is_roundEnded:
+            for _ in range(5): #test code : 5초간 게임 진행
+                print(self) #test code
+                round_ing_info = {
+                    "type": "round_ing",
+                }
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    round_ing_info
+                )
+                await asyncio.sleep(1)
+            round.is_roundEnded = True #test code
+            await database_sync_to_async(round.save)() #test code
+            
+    async def round_ing(self, event):
+        await self.send(text_data=json.dumps(event))
+            
