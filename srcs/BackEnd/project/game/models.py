@@ -3,6 +3,8 @@ from connect.models import Client
 from channels.db import database_sync_to_async
 from user.views import get_image
 from user.models import User
+import random
+import math
 
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
@@ -151,25 +153,62 @@ class Game(models.Model):
                 return round
         return None
 
+class Paddle():
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        
+        #패들 고정값
+        self.width = 10
+        self.height = 100
+        self.speed = 0.015
+        
+    def move_paddle(self, key, canvas_height):
+        if key == 'up':
+            self.y = max(self.y - self.speed, 0)
+        elif key == 'down':
+            self.y = min(self.y + self.speed, canvas_height - self.height)
+    
+class Ball:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.dirX, self.dirY = self.get_random_direction()
+        self.is_ball_moving = False
+        
+        #볼 고정값
+        self.radius = 10
+        self.speed = 10
+
+    def get_random_direction(self):
+        # 20도에서 40도를 라디안으로 변환
+        min_angle = 20 * math.pi / 180
+        max_angle = 40 * math.pi / 180
+        # 랜덤 각도 생성
+        angle = random.uniform(min_angle, max_angle)
+        # 무작위로 방향 뒤집기
+        dirX = math.cos(angle) * (1 if random.random() < 0.5 else -1)
+        dirY = math.sin(angle) * (1 if random.random() < 0.5 else -1)
+        return dirX, dirY
+
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
     
-    score1 = models.IntegerField(default=0)
-    score2 = models.IntegerField(default=0)
+    #서버 로직 계산을 위한 고정 크기
+    width = 500
+    height = 500
+    
+    paddle_1 = Paddle()
+    paddle_2 = Paddle()
+    
+    ball_1 = Ball()
+    ball_2 = Ball()
+    
+    score_1 = models.IntegerField(default=0)
+    score_2 = models.IntegerField(default=0)
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
-    
-    
-    paddle1_x = models.FloatField(default=0.0)
-    paddle1_y = models.FloatField(default=0.0)
-    paddle2_x = models.FloatField(default=0.0)
-    paddle2_y = models.FloatField(default=0.0)
-    
-    ball_1_x = models.FloatField(default=0.0)
-    ball_1_y = models.FloatField(default=0.0)
-    ball_2_x = models.FloatField(default=0.0)
-    ball_2_y = models.FloatField(default=0.0)
     
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
     
