@@ -16,9 +16,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
         
-        #중복플레이어 disconnect 하게 하기        
         double_players = await database_sync_to_async(list)(Player.objects.filter(client=client))
-        if double_players: #중복플레이어가 있을 경우
+        if double_players:
             for double_player in double_players:
                 await self.channel_layer.send(
                     double_player.channel_name, { "type": "double_player" }
@@ -38,6 +37,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         )   
         await self.accept()
         
+        await self.send(text_data=json.dumps({
+            'status': '2000',
+            'message': 'success.'
+        }))
+                
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "game_status"}
         )
@@ -77,7 +81,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def remove_player(self, client):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
         await database_sync_to_async(game.exit_player)(client)
-        await database_sync_to_async(game.verify_players)()
         
     async def create_room(self, client):
         game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'])
@@ -116,10 +119,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             else:
                 await database_sync_to_async(game.entry_player)(client, self.channel_name)
                 self.room_group_name = str(game.id)
-                await self.send(text_data=json.dumps({
-                    'status': '2000',
-                    'message': 'success.'
-                }))
                 return 'success'
         except Game.DoesNotExist:
             await self.accept()
