@@ -43,7 +43,11 @@ export default function LoginPage($container) {
                     }
                     wsManager.addMessageHandler(function(data) {
                         if (data.status === 4003)
+                        {
+                            const event = new CustomEvent('duplicated-login');
+                            document.dispatchEvent(event);
                             new ErrorPage($container, 4003);
+                        }
                     });
                 });
             return;
