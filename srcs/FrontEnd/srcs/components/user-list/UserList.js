@@ -12,10 +12,10 @@ import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { [WebSocketManager] } wsManager
+ * @param { WebSocketManager } connWsManager
  */
-export default function UserList($container, wsManager) {
-    if(hasUndefinedArgs($container, wsManager))
+export default function UserList($container, connWsManager) {
+    if(hasUndefinedArgs($container, connWsManager))
         return;
     
     let id;
@@ -131,7 +131,7 @@ export default function UserList($container, wsManager) {
             })
             .catch(error => console.error('Error:', error));
         } else {
-            new ProfileModal($container, wsManager, id, targetId, false);
+            new ProfileModal($container, connWsManager, id, targetId, false);
         }
     };
 
@@ -158,24 +158,24 @@ export default function UserList($container, wsManager) {
         fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
                 id = data.id;
-                wsManager.sendMessage({ type: "friend_list", sender: id });
+                connWsManager.sendMessage({ type: "friend_list", sender: id });
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);
                 new ErrorPage($container, error.status);
             });
-        wsManager.addMessageHandler(function(data) {
+        connWsManager.addMessageHandler(function(data) {
             if (data.friendList) {
                 setFriendList(data.friendList);
             }
         });
     }
 
-    if (wsManager) {
-        wsManager.addMessageHandler(function (data) {
+    if (connWsManager) {
+        connWsManager.addMessageHandler(function (data) {
             if (data.type === "invited") {
                 const {sender, receiver, game_type, game_mode, sender_id, receiver_id} = data;
-                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, wsManager);
+                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, connWsManager);
             }
         });
     }

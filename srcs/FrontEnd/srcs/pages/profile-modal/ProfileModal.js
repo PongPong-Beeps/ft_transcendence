@@ -11,14 +11,14 @@ import FriendCell from "../../components/user-list/FriendCell.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocketManager } wsManager
+ * @param { WebSocketManager } connWsManager
  * @param { number } id
  * @param { number } targetId
  * @param { boolean } isMe
  * @param { Function } setNicknameFn
  * @param { Function }setProfileImageFn
  */
-export default function ProfileModal($container, wsManager, id, targetId, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+export default function ProfileModal($container, connWsManager, id, targetId, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -172,7 +172,7 @@ export default function ProfileModal($container, wsManager, id, targetId, isMe, 
         .then(data => {
             console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
-            wsManager.sendMessage({ "type": "friend_list", "sender": id });
+            connWsManager.sendMessage({ "type": "friend_list", "sender": id });
         })
         .catch(error => {
             console.error("[ handleFriendEvent ] " + error.message);
@@ -240,7 +240,7 @@ export default function ProfileModal($container, wsManager, id, targetId, isMe, 
                     nicknameInput.placeholder = nicknameInput.value;
                     setNicknameFn(nicknameInput.value);
                     highlightInputBox(nicknameInput);
-                    wsManager.sendMessage({ "type": "friend_list", "sender": id });
+                    connWsManager.sendMessage({ "type": "friend_list", "sender": id });
                     document.dispatchEvent(new CustomEvent('profileChanged'));
                 })
                 .catch(error => {
