@@ -97,6 +97,9 @@ export default function GameSettings($container, wsManager) {
                 ws.onclose = function (event) {
                     console.log("게임 웹 소켓 닫힘");
                 }
+                document.addEventListener('duplicated-login', () => {
+                    ws.close();
+                });
                 document.addEventListener('logout', (event) => {
                     console.log("로그아웃으로 인해 게임 웹소켓 닫아용");
                     ws.close();
