@@ -3,9 +3,11 @@ import {navigate} from "../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocketManager } gameWsManager
+ * @param { [WebSocketManager] } wsManagers
  */
-export default function ExitConfirmation($container, gameWsManager = undefined) {
+export default function ExitConfirmation($container, wsManagers) {
+    const { gameWsManager, connWsManager } = wsManagers;
+
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -28,7 +30,7 @@ export default function ExitConfirmation($container, gameWsManager = undefined) 
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
             if (gameWsManager)
                 gameWsManager.ws.close();
-            navigate("lobby");
+            navigate("lobby", connWsManager);
         });
 
         $container.querySelector('#exit-confirmation-stay-btn').addEventListener('click', () => {
