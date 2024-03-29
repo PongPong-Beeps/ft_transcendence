@@ -7,9 +7,9 @@ import getCookie from "../../utils/cookie.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocketManager } wsManager
+ * @param { WebSocketManager } connWsManager
  */
-export default function GameSettings($container, wsManager) {
+export default function GameSettings($container, connWsManager) {
     const typeOption = [
         { label: 'one_to_one', image: '../../../assets/image/one_to_one.png' },
         { label: 'tournament', image: '../../../assets/image/tournament.png' }
@@ -88,21 +88,21 @@ export default function GameSettings($container, wsManager) {
                 const type = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
                 const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
                 // 웹 소켓 생성
-                const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
-                ws.onopen = function (event) {
+                const gameWs = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
+                gameWs.onopen = function (event) {
                     console.log("게임 웹 소켓 생성 완료");
-                    const data = { "gameWsManager": new WebSocketManager(ws), "connWsManager": wsManager };
+                    const data = { "gameWsManager": new WebSocketManager(gameWs), "connWsManager": connWsManager };
                     navigate('game-room', data);
                 }
-                ws.onclose = function (event) {
+                gameWs.onclose = function (event) {
                     console.log("게임 웹 소켓 닫힘");
                 }
                 document.addEventListener('duplicated-login', () => {
-                    ws.close();
+                    gameWs.close();
                 });
                 document.addEventListener('logout', (event) => {
                     console.log("로그아웃으로 인해 게임 웹소켓 닫아용");
-                    ws.close();
+                    gameWs.close();
                 });
             });
         }

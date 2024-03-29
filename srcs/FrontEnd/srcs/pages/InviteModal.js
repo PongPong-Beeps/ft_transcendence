@@ -6,15 +6,16 @@ import { WebSocketManager } from "../utils/webSocketManager.js";
 import GameRoom from "../components/game-room/GameRoom.js";
 
 /**
- *@param { HTMLElement } $container
- *@param { string } sender
- *@param { string } receiver
- *@param { string } game_type
- *@param { string } game_mode
- *@param { string } sender_id
- *@param { string } receiver_id
+ * @param { HTMLElement } $container
+ * @param { string } sender
+ * @param { string } receiver
+ * @param { string } game_type
+ * @param { string } game_mode
+ * @param { string } sender_id
+ * @param { string } receiver_id
+ * @param { WebSocketManager } connWsManager
 */
-export default function InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, wsManager) {
+export default function InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, connWsManager) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -69,17 +70,18 @@ export default function InviteModal($container, sender, receiver, game_type, gam
 
         $container.querySelector('#invite-modal-accept-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
-            const ws = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=invite`);
-            ws.onopen = function(event) {
+            const gameWs = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=invite`);
+            gameWs.onopen = function(event) {
                 console.log("초대 모달에서 게임 웹 소켓 생성 완료");
             };
-            ws.onmessage = function(event) {
+            gameWs.onmessage = function(event) {
                 const response = JSON.parse(event.data);
                 if (response.status === "4000" || response.status === "4001") {
                     $container.querySelector('#page').style.display = 'none';
                 } else {
-                    const data = {"gameWsManager" : new WebSocketManager(ws), "connWsManager": wsManager};
+                    const data = {"gameWsManager" : new WebSocketManager(gameWs), "connWsManager": connWsManager};
                     new GameRoom($container, data);
+                    navigate('game-room', data); // 실제 url 이동, GameRoom 재렌더링은 하지 않음
                 }
             };
             $container.querySelector('#page').style.display = 'none';

@@ -32,16 +32,16 @@ export default function LoginPage($container) {
         if (getCookie("access_token")) {
             fetchWithAuth(`${BACKEND}`)
                 .then(data => {
-                    const ws = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
-                    const wsManager = new WebSocketManager(ws);
-                    ws.onopen = function(event) {
+                    const connWs = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const connWsManager = new WebSocketManager(connWs);
+                    connWs.onopen = function(event) {
                         console.log("웹 소켓 생성 완료");
-                        navigate('lobby', wsManager);
+                        navigate('lobby', connWsManager);
                     }
-                    ws.onclose = function(event) {
+                    connWs.onclose = function(event) {
                         console.log("웹 소켓 닫아용");
                     }
-                    wsManager.addMessageHandler(function(data) {
+                    connWsManager.addMessageHandler(function(data) {
                         if (data.status === 4003)
                         {
                             const event = new CustomEvent('duplicated-login');
