@@ -17,6 +17,7 @@ class Player(models.Model):
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_winner')
     
     type = models.CharField(max_length=20) #one_to_one or "tournament"
     mode = models.CharField(max_length=20) #easy or hard
@@ -135,6 +136,7 @@ class Game(models.Model):
             )
             self.round1 = round1
             self.round2 = round2
+            self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
         self.is_gameRunning = True
         self.save()
         

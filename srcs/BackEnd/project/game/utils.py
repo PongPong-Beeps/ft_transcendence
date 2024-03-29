@@ -2,6 +2,16 @@ from channels.db import database_sync_to_async
 from user.views import get_image
 from .models import Ball, Paddle
 
+async def serialize_player(player):
+    if not player:
+        return None
+    serialized_player = {
+            'id': player.id,
+            'nickname': player.nickname,
+            'image': get_image(player)
+    }
+    return serialized_player
+
 async def serialize_round_players(round):
     if not round:
         return None
@@ -12,19 +22,11 @@ async def serialize_round_players(round):
     serialized_players = []
     
     if player1:
-        serialized_player1 = {
-            'id': player1.id,
-            'nickname': player1.nickname,
-            'image': get_image(player1)
-        }
+        serialized_player1 = await serialize_player(player1)
         serialized_players.append(serialized_player1)
 
     if player2:
-        serialized_player2 = {
-            'id': player2.id,
-            'nickname': player2.nickname,
-            'image': get_image(player2)
-        }
+        serialized_player2 = await serialize_player(player2)
         serialized_players.append(serialized_player2)
 
     return serialized_players
