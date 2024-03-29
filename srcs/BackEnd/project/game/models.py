@@ -97,11 +97,15 @@ class Game(models.Model):
             if self.players.count() == 0: #플레이어가 없으면 게임 삭제
                 self.delete()
         except :
-            print(f'player {client.user} does not exist')
+            print('player does not exist')
             
     def all_players_ready(self):
         if self.is_full:
-            return all(player.is_ready for player in self.players.all())
+            if all(player.is_ready for player in self.players.all()):
+                for player in self.players.all():
+                    player.is_ready = False
+                    player.save()
+                return True
         else:
             return False
     
