@@ -82,6 +82,16 @@ export default function InviteModal($container, sender, receiver, game_type, gam
                     const data = {"gameWsManager" : new WebSocketManager(gameWs), "connWsManager": connWsManager};
                     new GameRoom($container, data);
                     navigate('game-room', data); // 실제 url 이동, GameRoom 재렌더링은 하지 않음
+                    gameWs.onclose = function (event) {
+                        console.log("게임 웹 소켓 닫힘");
+                    }
+                    document.addEventListener('duplicated-login', () => {
+                        gameWs.close();
+                    });
+                    document.addEventListener('logout', (event) => {
+                        console.log("로그아웃으로 인해 게임 웹소켓 닫아용");
+                        gameWs.close();
+                    });
                 }
             };
             $container.querySelector('#page').style.display = 'none';

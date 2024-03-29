@@ -55,7 +55,7 @@ export default function GameRoom($container, wsManagers) {
     const setupEventListener = () => {
         $container.querySelector('.game-room-container').addEventListener('click', function(event) {
             if (event.target.closest('.game-room-back-btn')) {
-                new ExitConfirmation($container, gameWsManager);
+                new ExitConfirmation($container, wsManagers);
             } else if (event.target.closest('.game-room-ready-btn')) {
                 console.log("hi")
                 gameWsManager.sendMessage({ "type" : "ready" });
