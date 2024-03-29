@@ -38,8 +38,21 @@ def init_game_objects(round):
     timer = threading.Timer(1, lambda: set_ball_moving(round))
     timer.start()
 
+def check_round_ended(round):
+    WINNER_SCORE = 5
+    if round.score_1 >= WINNER_SCORE or round.score_2 >= WINNER_SCORE:
+        if round.score_1 > round.score_2:
+            round.winner = round.player1
+        else:
+            round.winner = round.player2
+        round.is_roundEnded = True
+        round.save()
+        return True
+    return False
 
 def update(round):
+    if check_round_ended(round):
+        return
     WIDTH = round.width
     HEIGHT = round.height
     
