@@ -188,6 +188,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
         })
         .then(data => {
             $container.querySelector('#block-btn').innerHTML = '차단 해제';
+            connWsManager.sendMessage({ "type": "friend_list", "sender": id });
             console.log('Success:', data);
         })
         .catch(error => {
@@ -204,8 +205,10 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
         .then(data => {
             if (isMe)
                 updateBlacklist();
-            else
+            else {
                 $container.querySelector('#block-btn').innerHTML = '차단';
+                connWsManager.sendMessage({ "type": "friend_list", "sender": id });
+            }
             console.log('Success:', data);
         })
         .catch(error => {

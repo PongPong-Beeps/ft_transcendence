@@ -99,6 +99,10 @@ html, body {
     transition: transform 0.1s ease-in-out;
 }
 
+button.disabled {
+    background-color: grey;
+}
+
 .non-outline-btn {}
 
 .non-outline-btn:focus {
