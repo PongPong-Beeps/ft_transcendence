@@ -8,7 +8,7 @@ from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
-from .utils import serialize_round_players, generate_round_info, serialize_round_info_to_player
+from .utils import serialize_player, serialize_round_players, generate_round_info, serialize_round_info_to_player
 from .game_logic import update, init_game_objects
 import asyncio
 from asyncio import Event
@@ -199,7 +199,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def process_game(self, game):
         await self.process_game_start(game)
         await self.process_game_ing(game)
-        # await self.process_game_end(game) 내부에서 game.is_gameRunning = False로 변경
+        await self.process_game_end(game)
         
     async def process_game_start(self, game):
         await database_sync_to_async(game.initialize_rounds)()
@@ -223,9 +223,21 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def game_start(self, event):
         await self.send(text_data=json.dumps(event))
         
-        
+    async def determine_winner(self, game, winner, round_number):
+        if game.type == 'one_to_one':
+            game.winner = winner
+        else:
+            if round_number == 1:
+                game.round3.player1 = winner
+            elif round_number == 2:
+                game.round3.player2 = winner
+            else:
+                game.winner = winner
+        await database_sync_to_async(game.save)()
+    
     async def process_game_ing(self, game):
         asyncio.create_task(self.game_init_received.wait()) ###### EVENT
+        round_number = 1
         while game.is_gameRunning:
             next_round = await database_sync_to_async(game.get_next_round)()
             print("next_round:", next_round) #test code
@@ -233,9 +245,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 print("round is started") #test code
                 await self.process_round_start(next_round)
                 await self.process_round_ing(next_round)
+                winner = await self.process_round_end(next_round)
                 print("round is end") #test code
                 await asyncio.sleep(5) #test code 
-                # await self.process_round_end(next_round)
+                await self.determine_winner(game, winner, round_number)
+                round_number += 1
             else:
                 break
         print("game is End") #test code
@@ -272,4 +286,37 @@ class GameConsumer(AsyncWebsocketConsumer):
         player = await database_sync_to_async(Player.objects.get)(channel_name=self.channel_name)
         round_info_to_player = await database_sync_to_async(serialize_round_info_to_player)(event, player)
         await self.send(text_data=json.dumps(round_info_to_player))
+        
+    async def process_round_end(self, round):
+        round_end_info = {
+            "type": "round_end",
+            "winner": await serialize_player(round.winner),
+        }
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            round_end_info
+        )
+        return round.winner
+          
+    async def round_end(self, event):
+        await self.send(text_data=json.dumps(event))
             
+    async def process_game_end(self, game):
+        winner = await serialize_player(game.winner)
+        game_info = {
+            "type": "game_end",
+            "game_type": game.type,
+            "game_mode": game.mode,
+            "winner": winner,
+        }
+        
+        await self.channel_layer.group_send(
+                self.room_group_name,
+                game_info
+        )
+        
+        game.is_gameRunning = False
+        await database_sync_to_async(game.save)()
+        
+    async def game_end(self, event):
+        await self.send(text_data=json.dumps(event))

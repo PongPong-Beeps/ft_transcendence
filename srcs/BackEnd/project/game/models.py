@@ -17,6 +17,7 @@ class Player(models.Model):
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_winner')
     
     type = models.CharField(max_length=20) #one_to_one or "tournament"
     mode = models.CharField(max_length=20) #easy or hard
@@ -96,11 +97,15 @@ class Game(models.Model):
             if self.players.count() == 0: #플레이어가 없으면 게임 삭제
                 self.delete()
         except :
-            print(f'player {client.user} does not exist')
+            print('player does not exist')
             
     def all_players_ready(self):
         if self.is_full:
-            return all(player.is_ready for player in self.players.all())
+            if all(player.is_ready for player in self.players.all()):
+                for player in self.players.all():
+                    player.is_ready = False
+                    player.save()
+                return True
         else:
             return False
     
@@ -135,6 +140,7 @@ class Game(models.Model):
             )
             self.round1 = round1
             self.round2 = round2
+            self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
         self.is_gameRunning = True
         self.save()
         
