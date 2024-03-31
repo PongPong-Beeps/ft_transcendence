@@ -1,6 +1,7 @@
 from channels.db import database_sync_to_async
 from user.views import get_image
 from .models import Ball, Paddle
+from user.models import MatchHistory
 
 async def serialize_player(player):
     if not player:
@@ -84,3 +85,27 @@ def serialize_round_info_to_player(info, player):
     except Exception as e:
         print("error: ", e)
         return None
+
+def update_match_history(round, game):
+    tournament = True if game.type == "tournament" else False
+    easy_mode = True if game.mode == "easy" else False
+    winner = round.winner
+    loser = round.player1 if round.player2 == winner else round.player2
+
+    MatchHistory.objects.create(
+        user=winner,
+        nick_me=winner.nickname,
+        nick_opponent=loser.nickname,
+        tournament=tournament,
+        easy_mode=easy_mode,
+        result=True
+    )
+
+    MatchHistory.objects.create(
+        user=loser,
+        nick_me=loser.nickname,
+        nick_opponent=winner.nickname,
+        tournament=tournament,
+        easy_mode=easy_mode,
+        result=False
+    )
