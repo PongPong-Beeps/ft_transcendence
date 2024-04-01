@@ -5,10 +5,10 @@ export default function DuplicateInviteMessage($container) {
         const page = $container.querySelector('#page');
         if (page) {
             page.innerHTML = `
-                <div id="exit-confirmation-background">
-                    <div id="exit-confirmation-container">
-                    <div id="exit-confirmation-title">이미 이 방에 있는 유저입니다.</div>
-                    <div id="exit-confirmation-button-container">
+                <div id="alert-background">
+                    <div id="alert-container">
+                    <div id="alert-title">이미 이 방에 있는 유저입니다.</div>
+                    <div id="alert-button-container">
                         <button class="green-btn" id="duplicate-invite-ok-btn">확인</button>
                     </div>
                     </div>
@@ -24,7 +24,7 @@ export default function DuplicateInviteMessage($container) {
         });
     };
 
-    importCss("assets/css/exit-confirmation.css");
+    importCss("assets/css/alert.css");
     render();
     setupEventListener();
 }
