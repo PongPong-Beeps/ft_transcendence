@@ -9,7 +9,7 @@ import {BACKEND, fetchWithAuth} from "../../api.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
 import InviteModal from "../../pages/InviteModal.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
-import DuplicateInviteMessage from "../../pages/DuplicateInviteMessage.js";
+import DuplicateInviteAlert from "../../pages/DuplicateInviteAlert.js";
 
 /**
  * @param { HTMLElement } $container
@@ -128,7 +128,7 @@ export default function UserList($container, connWsManager) {
             })
             .catch(error => {
                 if (error.status === 400) {
-                    new DuplicateInviteMessage($container);
+                    new DuplicateInviteAlert($container);
                 } else {
                     console.error("[ InviteUser ] " , error);
                 }

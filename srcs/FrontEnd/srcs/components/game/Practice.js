@@ -1,4 +1,4 @@
-import ExitConfirmation from "../../pages/ExitConfirmation.js";
+import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
 
 export default function Practice($container) {
     let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
@@ -219,7 +219,7 @@ export default function Practice($container) {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
-                new ExitConfirmation($container);
+                new ExitConfirmationAlert($container);
             });
         }
 

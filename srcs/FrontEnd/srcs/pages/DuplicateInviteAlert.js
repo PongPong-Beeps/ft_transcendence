@@ -1,6 +1,6 @@
 import {importCss} from "../utils/importCss.js";
 
-export default function DuplicateInviteMessage($container) {
+export default function DuplicateInviteAlert($container) {
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
