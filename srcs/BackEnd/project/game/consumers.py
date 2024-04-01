@@ -56,9 +56,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.close(4002)
 
     async def disconnect(self, close_code):
-        user = self.scope['user']
-        client = await database_sync_to_async(Client.objects.get)(user=user)
-        
         if close_code == 4000 :
             print('Game does not exist.')
             return
