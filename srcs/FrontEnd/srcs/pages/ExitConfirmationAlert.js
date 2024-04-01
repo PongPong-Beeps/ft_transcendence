@@ -5,17 +5,17 @@ import {navigate} from "../utils/navigate.js";
  * @param { HTMLElement } $container
  * @param { [WebSocketManager] } wsManagers
  */
-export default function ExitConfirmation($container, wsManagers) {
+export default function ExitConfirmationAlert($container, wsManagers) {
     const { gameWsManager, connWsManager } = wsManagers;
 
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
             page.innerHTML = `
-                <div id="exit-confirmation-background">
-                    <div id="exit-confirmation-container">
-                    <div id="exit-confirmation-title">정말로 게임방을 나가시나요 ?</div>
-                    <div id="exit-confirmation-button-container">
+                <div id="alert-background">
+                    <div id="alert-container">
+                    <div id="alert-title">정말로 게임방을 나가시나요 ?</div>
+                    <div id="alert-button-container">
                         <button class="green-btn" id="exit-confirmation-leave-btn">나가기</button>
                         <button class="green-btn" id="exit-confirmation-stay-btn">머무르기</button>
                     </div>
@@ -38,7 +38,7 @@ export default function ExitConfirmation($container, wsManagers) {
         });
     }
 
-    importCss("assets/css/exit-confirmation.css");
+    importCss("assets/css/alert.css");
     render();
     setupEventListener();
 }
