@@ -162,12 +162,12 @@ def create_jwt_token(user):
     # 'image': { 'versions': { 'large': 'url', 'medium': 'url', 'small': 'url', 'migro': 'url' }
         
 def generate_unique_nickname(nickname):
-    if User.objects.filter(nickname=nickname).exists():
-        i = 1
-        while User.objects.filter(nickname=nickname + '(' + str(i) + ')').exists():
-            i += 1
-        nickname += '(' + str(i) + ')'
-    return nickname    
+    original_nickname = nickname
+    i = 1
+    while User.objects.filter(nickname=nickname).exists():
+        nickname = f"{original_nickname}({i})"
+        i += 1
+    return nickname   
 
 def save_db(user_info, config):
     if config['type'] == 'kakao' :
