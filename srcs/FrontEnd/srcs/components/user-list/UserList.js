@@ -9,6 +9,7 @@ import {BACKEND, fetchWithAuth} from "../../api.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
 import InviteModal from "../../pages/InviteModal.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
+import DuplicateInviteMessage from "../../pages/DuplicateInviteMessage.js";
 
 /**
  * @param { HTMLElement } $container
@@ -116,20 +117,22 @@ export default function UserList($container, connWsManager) {
                     receiver: parseInt(targetId),
                 })
             })
-            .then(response => {
-                if (response) {
-                    const event = new CustomEvent('inviteUser', {
-                        detail: {
-                            sender: id,
-                            receiver: parseInt(targetId),
-                        }
-                    });
-                    document.dispatchEvent(event);
-                } else {
-                    console.error('Invite request failed');
-                }
+            .then(() => {
+                const event = new CustomEvent('inviteUser', {
+                    detail: {
+                        sender: id,
+                        receiver: parseInt(targetId),
+                    }
+                });
+                document.dispatchEvent(event);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                if (error.status === 400) {
+                    new DuplicateInviteMessage($container);
+                } else {
+                    console.error("[ InviteUser ] " , error);
+                }
+            });
         } else {
             new ProfileModal($container, connWsManager, id, targetId, false);
         }
