@@ -95,3 +95,15 @@ def update_match_history(round, game):
         easy_mode=easy_mode,
         result=False
     )
+
+async def determine_winner(game, winner, round_number):
+    if game.type == 'one_to_one':
+        game.winner = winner
+    else:
+        if round_number == 1:
+            game.round3.player1 = winner
+        elif round_number == 2:
+            game.round3.player2 = winner
+        else:
+            game.winner = winner
+    await database_sync_to_async(game.save)()
