@@ -68,13 +68,17 @@ class Game(models.Model):
             if count_player == 2:
                 self.is_full = True
                 self.save()
-            else:
+            elif count_player == 1:
                 self.is_full = False
                 self.save()
+            elif count_player == 0:
+                self.delete()
         else : #'tournament':
             if count_player == 4:
                 self.is_full = True
                 self.save()
+            elif count_player == 0:
+                self.delete()
             else:
                 self.is_full = False
                 self.save()
