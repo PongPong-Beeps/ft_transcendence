@@ -9,8 +9,6 @@ import math
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
-    height = models.FloatField(default=0.0)
-    width = models.FloatField(default=0.0)
     channel_name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -143,14 +141,6 @@ class Game(models.Model):
             self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
         self.is_gameRunning = True
         self.save()
-        
-    def initialize_player_size(self, client, width, height):
-        player = self.players.filter(client=client).first()
-
-        if player:
-            player.height = height
-            player.width = width
-            player.save()
     
     def get_next_round(self):
         rounds = [self.round1, self.round2, self.round3]
