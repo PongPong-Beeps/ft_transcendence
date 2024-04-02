@@ -159,6 +159,7 @@ class Paddle():
         self.width = 10
         self.height = 150
         self.speed = 10
+        self.player_area = 25
     
     async def change_direction(self, key):
         self.direction = key
@@ -179,8 +180,8 @@ class Ball:
         self.is_ball_moving = False
         
         #볼 고정값
-        self.radius = 10
-        self.speed = 10
+        self.radius = 5
+        self.speed = 5
 
     def get_random_direction(self):
         # 20도에서 40도를 라디안으로 변환

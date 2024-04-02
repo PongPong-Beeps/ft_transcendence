@@ -8,7 +8,7 @@ from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
-from .utils import serialize_player, serialize_round_players, generate_round_info, update_match_history
+from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history
 from .game_logic import update, init_game_objects
 import asyncio
 from asyncio import Event
@@ -257,9 +257,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def process_round_start(self, round):
         round_info = await serialize_round_players(round)
+        player_area = await serialize_fixed_data(round, "player_area")
+        canvas_size = await serialize_fixed_data(round, "canvas_size")
         round_start_info = {
             "type": "round_start",
             "player_data": round_info,
+            "player_area": player_area,
+            "fix": canvas_size,
         }
         await self.channel_layer.group_send(
             self.room_group_name,

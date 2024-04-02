@@ -32,6 +32,19 @@ async def serialize_round_players(round):
 
     return serialized_players
 
+async def serialize_fixed_data(round, data_type):
+    if not round:
+        return None
+    
+    if data_type == "player_area":
+        serialized_fixed_data = Paddle().player_area
+    elif data_type == "canvas_size":
+        serialized_fixed_data = {
+            "width": round.width,
+            "height": round.height
+        }
+    
+    return serialized_fixed_data
 
 def generate_round_info(round):
     if not round:
@@ -47,12 +60,10 @@ def generate_round_info(round):
         "balls": {
             "ball1": {"x": round.ball_1.x, "y": round.ball_1.y},
             "ball2": {"x": 0, "y": 0}, #하드모드에서 사용
-            "size": {"radius": Ball().radius},
+            "radius": Ball().radius,
         },
         "score1": round.score_1,
         "score2": round.score_2,
-        "width" : round.width,
-        "height" : round.height,
     }
     return game_info
 

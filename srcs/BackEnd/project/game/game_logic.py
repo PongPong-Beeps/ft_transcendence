@@ -1,4 +1,5 @@
 import threading
+from .models import Paddle
 
 def set_ball_moving(round):
     balls = [ round.ball_1, round.ball_2 ]
@@ -15,9 +16,9 @@ def init_game_objects(round):
     paddles = [ round.paddle_1, round.paddle_2 ]
     for i, paddle in enumerate(paddles):
         if i == 0:
-            paddle.x = 50
+            paddle.x = Paddle().player_area
         else:
-            paddle.x = WIDTH - paddle.width - 50
+            paddle.x = WIDTH - paddle.width - Paddle().player_area
         paddle.y = (HEIGHT / 2) - (paddle.height) / 2
         paddle.direction = 'stop'
     
@@ -75,10 +76,10 @@ def update(round):
                 ball.dirY = -ball.dirY#y방향 반전
 
             #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
-            if ball.x - ball.radius < 50: #왼쪽 벽 충돌
+            if ball.x - ball.radius < Paddle().player_area: #왼쪽 벽 충돌
                 round.score_2 += 1
                 init_game_objects(round)
-            elif ball.x + ball.radius > WIDTH - 50:
+            elif ball.x + ball.radius > WIDTH - Paddle().player_area:
                 round.score_1 += 1
                 init_game_objects(round)
             
