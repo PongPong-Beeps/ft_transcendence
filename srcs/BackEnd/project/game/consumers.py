@@ -318,6 +318,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 game_info
         )
         
+        await asyncio.sleep(5) #빵빠레 띄우는 시간
+        await self.channel_layer.group_send(
+                self.room_group_name, { "type": "game_status" }
+        )
+        
         game.is_gameRunning = False
         await database_sync_to_async(game.save)()
         
