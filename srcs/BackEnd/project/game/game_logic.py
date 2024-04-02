@@ -8,7 +8,7 @@ def set_ball_moving(round):
             ball.is_ball_moving = True
             round.save()
 
-def init_game_objects(round):
+def init_game_objects(round, mode):
     WIDTH = round.width
     HEIGHT = round.height
     
@@ -21,18 +21,22 @@ def init_game_objects(round):
             paddle.x = WIDTH - paddle.width - Paddle().player_area
         paddle.y = (HEIGHT / 2) - (paddle.height) / 2
         paddle.direction = 'stop'
+
+    if mode == "easy":
+        round.ball_2 = None
     
     #볼 위치, 방향 초기화
     balls = [ round.ball_1, round.ball_2 ]
-    for ball in balls:
+    for i, ball in enumerate(balls):
         if ball is not None:
             ball.x = WIDTH / 2
             ball.y = HEIGHT / 2
-            ball.dirX, ball.dirY = ball.get_random_direction()
             ball.is_ball_moving = False
-    
-    #볼2 기능 정지
-    round.ball_2 = None
+            if i == 0:
+                ball.dirX, ball.dirY = ball.get_random_direction()
+            else:
+                ball.dirX = -balls[0].dirX
+                ball.dirY = -balls[0].dirY    
 
     round.save()
 
@@ -52,7 +56,7 @@ def check_round_ended(round):
         return True
     return False
 
-def update(round):
+def update(round, mode):
     if check_round_ended(round):
         return
     WIDTH = round.width
@@ -78,11 +82,11 @@ def update(round):
             #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
             if ball.x - ball.radius < Paddle().player_area: #왼쪽 벽 충돌
                 round.score_2 += 1
-                init_game_objects(round)
+                init_game_objects(round, mode)
             elif ball.x + ball.radius > WIDTH - Paddle().player_area:
                 round.score_1 += 1
-                init_game_objects(round)
-            
+                init_game_objects(round, mode)
+
             #패들 충돌검사
             nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]
             if ball.x - ball.radius <= nearest_paddle.x + nearest_paddle.width\

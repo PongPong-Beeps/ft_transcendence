@@ -46,9 +46,14 @@ async def serialize_fixed_data(round, data_type):
     
     return serialized_fixed_data
 
-def generate_round_info(round):
+def generate_round_info(round, mode):
     if not round:
         return {"error": "Player or round information is missing."}
+    
+    if mode == "easy":
+        ball2 = None
+    else:
+        ball2 = { "x": round.ball_2.x, "y": round.ball_2.y }
     
     game_info = {
         "type": "round_ing",
@@ -59,7 +64,7 @@ def generate_round_info(round):
         },
         "balls": {
             "ball1": {"x": round.ball_1.x, "y": round.ball_1.y},
-            "ball2": {"x": 0, "y": 0}, #하드모드에서 사용
+            "ball2": ball2,
             "radius": Ball().radius,
         },
         "score1": round.score_1,

@@ -244,7 +244,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             if next_round:
                 print("round is started") #test code
                 await self.process_round_start(next_round)
-                await self.process_round_ing(next_round)
+                await self.process_round_ing(next_round, game.mode)
                 winner = await self.process_round_end(next_round)
                 await database_sync_to_async(update_match_history)(next_round, game)
                 print("round is end") #test code
@@ -273,12 +273,12 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_start(self, event):
         await self.send(text_data=json.dumps(event))
     
-    async def process_round_ing(self, round):
+    async def process_round_ing(self, round, mode):
         await asyncio.sleep(5)
-        await database_sync_to_async(init_game_objects)(round)
+        await database_sync_to_async(init_game_objects)(round, mode)
         while not round.is_roundEnded:
-            await database_sync_to_async(update)(round)
-            round_ing_info = await database_sync_to_async(generate_round_info)(round)
+            await database_sync_to_async(update)(round, mode)
+            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode)
             await self.channel_layer.group_send(
                     self.room_group_name,
                     round_ing_info
