@@ -40,6 +40,13 @@
     background-color: #8DAA4E;
 }
 
+.game-title-container {
+    display: flex;
+    color: white;
+    font-size: 1em;
+    justify-content: space-evenly;
+}
+
 .game-canvas-container {
     position: relative;
     width: 55vw;

@@ -1,36 +1,42 @@
 import threading
+from .models import Paddle
 
 def set_ball_moving(round):
-    balls = { round.ball_1, round.ball_2 }
+    balls = [ round.ball_1, round.ball_2 ]
     for ball in balls:
         if ball is not None:
             ball.is_ball_moving = True
             round.save()
 
-def init_game_objects(round):
+def init_game_objects(round, mode):
     WIDTH = round.width
     HEIGHT = round.height
     
     #패들 위치 초기화
-    paddles = { round.paddle_1, round.paddle_2 }
+    paddles = [ round.paddle_1, round.paddle_2 ]
     for i, paddle in enumerate(paddles):
         if i == 0:
-            paddle.x = 50
+            paddle.x = Paddle().player_area
         else:
-            paddle.x = WIDTH - paddle.width - 50
+            paddle.x = WIDTH - paddle.width - Paddle().player_area
         paddle.y = (HEIGHT / 2) - (paddle.height) / 2
+        paddle.direction = 'stop'
+
+    if mode == "easy":
+        round.ball_2 = None
     
     #볼 위치, 방향 초기화
-    balls = { round.ball_1, round.ball_2 }
-    for ball in balls:
+    balls = [ round.ball_1, round.ball_2 ]
+    for i, ball in enumerate(balls):
         if ball is not None:
             ball.x = WIDTH / 2
             ball.y = HEIGHT / 2
-            ball.dirX, ball.dirY = ball.get_random_direction()
             ball.is_ball_moving = False
-    
-    #볼2 기능 정지
-    round.ball_2 = None
+            if i == 0:
+                ball.dirX, ball.dirY = ball.get_random_direction()
+            else:
+                ball.dirX = -balls[0].dirX
+                ball.dirY = -balls[0].dirY    
 
     round.save()
 
@@ -50,18 +56,19 @@ def check_round_ended(round):
         return True
     return False
 
-def update(round):
+def update(round, mode):
     if check_round_ended(round):
         return
     WIDTH = round.width
     HEIGHT = round.height
     
-    paddle_1 = round.paddle_1
-    paddle_2 = round.paddle_2
+    paddles = [ round.paddle_1, round.paddle_2 ]
+    # 패들 위치 업데이트
+    for paddle in paddles:
+        paddle.move_paddle(HEIGHT)
     
-    balls = { round.ball_1, round.ball_2 }
     
-    
+    balls = [ round.ball_1, round.ball_2 ]
     for ball in balls:
         if ball is not None and ball.is_ball_moving:
             #공 위치 업데이트
@@ -70,19 +77,18 @@ def update(round):
 
             #벽 충돌 검사(맵 상단, 하단)
             if ball.y + ball.radius > HEIGHT or ball.y - ball.radius < 0:
-                ball.y = -ball.y #y방향 반전
-            
+                ball.dirY = -ball.dirY#y방향 반전
 
             #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
-            if ball.x - ball.radius < 50: #왼쪽 벽 충돌
+            if ball.x - ball.radius < Paddle().player_area: #왼쪽 벽 충돌
                 round.score_2 += 1
-                init_game_objects(round)
-            elif ball.x + ball.radius > WIDTH - 50:
+                init_game_objects(round, mode)
+            elif ball.x + ball.radius > WIDTH - Paddle().player_area:
                 round.score_1 += 1
-                init_game_objects(round)
-            
+                init_game_objects(round, mode)
+
             #패들 충돌검사
-            nearest_paddle = paddle_1 if ball.x < WIDTH / 2 else paddle_2
+            nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]
             if ball.x - ball.radius <= nearest_paddle.x + nearest_paddle.width\
                 and ball.x + ball.radius >= nearest_paddle.x\
                 and ball.y - ball.radius <= nearest_paddle.y + nearest_paddle.height\

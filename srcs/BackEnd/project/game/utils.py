@@ -32,10 +32,28 @@ async def serialize_round_players(round):
 
     return serialized_players
 
+async def serialize_fixed_data(round, data_type):
+    if not round:
+        return None
+    
+    if data_type == "player_area":
+        serialized_fixed_data = Paddle().player_area
+    elif data_type == "canvas_size":
+        serialized_fixed_data = {
+            "width": round.width,
+            "height": round.height
+        }
+    
+    return serialized_fixed_data
 
-def generate_round_info(round):
+def generate_round_info(round, mode):
     if not round:
         return {"error": "Player or round information is missing."}
+    
+    if mode == "easy":
+        ball2 = None
+    else:
+        ball2 = { "x": round.ball_2.x, "y": round.ball_2.y }
     
     game_info = {
         "type": "round_ing",
@@ -46,45 +64,13 @@ def generate_round_info(round):
         },
         "balls": {
             "ball1": {"x": round.ball_1.x, "y": round.ball_1.y},
-            "ball2": {"x": 0, "y": 0}, #하드모드에서 사용
-            "size": {"radius": Ball().radius},
+            "ball2": ball2,
+            "radius": Ball().radius,
         },
         "score1": round.score_1,
         "score2": round.score_2,
-        "width" : round.width,
-        "height" : round.height,
     }
     return game_info
-
-def calculate_positions(objects, width, height, player):
-    for obj in objects:
-        obj['x'] = obj['x'] / width * player.width
-        obj['y'] = obj['y'] / height * player.height
-    return objects
-
-def serialize_round_info_to_player(info, player):
-    
-    try:
-        paddles = info["paddles"]
-        balls = info["balls"]
-
-        width = info["width"]
-        height = info["height"]
-
-        objects = [paddles['paddle1'], paddles['paddle2'], balls['ball1']] #, balls['ball2']]
-        objects = calculate_positions(objects, width, height, player)
-
-        new_info = {
-            "type": "round_ing",
-            "paddles": paddles,
-            "balls": balls,
-            "score1": info['score1'],
-            "score2": info['score2'],
-        }
-        return new_info
-    except Exception as e:
-        print("error: ", e)
-        return None
 
 def update_match_history(round, game):
     tournament = True if game.type == "tournament" else False

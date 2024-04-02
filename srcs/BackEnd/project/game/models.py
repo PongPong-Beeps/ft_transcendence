@@ -9,8 +9,6 @@ import math
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
-    height = models.FloatField(default=0.0)
-    width = models.FloatField(default=0.0)
     channel_name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -143,14 +141,6 @@ class Game(models.Model):
             self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
         self.is_gameRunning = True
         self.save()
-        
-    def initialize_player_size(self, client, width, height):
-        player = self.players.filter(client=client).first()
-
-        if player:
-            player.height = height
-            player.width = width
-            player.save()
     
     def get_next_round(self):
         rounds = [self.round1, self.round2, self.round3]
@@ -163,18 +153,25 @@ class Paddle():
     def __init__(self):
         self.x = 0
         self.y = 0
+        self.direction = 'stop'
         
         #패들 고정값
         self.width = 10
-        self.height = 100
-        self.speed = 0.015
-        
-    def move_paddle(self, key, canvas_height):
-        if key == 'up':
-            self.y = max(self.y - self.speed, 0)
-        elif key == 'down':
-            self.y = min(self.y + self.speed, canvas_height - self.height)
+        self.height = 150
+        self.speed = 10
+        self.player_area = 25
     
+    async def change_direction(self, key):
+        self.direction = key
+        
+    def move_paddle(self, canvas_height):
+        if self.direction == 'stop':
+            return
+        elif self.direction == 'up':
+            self.y = max(self.y - self.speed, 0)
+        elif self.direction == 'down':
+            self.y = min(self.y + self.speed, canvas_height - self.height)
+
 class Ball:
     def __init__(self):
         self.x = 0
@@ -183,8 +180,8 @@ class Ball:
         self.is_ball_moving = False
         
         #볼 고정값
-        self.radius = 10
-        self.speed = 10
+        self.radius = 5
+        self.speed = 5
 
     def get_random_direction(self):
         # 20도에서 40도를 라디안으로 변환
