@@ -56,36 +56,6 @@ def generate_round_info(round):
     }
     return game_info
 
-def calculate_positions(objects, width, height, player):
-    for obj in objects:
-        obj['x'] = obj['x'] / width * player.width
-        obj['y'] = obj['y'] / height * player.height
-    return objects
-
-def serialize_round_info_to_player(info, player):
-    
-    try:
-        paddles = info["paddles"]
-        balls = info["balls"]
-
-        width = info["width"]
-        height = info["height"]
-
-        objects = [paddles['paddle1'], paddles['paddle2'], balls['ball1']] #, balls['ball2']]
-        objects = calculate_positions(objects, width, height, player)
-
-        new_info = {
-            "type": "round_ing",
-            "paddles": paddles,
-            "balls": balls,
-            "score1": info['score1'],
-            "score2": info['score2'],
-        }
-        return new_info
-    except Exception as e:
-        print("error: ", e)
-        return None
-
 def update_match_history(round, game):
     tournament = True if game.type == "tournament" else False
     easy_mode = True if game.mode == "easy" else False
