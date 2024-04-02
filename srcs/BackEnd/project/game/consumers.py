@@ -147,6 +147,25 @@ class GameConsumer(AsyncWebsocketConsumer):
             else:
                 print("Width and height must be provided for game initialization.")
             self.game_init_received.set() ###### EVENT   
+        elif type == 'paddle':
+            direction = text_data_json.get("direction")
+            asyncio.create_task(self.move_paddle(self.scope['user'], direction))
+            
+    async def move_paddle(self, user, direction):
+        game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        round = await database_sync_to_async(game.get_next_round)()
+        if round is None:
+            print("round is None")
+            return
+        players = await database_sync_to_async(round.get_players)()
+        for i, player in enumerate(players):
+            if player == user:
+                if i == 0:
+                    await round.paddle_1.change_direction(direction)
+                else:
+                    await round.paddle_2.change_direction(direction)
+                print("paddle moved ", round.paddle_1.direction) #test code
+                break
             
     async def ready(self, event):
         user = self.scope['user']
