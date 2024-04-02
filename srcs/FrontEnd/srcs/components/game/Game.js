@@ -1,10 +1,14 @@
 import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
+import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 
 /**
  * @param { HTMLElement } $container
  * @param { Object } data
  */
 export default function Game($container, data) {
+     if (hasUndefinedArgs($container, data))
+          return;
+     
      let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
      let players = [], fixCanvas, player_area;
      const paddleColor = '#ffffff', pongColor = '#ffa939', backgroundColor = '#27522d';

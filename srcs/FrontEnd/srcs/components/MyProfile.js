@@ -8,9 +8,9 @@ import ErrorPage from "../pages/ErrorPage.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocket } ws
+ * @param { WebSocketManager } connWsManager
  */
-export default function MyProfile($container, ws) {
+export default function MyProfile($container, connWsManager) {
     let id;
     let [getNickname, setNickname] = useState("", this, 'renderNickname');
     let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
@@ -33,7 +33,7 @@ export default function MyProfile($container, ws) {
         const profileButton = $container.querySelector('#profile-btn');
         if (profileButton) {
             profileButton.addEventListener('click', () => {
-                new ProfileModal($container, ws, id, id, true, setNickname, setProfileImage);
+                new ProfileModal($container, connWsManager, id, id, true, setNickname, setProfileImage);
             });
         }
     }

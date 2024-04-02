@@ -4,6 +4,11 @@ html, body {
     background-color: #B7D768;
 }
 
+@font-face {
+    font-family: "DNF Bit Bit v2";
+    src: url("../font/DNFBitBitv2.ttf") format("truetype");
+}
+
 #app {
     display: grid;
     place-items: center; /* 가로와 세로 중앙 정렬을 간단히 처리 */
@@ -92,6 +97,10 @@ html, body {
     color : white;
     font-family: "DNF Bit Bit v2", serif;
     transition: transform 0.1s ease-in-out;
+}
+
+button.disabled {
+    background-color: grey;
 }
 
 .non-outline-btn {}

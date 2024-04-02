@@ -1,11 +1,14 @@
 import { importCss } from "../utils/importCss.js";
 import { BACKEND, fetchWithAuth } from "../api.js";
+import hasUndefinedArgs from "../utils/hasUndefinedArgs.js";
 
 /**
  * @param {HTMLElement} $container
- * @param { WebSocketManager } wsManager
+ * @param { WebSocketManager } connWsManager
  */
-export default function Chat($container, wsManager) {
+export default function Chat($container, connWsManager) {
+    if (hasUndefinedArgs($container, connWsManager))
+        return;
     let myId = '';
     let currentType, currentReceiver;
 
@@ -18,7 +21,7 @@ export default function Chat($container, wsManager) {
             new ErrorPage($container, error.status);
         });
 
-    wsManager.addMessageHandler(function (data) {
+    connWsManager.addMessageHandler(function (data) {
         if (data.message && (data.receiver || data.sender)) {
             const chatType = getChatType(data);
             const senderOrReceiver = data.sender || data.receiver;
@@ -57,7 +60,7 @@ export default function Chat($container, wsManager) {
         if (type === "dm_chat") {
             msgObject.receiver = receiver;
         }
-        wsManager.sendMessage(msgObject);
+        connWsManager.sendMessage(msgObject);
     };
 
     const render = () => {

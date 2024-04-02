@@ -6,9 +6,9 @@ import { navigate } from "../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { WebSocket } ws
+ * @param { WebSocketManager } connWsManager
  */
-export default function Header($container, wsManager) {
+export default function Header($container, connWsManager) {
     const render = () => {
         const header = $container.querySelector('#header');
         if (header) {
@@ -32,7 +32,7 @@ export default function Header($container, wsManager) {
             fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
                 .then(data => {
                     console.log("[ logout ] 완료");
-                    wsManager.ws.close();
+                    connWsManager.ws.close();
                     const event = new CustomEvent('logout');
                     document.dispatchEvent(event);
                     navigate('/');

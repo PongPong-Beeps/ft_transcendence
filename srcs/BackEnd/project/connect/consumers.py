@@ -133,16 +133,20 @@ class ConnectConsumer(AsyncWebsocketConsumer):
     
     
     async def generate_friend_list_status_json(self, user):
+        blacklist = await database_sync_to_async(lambda: list(user.blacklist.all()))()
         friends = await database_sync_to_async(lambda: list(user.friendlist.all()))()
         friendList = []
 
         for friend in friends:
             # 각 친구가 Client 모델에 존재하는지 확인 (온라인 상태인지 확인)
             is_online = await database_sync_to_async(Client.objects.filter(user=friend).exists)()
+            is_block = friend in blacklist
             friendList.append({
                 "id" : friend.id,
                 "nickname": friend.nickname,
-                "is_online": is_online
+                "is_online": is_online,
+                "is_block": is_block,
+
             })
         friendList_json = json.dumps({"friendList": friendList})
         return friendList_json

@@ -8,12 +8,17 @@ import getCookie from "../../utils/cookie.js";
 import {BACKEND, fetchWithAuth} from "../../api.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
 import InviteModal from "../../pages/InviteModal.js";
+import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
+import DuplicateInviteAlert from "../../pages/DuplicateInviteAlert.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { [WebSocketManager] } wsManager
+ * @param { WebSocketManager } connWsManager
  */
-export default function UserList($container, wsManager) {
+export default function UserList($container, connWsManager) {
+    if(hasUndefinedArgs($container, connWsManager))
+        return;
+    
     let id;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
@@ -112,22 +117,24 @@ export default function UserList($container, wsManager) {
                     receiver: parseInt(targetId),
                 })
             })
-            .then(response => {
-                if (response) {
-                    const event = new CustomEvent('inviteUser', {
-                        detail: {
-                            sender: id,
-                            receiver: parseInt(targetId),
-                        }
-                    });
-                    document.dispatchEvent(event);
-                } else {
-                    console.error('Invite request failed');
-                }
+            .then(() => {
+                const event = new CustomEvent('inviteUser', {
+                    detail: {
+                        sender: id,
+                        receiver: parseInt(targetId),
+                    }
+                });
+                document.dispatchEvent(event);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                if (error.status === 400) {
+                    new DuplicateInviteAlert($container);
+                } else {
+                    console.error("[ InviteUser ] " , error);
+                }
+            });
         } else {
-            new ProfileModal($container, wsManager, id, targetId, false);
+            new ProfileModal($container, connWsManager, id, targetId, false);
         }
     };
 
@@ -154,24 +161,24 @@ export default function UserList($container, wsManager) {
         fetchWithAuth(`${BACKEND}/user/me/`)
             .then(data => {
                 id = data.id;
-                wsManager.sendMessage({ type: "friend_list", sender: id });
+                connWsManager.sendMessage({ type: "friend_list", sender: id });
             })
             .catch(error => {
                 console.error("[ setupUserListData ] ", error.message);
                 new ErrorPage($container, error.status);
             });
-        wsManager.addMessageHandler(function(data) {
+        connWsManager.addMessageHandler(function(data) {
             if (data.friendList) {
                 setFriendList(data.friendList);
             }
         });
     }
 
-    if (wsManager) {
-        wsManager.addMessageHandler(function (data) {
+    if (connWsManager) {
+        connWsManager.addMessageHandler(function (data) {
             if (data.type === "invited") {
                 const {sender, receiver, game_type, game_mode, sender_id, receiver_id} = data;
-                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, wsManager);
+                new InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, connWsManager);
             }
         });
     }
