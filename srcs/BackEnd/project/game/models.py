@@ -163,18 +163,24 @@ class Paddle():
     def __init__(self):
         self.x = 0
         self.y = 0
+        self.direction = 'stop'
         
         #패들 고정값
         self.width = 10
-        self.height = 100
-        self.speed = 0.015
-        
-    def move_paddle(self, key, canvas_height):
-        if key == 'up':
-            self.y = max(self.y - self.speed, 0)
-        elif key == 'down':
-            self.y = min(self.y + self.speed, canvas_height - self.height)
+        self.height = 150
+        self.speed = 10
     
+    async def change_direction(self, key):
+        self.direction = key
+        
+    def move_paddle(self, canvas_height):
+        if self.direction == 'stop':
+            return
+        elif self.direction == 'up':
+            self.y = max(self.y - self.speed, 0)
+        elif self.direction == 'down':
+            self.y = min(self.y + self.speed, canvas_height - self.height)
+
 class Ball:
     def __init__(self):
         self.x = 0

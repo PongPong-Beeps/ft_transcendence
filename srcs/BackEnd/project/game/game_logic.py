@@ -1,7 +1,7 @@
 import threading
 
 def set_ball_moving(round):
-    balls = { round.ball_1, round.ball_2 }
+    balls = [ round.ball_1, round.ball_2 ]
     for ball in balls:
         if ball is not None:
             ball.is_ball_moving = True
@@ -12,16 +12,17 @@ def init_game_objects(round):
     HEIGHT = round.height
     
     #패들 위치 초기화
-    paddles = { round.paddle_1, round.paddle_2 }
+    paddles = [ round.paddle_1, round.paddle_2 ]
     for i, paddle in enumerate(paddles):
         if i == 0:
             paddle.x = 50
         else:
             paddle.x = WIDTH - paddle.width - 50
         paddle.y = (HEIGHT / 2) - (paddle.height) / 2
+        paddle.direction = 'stop'
     
     #볼 위치, 방향 초기화
-    balls = { round.ball_1, round.ball_2 }
+    balls = [ round.ball_1, round.ball_2 ]
     for ball in balls:
         if ball is not None:
             ball.x = WIDTH / 2
@@ -56,12 +57,13 @@ def update(round):
     WIDTH = round.width
     HEIGHT = round.height
     
-    paddle_1 = round.paddle_1
-    paddle_2 = round.paddle_2
+    paddles = [ round.paddle_1, round.paddle_2 ]
+    # 패들 위치 업데이트
+    for paddle in paddles:
+        paddle.move_paddle(HEIGHT)
     
-    balls = { round.ball_1, round.ball_2 }
     
-    
+    balls = [ round.ball_1, round.ball_2 ]
     for ball in balls:
         if ball is not None and ball.is_ball_moving:
             #공 위치 업데이트
@@ -70,8 +72,7 @@ def update(round):
 
             #벽 충돌 검사(맵 상단, 하단)
             if ball.y + ball.radius > HEIGHT or ball.y - ball.radius < 0:
-                ball.y = -ball.y #y방향 반전
-            
+                ball.dirY = -ball.dirY#y방향 반전
 
             #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
             if ball.x - ball.radius < 50: #왼쪽 벽 충돌
@@ -82,7 +83,7 @@ def update(round):
                 init_game_objects(round)
             
             #패들 충돌검사
-            nearest_paddle = paddle_1 if ball.x < WIDTH / 2 else paddle_2
+            nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]
             if ball.x - ball.radius <= nearest_paddle.x + nearest_paddle.width\
                 and ball.x + ball.radius >= nearest_paddle.x\
                 and ball.y - ball.radius <= nearest_paddle.y + nearest_paddle.height\
