@@ -14,12 +14,6 @@ import asyncio
 from asyncio import Event
 
 class GameConsumer(AsyncWebsocketConsumer):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.game_init_received = Event() ###### EVENT
-    # self.game_init_received.set() ###### EVENT
-    # asyncio.create_task(self.game_init_received.wait()) ###### EVENT
-    
     async def connect(self):
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
