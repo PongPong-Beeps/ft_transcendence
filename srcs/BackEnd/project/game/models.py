@@ -3,18 +3,19 @@ from connect.models import Client
 from channels.db import database_sync_to_async
 from user.views import get_image
 from user.models import User
+import random
+import math
 
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
-    height = models.FloatField(default=0.0)
-    width = models.FloatField(default=0.0)
     channel_name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Game(models.Model):
     is_gameRunning = models.BooleanField(default=False)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='game_winner')
     
     type = models.CharField(max_length=20) #one_to_one or "tournament"
     mode = models.CharField(max_length=20) #easy or hard
@@ -67,13 +68,17 @@ class Game(models.Model):
             if count_player == 2:
                 self.is_full = True
                 self.save()
-            else:
+            elif count_player == 1:
                 self.is_full = False
                 self.save()
+            elif count_player == 0:
+                self.delete()
         else : #'tournament':
             if count_player == 4:
                 self.is_full = True
                 self.save()
+            elif count_player == 0:
+                self.delete()
             else:
                 self.is_full = False
                 self.save()
@@ -85,36 +90,24 @@ class Game(models.Model):
         self.check_full() #플레이어가 들어오면 게임의 is_full 상태도 변경
         self.save()
 
-    def exit_player(self, client): #플레이어 퇴장
+    def exit_player(self, channel_name): #플레이어 퇴장
         try :
-            player = self.players.get(client=client)
+            player = self.players.get(channel_name=channel_name)
             player.delete() #player 객체 삭제하면 자동으로 players에서도 삭제됨
             self.check_full() #플레이어가 나가면 게임의 is_full 상태도 변경
             self.save()
             if self.players.count() == 0: #플레이어가 없으면 게임 삭제
                 self.delete()
         except :
-            print(f'player {client.user} does not exist')
+            print('player does not exist')
             
-    def verify_players(self):
-        print('start verify players')
-        for player in self.players.all():
-            try :
-                getattr(player, 'client')
-                print('real? ', player.client.user)
-            except AttributeError:
-                print('AttributeError')
-                player.delete() #player 객체 삭제하면 자동으로 players에서도 삭제됨
-                self.check_full() #플레이어가 나가면 게임의 is_full 상태도 변경
-                self.save()
-                print('player delete ok')
-                if self.players.count() == 0: #플레이어가 없으면 게임 삭제
-                    self.delete()
-                    print('room delete ok')
-    
     def all_players_ready(self):
         if self.is_full:
-            return all(player.is_ready for player in self.players.all())
+            if all(player.is_ready for player in self.players.all()):
+                for player in self.players.all():
+                    player.is_ready = False
+                    player.save()
+                return True
         else:
             return False
     
@@ -149,43 +142,80 @@ class Game(models.Model):
             )
             self.round1 = round1
             self.round2 = round2
+            self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
         self.is_gameRunning = True
         self.save()
-        
-    def initialize_player_size(self, client, width, height):
-        player = self.players.filter(client=client).first()
-
-        if player:
-            player.height = height
-            player.width = width
-            player.save()
     
     def get_next_round(self):
         rounds = [self.round1, self.round2, self.round3]
         for round in rounds:
-            if round and not round.is_gameEnded:
+            if round and not round.is_roundEnded:
                 return round
         return None
 
-class Round(models.Model):
-    is_gameEnded = models.BooleanField(default=False)
+class Paddle():
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.direction = 'stop'
+        
+        #패들 고정값
+        self.width = 10
+        self.height = 150
+        self.speed = 10
+        self.player_area = 25
     
-    score1 = models.IntegerField(default=0)
-    score2 = models.IntegerField(default=0)
+    async def change_direction(self, key):
+        self.direction = key
+        
+    def move_paddle(self, canvas_height):
+        if self.direction == 'stop':
+            return
+        elif self.direction == 'up':
+            self.y = max(self.y - self.speed, 0)
+        elif self.direction == 'down':
+            self.y = min(self.y + self.speed, canvas_height - self.height)
+
+class Ball:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.dirX, self.dirY = self.get_random_direction()
+        self.is_ball_moving = False
+        
+        #볼 고정값
+        self.radius = 5
+        self.speed = 5
+
+    def get_random_direction(self):
+        # 20도에서 40도를 라디안으로 변환
+        min_angle = 20 * math.pi / 180
+        max_angle = 40 * math.pi / 180
+        # 랜덤 각도 생성
+        angle = random.uniform(min_angle, max_angle)
+        # 무작위로 방향 뒤집기
+        dirX = math.cos(angle) * (1 if random.random() < 0.5 else -1)
+        dirY = math.sin(angle) * (1 if random.random() < 0.5 else -1)
+        return dirX, dirY
+
+class Round(models.Model):
+    is_roundEnded = models.BooleanField(default=False)
+    
+    #서버 로직 계산을 위한 고정 크기
+    width = 500
+    height = 500
+    
+    paddle_1 = Paddle()
+    paddle_2 = Paddle()
+    
+    ball_1 = Ball()
+    ball_2 = Ball()
+    
+    score_1 = models.IntegerField(default=0)
+    score_2 = models.IntegerField(default=0)
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
-    
-    
-    paddle1_x = models.FloatField(default=0.0)
-    paddle1_y = models.FloatField(default=0.0)
-    paddle2_x = models.FloatField(default=0.0)
-    paddle2_y = models.FloatField(default=0.0)
-    
-    ball_1_x = models.FloatField(default=0.0)
-    ball_1_y = models.FloatField(default=0.0)
-    ball_2_x = models.FloatField(default=0.0)
-    ball_2_y = models.FloatField(default=0.0)
     
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
     

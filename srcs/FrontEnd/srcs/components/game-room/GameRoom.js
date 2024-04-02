@@ -97,6 +97,12 @@ export default function GameRoom($container, wsManagers) {
             navigate('game', data);
         }
     });
+
+    gameWsManager.addMessageHandler(function (data) {
+        if (data.type === "round_ing") {
+            $container.querySelector('#page').style.display = 'none';
+        }
+    });
     
     importCss("assets/css/game-room.css")
     init();
