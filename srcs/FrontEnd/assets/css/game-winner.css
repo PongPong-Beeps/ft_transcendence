@@ -9,6 +9,7 @@
 }
 
 #game-winner-container {
+  display: grid;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -18,20 +19,25 @@
   background-color: transparent;
   padding: 20px;
   border-radius: 10px;
+  grid-template-rows: 1fr 5fr 1fr 1fr 2fr;
+  justify-items: center;
+  align-items: center;
 }
 
 #game-winner-title {
+  grid-row: 1;
   font-size: 3vw;
   font-weight: bold;
   text-align: center;
 }
 
 #game-winner-img {
+  grid-row: 2;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 50%;
-  height: 50%
+  width: 100%;
+  height: 100%;
 }
 
 #game-winner-img img {
@@ -40,6 +46,29 @@
 }
 
 #player-nickname {
+  grid-row: 3;
   font-size: 2vw;
   text-align: center;
+}
+
+#move-message {
+  grid-row: 4;
+  font-size: 1.5vw;
+  text-align: center;
+}
+
+#move-button-container {
+  grid-row: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#move-button {
+  font-size: 1.5vw;
+  border-radius: 5px;
+  border: 4px solid #38631D;
+  outline: none;
 }
