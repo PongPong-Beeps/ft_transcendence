@@ -106,4 +106,3 @@ async def determine_winner(game, winner, round_number):
             game.round3.player2 = winner
         else:
             game.winner = winner
-    await database_sync_to_async(game.save)()
