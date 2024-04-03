@@ -28,32 +28,6 @@ export default function LoginPage($container) {
         }
     }
 
-    const handleAccessToken = () => {
-        if (getCookie("access_token")) {
-            fetchWithAuth(`https://${BACKEND}/api/`)
-                .then(data => {
-                    const connWs = new WebSocket(`wss://${BACKEND}/ws/connect/?token=${getCookie('access_token')}`);
-                    const connWsManager = new WebSocketManager(connWs);
-                    connWs.onopen = function(event) {
-                        console.log("웹 소켓 생성 완료");
-                        navigate('lobby', connWsManager);
-                    }
-                    connWs.onclose = function(event) {
-                        console.log("웹 소켓 닫아용");
-                    }
-                    connWsManager.addMessageHandler(function(data) {
-                        if (data.status === 4003)
-                        {
-                            const event = new CustomEvent('duplicated-login');
-                            document.dispatchEvent(event);
-                            new ErrorPage($container, 4003);
-                        }
-                    });
-                });
-            return;
-        }
-    };
-
     const setupEventListener = () => {
         const loginButtons = {
           '#login-btn': '42',
@@ -71,7 +45,6 @@ export default function LoginPage($container) {
       };
 
     importCss("assets/css/login.css");
-    handleAccessToken();
     render();
     setupEventListener();
 }

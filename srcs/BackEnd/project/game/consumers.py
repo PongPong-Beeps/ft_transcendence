@@ -89,7 +89,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def quick_start(self, client):
         game_queryset = await database_sync_to_async(Game.objects.filter)(type=self.scope['type'], mode=self.scope['mode'], is_full=False)
         game = await database_sync_to_async(game_queryset.first)()
-        if game:
+        if game and game.is_gameRunning == False:
             await database_sync_to_async(game.entry_player)(client, self.channel_name)
             self.room_group_name = str(game.id)
         else:
