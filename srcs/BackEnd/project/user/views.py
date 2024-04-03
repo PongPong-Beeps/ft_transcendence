@@ -252,7 +252,7 @@ class MatchHistoryView(APIView):
     def get(self, request): #내 프로필 - 전적
         user_id = request.user.id
         user_me = User.objects.get(id=user_id)
-        my_match = MatchHistory.objects.filter(user=user_me)
+        my_match = MatchHistory.objects.filter(user=user_me).order_by('-datetime')
         serializer = MatchHistorySerializer(my_match, many=True) #many=True : 하나가 아닌 여러개의 데이터를 직렬화
         response_data = {"history" : serializer.data}
         return Response(response_data, status=200)
@@ -265,7 +265,7 @@ class MatchHistoryView(APIView):
     def post(self, request): #상대 프로필 - 전적
         target_id = request.data.get('id')
         target_user = User.objects.get(id=target_id)
-        target_match = MatchHistory.objects.filter(user=target_user)
+        target_match = MatchHistory.objects.filter(user=target_user).order_by('-datetime')
         serializer = MatchHistorySerializer(target_match, many=True)
         response_data = {"history" : serializer.data}
         return Response(response_data, status=200)
