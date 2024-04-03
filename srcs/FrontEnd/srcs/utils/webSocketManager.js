@@ -9,6 +9,9 @@ export class WebSocketManager {
                 this.messageHandlers.forEach(handler => handler(data));
             }
         };
+        this.ws.onclose = () => {
+            this.removeMessageHandler();
+        };
     }
 
     addMessageHandler(handler) {
@@ -20,6 +23,8 @@ export class WebSocketManager {
     }
 
     sendMessage(data) {
-        this.ws.send(JSON.stringify(data));
+        if (this.ws.readyState === this.ws.OPEN) {
+            this.ws.send(JSON.stringify(data));
+        }
     }
 }
