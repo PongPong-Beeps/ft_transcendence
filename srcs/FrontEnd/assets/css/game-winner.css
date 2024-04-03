@@ -1,0 +1,45 @@
+#game-winner-background {
+  background-color: #B7D768;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+#game-winner-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 30vw;
+  height: 30vw;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+#game-winner-title {
+  font-size: 3vw;
+  font-weight: bold;
+  text-align: center;
+}
+
+#game-winner-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 50%
+}
+
+#game-winner-img img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+#player-nickname {
+  font-size: 2vw;
+  text-align: center;
+}
