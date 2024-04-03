@@ -242,24 +242,26 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def process_round_start(self, round):
         round_info = await serialize_round_players(round)
-        player_area = await serialize_fixed_data(round, "player_area")
-        canvas_size = await serialize_fixed_data(round, "canvas_size")
-        round_start_info = {
-            "type": "round_start",
+        fixed_data = await serialize_fixed_data(round)
+        round_ready_info = {
+            "type": "round_ready",
             "player_data": round_info,
-            "player_area": player_area,
-            "fix": canvas_size,
+            "fix": fixed_data,
         }
         await self.channel_layer.group_send(
             self.room_group_name,
-            round_start_info
+            round_ready_info
         )
         
-    async def round_start(self, event):
+    async def round_ready(self, event):
         await self.send(text_data=json.dumps(event))
-    
+
     async def process_round_ing(self, round, mode):
         await asyncio.sleep(5)
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            { "type": "round_start" }
+        )
         await database_sync_to_async(init_game_objects)(round, mode)
         while not round.is_roundEnded:
             await database_sync_to_async(update)(round, mode)
@@ -270,7 +272,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             )
             await asyncio.sleep(0.01) #게임 속도 조절을 위한 sleep
         print("round is end = ", round) #test code
-       
+    
+    async def round_start(self, event):
+        await self.send(text_data=json.dumps({"type": "round_start"}))
             
     async def round_ing(self, event):
         await self.send(text_data=json.dumps(event))

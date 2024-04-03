@@ -211,8 +211,8 @@ class Round(models.Model):
     ball_1 = Ball()
     ball_2 = Ball()
     
-    score_1 = models.IntegerField(default=0)
-    score_2 = models.IntegerField(default=0)
+    heart_1 = models.IntegerField(default=5)
+    heart_2 = models.IntegerField(default=5)
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')

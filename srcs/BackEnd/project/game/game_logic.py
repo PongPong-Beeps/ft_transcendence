@@ -45,11 +45,10 @@ def init_game_objects(round, mode):
     timer.start()
 
 def check_round_ended(round):
-    WINNER_SCORE = 5
-    if round.score_1 >= WINNER_SCORE or round.score_2 >= WINNER_SCORE:
-        if round.score_1 > round.score_2:
+    if round.heart_1 == 0 or round.heart_2 == 0:
+        if round.heart_2 == 0:
             round.winner = round.player1
-        else:
+        elif round.heart_1 == 0:
             round.winner = round.player2
         round.is_roundEnded = True
         round.save()
@@ -80,11 +79,11 @@ def update(round, mode):
                 ball.dirY = -ball.dirY#y방향 반전
 
             #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
-            if ball.x - ball.radius < Paddle().player_area: #왼쪽 벽 충돌
-                round.score_2 += 1
+            if ball.x - ball.radius < Paddle().player_area:
+                round.heart_1 -= 1
                 init_game_objects(round, mode)
             elif ball.x + ball.radius > WIDTH - Paddle().player_area:
-                round.score_1 += 1
+                round.heart_2 -= 1
                 init_game_objects(round, mode)
 
             #패들 충돌검사

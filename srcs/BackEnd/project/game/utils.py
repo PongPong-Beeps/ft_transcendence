@@ -32,44 +32,52 @@ async def serialize_round_players(round):
 
     return serialized_players
 
-async def serialize_fixed_data(round, data_type):
+async def serialize_fixed_data(round):
     if not round:
         return None
     
-    if data_type == "player_area":
-        serialized_fixed_data = Paddle().player_area
-    elif data_type == "canvas_size":
-        serialized_fixed_data = {
+    fixed_data = {}
+    
+    fixed_data["player_area"] = Paddle().player_area
+    fixed_data["canvas"] = {
             "width": round.width,
             "height": round.height
         }
+    fixed_data["paddle_width"] = Paddle().width
+    fixed_data["item_radius"] = Item().radius
     
-    return serialized_fixed_data
+    return fixed_data
 
 def generate_round_info(round, mode):
     if not round:
         return {"error": "Player or round information is missing."}
     
-    if mode == "easy":
-        ball2 = None
-    else:
-        ball2 = { "x": round.ball_2.x, "y": round.ball_2.y }
+    # item = None
+    
+    # if round.item is not None: #hard모드일때만 item이 생김
+        # item = { "x": round.item.x, "y": round.item.y }
     
     game_info = {
         "type": "round_ing",
-        "paddles": {
-            "paddle1": {"x": round.paddle_1.x, "y": round.paddle_1.y},
-            "paddle2": {"x": round.paddle_2.x, "y": round.paddle_2.y},
-            "size": {"width": Paddle().width, "height": Paddle().height},
-        },
-        "balls": {
-            "ball1": {"x": round.ball_1.x, "y": round.ball_1.y},
-            "ball2": ball2,
-            "radius": Ball().radius,
-        },
-        "score1": round.score_1,
-        "score2": round.score_2,
+        "players": [
+            {
+                "paddle": {"x": round.paddle_1.x, "y": round.paddle_1.y, "height": round.paddle_1.height},
+                "heart": round.heart_1,
+                # "item": round.slot_1, # True or False
+            },
+            {
+                "paddle": {"x": round.paddle_2.x, "y": round.paddle_2.y, "height": round.paddle_2.height},
+                "heart": round.heart_2,
+                # "item": round.slot_2, # True or False
+            }
+        ],
+        "balls": [
+            {"x": round.ball_1.x, "y": round.ball_1.y, "radius": round.ball_1.radius, "type": "default"},
+            # {"x": 0.0, "y": 0.0, "radius": 0.0, "type": "optional"},
+        ],
+        # "item": item, # 없으면 null
     }
+    
     return game_info
 
 def update_match_history(round, game):
