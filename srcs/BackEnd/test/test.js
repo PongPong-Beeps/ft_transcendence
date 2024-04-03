@@ -1,1 +1,0 @@
-../../FrontEnd/srcs/components/test.js
