@@ -29,7 +29,7 @@ export default function Header($container, connWsManager) {
         const logoutButton = $container.querySelector('#logout-btn');
         if (!logoutButton) return;
         logoutButton.addEventListener('click', () => {
-            fetchWithAuth(`${BACKEND}/logout/`, { method: 'POST' })
+            fetchWithAuth(`https://${BACKEND}/api/logout/`, { method: 'POST' })
                 .then(data => {
                     console.log("[ logout ] 완료");
                     connWsManager.ws.close();

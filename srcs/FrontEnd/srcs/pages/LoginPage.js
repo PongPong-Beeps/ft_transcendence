@@ -30,9 +30,9 @@ export default function LoginPage($container) {
 
     const handleAccessToken = () => {
         if (getCookie("access_token")) {
-            fetchWithAuth(`${BACKEND}`)
+            fetchWithAuth(`https://${BACKEND}/api/`)
                 .then(data => {
-                    const connWs = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const connWs = new WebSocket(`wss://${BACKEND}/ws/connect/?token=${getCookie('access_token')}`);
                     const connWsManager = new WebSocketManager(connWs);
                     connWs.onopen = function(event) {
                         console.log("웹 소켓 생성 완료");
@@ -62,7 +62,7 @@ export default function LoginPage($container) {
         };
         const handleLogin = (endpoint) => {
           localStorage.setItem('provider', endpoint);
-          window.location.href = `${BACKEND}/login/${endpoint}/`;
+          window.location.href = `https://${BACKEND}/api/login/${endpoint}/`;
         };
       
         Object.entries(loginButtons).forEach(([selector, endpoint]) => {

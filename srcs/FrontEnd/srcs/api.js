@@ -1,9 +1,10 @@
 import getCookie from "./utils/cookie.js";
 
-export const BACKEND = 'https://127.0.0.1/api';
+// export const BACKEND = 'https://127.0.0.1/api';
+export const BACKEND = '127.0.0.1';
 
 async function refreshToken() {
-    const refreshTokenResponse = await fetch(`${BACKEND}/token/refresh/`, {
+    const refreshTokenResponse = await fetch(`https://${BACKEND}/api/token/refresh/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -95,7 +96,7 @@ export async function fetchWithAuthFormData(url, options = {}) {
 /*
 
 [ 바디 없을 때 ]
-fetchWithAuth('${BACKEND}/resource')
+fetchWithAuth('https://${BACKEND}/api/resource')
 .then(data => {
     console.log('Data:', data);
 })
@@ -105,7 +106,7 @@ fetchWithAuth('${BACKEND}/resource')
 
 [ 바디 있을 때 ]
 const data = { key: 'value' };
-fetchWithAuth('${BACKEND}/resource', {
+fetchWithAuth('https://${BACKEND}/api/resource', {
     method: 'POST',
     body: JSON.stringify(data),
 })

@@ -12,7 +12,7 @@ export default function Chat($container, connWsManager) {
     let myId = '';
     let currentType, currentReceiver;
 
-    fetchWithAuth(`${BACKEND}/user/me`)
+    fetchWithAuth(`https://${BACKEND}/api/user/me`)
         .then(data => {
             myId = data.id;
         })

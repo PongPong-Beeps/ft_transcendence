@@ -74,7 +74,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
             setupEventListener();
             return;
         }
-        fetchWithAuthFormData(`${BACKEND}/user/me/image/`, {
+        fetchWithAuthFormData(`https://${BACKEND}/api/user/me/image/`, {
             method: 'POST',
             body: formData,
         })
@@ -165,7 +165,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
     };
 
     const handleFriendEvent = (uri, innerText) => {
-        fetchWithAuth(`${BACKEND}/${uri}/`, {
+        fetchWithAuth(`https://${BACKEND}/api/${uri}/`, {
             method: 'POST',
             body: JSON.stringify({ "id": targetId }),
         })
@@ -182,7 +182,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
 
     const handleBlockButtonClick = () => {
         const toBlock = { "id": targetId };
-        fetchWithAuth(`${BACKEND}/user/block/`, {
+        fetchWithAuth(`https://${BACKEND}/api/user/block/`, {
             method: 'POST',
             body: JSON.stringify(toBlock),
         })
@@ -198,7 +198,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
 
     const handleUnBlockButtonClick = (unblockId) => {
         const toUnBlock = { "id": unblockId };
-        fetchWithAuth(`${BACKEND}/user/unblock/`, {
+        fetchWithAuth(`https://${BACKEND}/api/user/unblock/`, {
             method: 'POST',
             body: JSON.stringify(toUnBlock),
         })
@@ -235,7 +235,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
     const handleUpdateNicknameButtonClick = (button) => {
         const nicknameInput = $container.querySelector('#nickname-input');
         if (nicknameInput) {
-            fetchWithAuth(`${BACKEND}/user/me/nickname/`, {
+            fetchWithAuth(`https://${BACKEND}/api/user/me/nickname/`, {
                 method: 'POST',
                 body: JSON.stringify({ "nickname": nicknameInput.value }),
             })
@@ -286,7 +286,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
     }
 
     const updateBlacklist = () => {
-        fetchWithAuth(`${BACKEND}/user/blacklist/`)
+        fetchWithAuth(`https://${BACKEND}/api/user/blacklist/`)
             .then(data => {
                 setBlacklist(data.blacklist);
                 console.log("[ updateBlacklist ] 블랙리스트 패치 완료");
@@ -309,7 +309,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
             $container.querySelector('#blacklist-btn').classList.add('hidden');
         }
         // 데이터 채우기
-        fetchWithAuth(`${BACKEND}/user/history/`, option)
+        fetchWithAuth(`https://${BACKEND}/api/user/history/`, option)
             .then(data => {
                 setHistory(data.history);
                 console.log("[ fetchHistoryData ] 전적 리스트 패치 완료");
@@ -319,7 +319,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
                 new ErrorPage($container, error.status);
             });
 
-        fetchWithAuth(`${BACKEND}/user/info/`, option)
+        fetchWithAuth(`https://${BACKEND}/api/user/info/`, option)
             .then(data => {
                 setInfo(data);
                 console.log("[ fetchInfoData ] 정보 패치 완료");

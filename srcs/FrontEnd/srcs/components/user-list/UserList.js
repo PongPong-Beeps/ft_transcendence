@@ -111,7 +111,7 @@ export default function UserList($container, connWsManager) {
             });
             document.dispatchEvent(event);
         } else if (event.target.matches('.invite-btn')) {
-            fetchWithAuth(`${BACKEND}/connect/invite/`, {
+            fetchWithAuth(`https://${BACKEND}/api/connect/invite/`, {
                 method: 'POST',
                 body: JSON.stringify({
                     sender: id,
@@ -149,7 +149,7 @@ export default function UserList($container, connWsManager) {
             list.style.display = list.id === showListId ? 'block' : 'none';
         });
         if (showListId === 'all-user-list-tab') {
-            fetchWithAuth(`${BACKEND}/user/list/`)
+            fetchWithAuth(`https://${BACKEND}/api/user/list/`)
                 .then(data => {
                     console.log("[ fetchUserListData ] 유저 리스트 패치 완료");
                     setAllUserList(data.userList);
@@ -162,7 +162,7 @@ export default function UserList($container, connWsManager) {
     };
 
     const setupUserListData = () => {
-        fetchWithAuth(`${BACKEND}/user/me/`)
+        fetchWithAuth(`https://${BACKEND}/api/user/me/`)
             .then(data => {
                 id = data.id;
                 connWsManager.sendMessage({ type: "friend_list", sender: id });

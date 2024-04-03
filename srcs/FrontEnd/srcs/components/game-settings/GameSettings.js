@@ -4,6 +4,7 @@ import GameSettingsOption from "./GameSettingsOption.js";
 import { importCss } from "../../utils/importCss.js";
 import { WebSocketManager } from "../../utils/webSocketManager.js";
 import getCookie from "../../utils/cookie.js";
+import { BACKEND } from "../../api.js";
 
 /**
  * @param { HTMLElement } $container
@@ -88,7 +89,7 @@ export default function GameSettings($container, connWsManager) {
                 const type = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
                 const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
                 // 웹 소켓 생성
-                const gameWs = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
+                const gameWs = new WebSocket(`wss://${BACKEND}/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
                 gameWs.onopen = function (event) {
                     console.log("게임 웹 소켓 생성 완료");
                     const data = { "gameWsManager": new WebSocketManager(gameWs), "connWsManager": connWsManager };

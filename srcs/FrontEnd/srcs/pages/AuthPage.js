@@ -32,7 +32,7 @@ export default function AuthPage($container) {
         console.log("[ sendAuthorizationCode ] 인증 코드 추출 : ", authorization_code);
 
         // 백엔드로 전송
-        fetch(`${BACKEND}/login/${provider}/callback/`, {
+        fetch(`https://${BACKEND}/api/login/${provider}/callback/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export default function AuthPage($container) {
                     new ErrorPage($container, response.status);
                 } else {
                     console.log("[ sendAuthorizationCode ] 토큰 발급 성공");
-                    const connWs = new WebSocket(`wss://127.0.0.1/ws/connect/?token=${getCookie('access_token')}`);
+                    const connWs = new WebSocket(`wss://${BACKEND}/ws/connect/?token=${getCookie('access_token')}`);
                     const connWsManager = new WebSocketManager(connWs);
                     connWs.onopen = function(event) {
                         console.log("웹 소켓 생성 완료");
