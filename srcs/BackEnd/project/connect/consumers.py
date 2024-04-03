@@ -162,10 +162,19 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         sender = event['sender']
         message = event['message']
         
+        sender_user = await database_sync_to_async(User.objects.get)(id=sender)
+        sender_nick = sender_user.nickname
+        
+        sender_client = await database_sync_to_async(Client.objects.filter(user__id=sender).first)()
+        sender_game = await database_sync_to_async(Game.objects.filter(players__client=sender_client).first)() if sender_client else None
+        user_client = await database_sync_to_async(Client.objects.filter(user=user).first)()
+        user_game = await database_sync_to_async(Game.objects.filter(players__client=user_client).first)() if user_client else None
+        
         is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
-        if not is_blocked:
-            sender_user = await database_sync_to_async(User.objects.get)(id=sender)
-            sender_nick = sender_user.nickname
+        if is_blocked:
+            return
+        
+        if sender_game == user_game:
             await self.send(text_data=json.dumps({
                 "type": "all_chat",
                 "sender": sender_nick,
