@@ -10,6 +10,7 @@ import { WebSocketManager } from "../../utils/webSocketManager.js";
 import InviteModal from "../../pages/InviteModal.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 import DuplicateInviteAlert from "../../pages/DuplicateInviteAlert.js";
+import AlreadyInGameAlert from "../../pages/AlreadyInGameAlert.js";
 
 /**
  * @param { HTMLElement } $container
@@ -129,6 +130,9 @@ export default function UserList($container, connWsManager) {
             .catch(error => {
                 if (error.status === 400) {
                     new DuplicateInviteAlert($container);
+                } 
+                else if (error.status === 403) {
+                    new AlreadyInGameAlert($container);
                 } else {
                     console.error("[ InviteUser ] " , error);
                 }
