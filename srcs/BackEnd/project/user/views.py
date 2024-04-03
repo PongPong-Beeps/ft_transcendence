@@ -126,25 +126,6 @@ class ChangeNicknameView(APIView):
             return Response({"error": "닉네임은 2자 이상 8자 이하"}, status=402)
         elif not new_nickname.isalnum(): #isalnum 숫자, 알파벳으로만 이루어졌는지 확인하는 파이썬 내장함수
             return Response({"error": "닉네임은 숫자와 알파벳만 사용"}, status=403)
-        if user.image_file : #db에 저장된 이미지가 있으면
-            old_file_path = user.image_file.name
-            new_file_path = old_file_path.replace(user.nickname, new_nickname)
-            
-            try :
-                # 파일의 내용을 읽습니다.
-                old_file = default_storage.open(old_file_path, 'rb')
-                old_file_content = old_file.read()
-
-                # 새 파일 경로에 내용을 쓰고, 기존 파일 및 폴더를 삭제합니다.
-                default_storage.save(new_file_path, ContentFile(old_file_content))
-                default_storage.delete(old_file_path) # 기존 이미지 파일 삭제
-                parsed = old_file_path.split('/')
-                os.rmdir('/'.join(parsed[:2])) # 기존 닉네임 폴더 삭제 (폴더가 비어있어야 삭제 가능)
-            
-                user.image_file = new_file_path
-                user.save()
-            except Exception as e:
-                print("닉네임 변경중 기존 이미지 저장 폴더 변경시 생긴 에러: ", e)
         user.nickname = new_nickname
         user.save()
         return Response({"message": f"닉네임이 {new_nickname}으로 변경되었습니다."}, status=200)
@@ -288,10 +269,10 @@ class ChangeImageView(APIView):
             user = User.objects.get(id=user_id)
             image = request.data.get('image') # body내 key값이 'image'인 value를 가져옴
             # resize_image(image, 150, 150) # 이미지 리사이징 (150x150으로 리사이징) 추후 필요 # django-imagekit 라이브러리 활용
-            if ('user_images/' + user.nickname + '/') in user.image_file.name:
+            if ('user_images/' + str(user.id) + '/') in user.image_file.name:
                 default_storage.delete(user.image_file.name) # 기존 이미지 삭제
             #django컨테이너 내부 WORKDIR / user_images/geonwule/ 에 이미지 저장
-            file_path = default_storage.save('user_images/' + user.nickname + '/' + image.name, ContentFile(image.read()))
+            file_path = default_storage.save('user_images/' + str(user.id) + '/' + image.name, ContentFile(image.read()))
             # ImageField에 파일 경로 저장
             user.image_file = file_path
             user.save()
