@@ -217,7 +217,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                 game_info
         )
         game.is_gameRunning = True
-        await database_sync_to_async(game.save)()
         
     async def game_start(self, event):
         await self.send(text_data=json.dumps(event))
@@ -305,12 +304,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         )
         
         await asyncio.sleep(5) #빵빠레 띄우는 시간
-        game.is_gameRunning = False
-        await database_sync_to_async(game.save)()
-        await database_sync_to_async(game.check_full)()
-        await self.channel_layer.group_send(
-                self.room_group_name, { "type": "game_status" }
-        )
+        await database_sync_to_async(game.delete)()
         
     async def game_end(self, event):
         await self.send(text_data=json.dumps(event))
