@@ -1,5 +1,4 @@
 import Chat from "../components/Chat.js";
-import DisplayBoard from "../components/DisplayBoard.js";
 import GameSettings from "../components/game-settings/GameSettings.js";
 import UserList from "../components/user-list/UserList.js";
 import LoginPage from "../pages/LoginPage.js";
@@ -15,5 +14,5 @@ export const routes = [
     {path: /^\/lobby$/, layout: "grid", components: { menu: UserList, main: GameSettings, footer: Chat }},
     {path: /^\/practice$/, layout: "grid", components: { menu: UserList, main: Practice, footer: Chat }},
     {path: /^\/game-room$/, layout: "grid", components: { menu: UserList, main: GameRoom, footer: Chat }},
-    {path: /^\/game$/, layout: "grid", components: { menu: PlayerList, main: Game, footer: DisplayBoard }},
+    {path: /^\/game$/, layout: "grid", components: { menu: PlayerList, main: Game, footer: Chat }},
 ]
