@@ -12,7 +12,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         if isinstance(user, AnonymousUser):
             print("User is anonymous")
-            # await self.close()
+            await self.close()
         else:
             print("user is authenticated:", user)
             
@@ -27,13 +27,6 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             client = await database_sync_to_async(Client.objects.create)(channel_name=self.channel_name, user=user)
             await database_sync_to_async(client.save)()
             print("client created, ", client)
-            
-            # await self.channel_layer.group_add(
-            #     self.room_group_name,
-            #     self.channel_name
-            # )
-            # await self.accept()
-            #동기적인 코드를 비동기적으로 실행하기 위해 database_sync_to_async를 사용 : User, Client, save
             
         await self.channel_layer.group_add(
             self.room_group_name,
