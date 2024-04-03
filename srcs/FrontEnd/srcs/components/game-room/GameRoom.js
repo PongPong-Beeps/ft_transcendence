@@ -6,6 +6,7 @@ import useState from "../../utils/useState.js";
 import UserCell from "../user-list/UserCell.js";
 import {navigate} from "../../utils/navigate.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
+import GameWinner from "../../pages/GameWinner.js";
 
 /**
  * @param {HTMLElement} $container
@@ -75,6 +76,7 @@ export default function GameRoom($container, wsManagers) {
     // 게임방 정보 (타입, 모드, 플레이어 목록, ready 정보)
     gameWsManager.addMessageHandler(function (data) {
         if (data.type === "game_status") {
+            // $container.querySelector('#page').style.display = 'none';
             const gameRoomDetail = $container.querySelector('.game-room-detail');
             if (gameRoomDetail) {
                 gameRoomDetail.innerHTML = `
@@ -89,15 +91,25 @@ export default function GameRoom($container, wsManagers) {
         }
     });
 
+    // 라운드 시작시 메시지  핸들러
+    gameWsManager.addMessageHandler(function (data) {
+        if (data.type === "round_start") {
+            $container.querySelector('#page').style.display = 'none';
+            console.log("라운드 시작");
+            console.log(data);
+        }
+    });
+
     // 게임방 시작 (모두 ready 완료했을 때 게임, 대진표 정보)
     gameWsManager.addMessageHandler(function (data) {
         if (data.type === "game_start") {
             delete data.type;
-            data.additionalData = { "gameWsManager": gameWsManager };
+            // data.additionalData = { "gameWsManager": gameWsManager };
+            data.additionalData = {"wsManagers": wsManagers};
             navigate('game', data);
         }
     });
-
+    
     gameWsManager.addMessageHandler(function (data) {
         if (data.type === "round_ing") {
             $container.querySelector('#page').style.display = 'none';

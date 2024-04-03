@@ -14,6 +14,10 @@ export class WebSocketManager {
     addMessageHandler(handler) {
         this.messageHandlers.push(handler);
     }
+    
+    removeMessageHandler() {
+        this.messageHandlers = [];
+    }
 
     sendMessage(data) {
         this.ws.send(JSON.stringify(data));

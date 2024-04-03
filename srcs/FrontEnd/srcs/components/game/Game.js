@@ -1,5 +1,7 @@
 import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
+import GameWinner from "../../pages/GameWinner.js";
+import { navigate } from "../../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
@@ -9,6 +11,7 @@ export default function Game($container, data) {
      if (hasUndefinedArgs($container, data))
           return;
      
+     const { gameWsManager, connWsManager } = data.additionalData.wsManagers;
      let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
      let players = [], fixCanvas, player_area;
      const paddleColor = '#ffffff', pongColor = '#ffa939', backgroundColor = '#27522d';
@@ -117,17 +120,17 @@ export default function Game($container, data) {
                switch (event.code) {
                     case 'KeyW':
                     case 'ArrowUp':
-                         data.additionalData.gameWsManager.sendMessage({ "type": "paddle", "direction": "up" });
+                         gameWsManager.sendMessage({ "type": "paddle", "direction": "up" });
                          break;
                     case 'KeyS':
                     case 'ArrowDown':
-                         data.additionalData.gameWsManager.sendMessage({ "type": "paddle", "direction": "down" });
+                         gameWsManager.sendMessage({ "type": "paddle", "direction": "down" });
                          break;
                }
           });
      };
 
-     data.additionalData.gameWsManager.addMessageHandler(function (roundData) {
+     gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_start') {
                $container.querySelector('#page').style.display = 'none';
                // 플레이어 정보 저장
@@ -145,11 +148,21 @@ export default function Game($container, data) {
           }
      });
 
-     data.additionalData.gameWsManager.addMessageHandler(function (gameData) {
+     gameWsManager.addMessageHandler(function (gameData) {
           if (gameData.type === 'round_ing') {
                drawGame(gameData.paddles, gameData.balls, gameData.score1, gameData.score2);
           }
      });
+
+
+    // game_end 처리
+    gameWsManager.addMessageHandler(function (gameData) {
+        if (gameData.type === "game_end") {
+            console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~", gameData);
+          gameWsManager.ws.close();
+          new GameWinner($container, gameData, connWsManager);
+        }
+    });
 
      render();
      setupEventListener();
