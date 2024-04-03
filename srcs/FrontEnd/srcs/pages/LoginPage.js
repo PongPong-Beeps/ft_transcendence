@@ -36,7 +36,7 @@ export default function LoginPage($container) {
         };
         const handleLogin = (endpoint) => {
           localStorage.setItem('provider', endpoint);
-          window.location.href = `${BACKEND}/login/${endpoint}/`;
+          window.location.href = `https://${BACKEND}/api/login/${endpoint}/`;
         };
       
         Object.entries(loginButtons).forEach(([selector, endpoint]) => {

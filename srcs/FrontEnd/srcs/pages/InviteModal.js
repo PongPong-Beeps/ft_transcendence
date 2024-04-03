@@ -52,7 +52,7 @@ export default function InviteModal($container, sender, receiver, game_type, gam
 
     const setupEventListener = () => {
         $container.querySelector('#invite-modal-refuse-btn').addEventListener('click', () => {
-            fetchWithAuth(`${BACKEND}/connect/invite/refuse/`, {
+            fetchWithAuth(`https://${BACKEND}/api/connect/invite/refuse/`, {
                 method: 'POST',
                 body: JSON.stringify({
                     sender: sender_id,
@@ -70,7 +70,7 @@ export default function InviteModal($container, sender, receiver, game_type, gam
 
         $container.querySelector('#invite-modal-accept-btn').addEventListener('click', () => {
             $container.querySelector('#page').style.display = 'none';
-            const gameWs = new WebSocket(`wss://127.0.0.1/ws/game/?token=${getCookie('access_token')}&category=invite`);
+            const gameWs = new WebSocket(`wss://${BACKEND}/ws/game/?token=${getCookie('access_token')}&category=invite`);
             gameWs.onopen = function(event) {
                 console.log("초대 모달에서 게임 웹 소켓 생성 완료");
             };

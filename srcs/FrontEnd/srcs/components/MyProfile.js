@@ -48,7 +48,7 @@ export default function MyProfile($container, connWsManager) {
     importCss("assets/css/my-profile.css");
     render();
     setupEventListener();
-    fetchWithAuth(`${BACKEND}/user/me`)
+    fetchWithAuth(`https://${BACKEND}/api/user/me`)
         .then(data => {
             id = data.id;
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
