@@ -183,7 +183,7 @@ def save_db(user_info, config):
     save_user_to_db(user_email, user_nickname)
     user = User.objects.get(email=user_email)
     #(장고 스토리지가 초기화됬거나(추후 volume설정 필요), DB에 이미지 저장이 안되어 있거나 or 프로필 사진을 변경안하고 카카오 프로필 이미지를 쓸경우는) 로그인 할때마다 프로필 이미지로 업데이트
-    if not default_storage.exists('user_images/' + user_nickname) or not user.image_file or config['type'] + '.jpg' in user.image_file.name.split('/')[2]:
+    if not default_storage.exists('user_images/' + str(user.id)) or not user.image_file or config['type'] + '.jpg' in user.image_file.name.split('/')[2]:
         if config['type'] == 'kakao' :
             image_url = user_info.get('data', {}).get('properties', {}).get('profile_image')
         elif config['type'] == 'google' :
@@ -192,10 +192,10 @@ def save_db(user_info, config):
             image_url = user_info.get('data', {}).get('image', {}).get('versions', {}).get('small')
         response = requests.get(image_url) #이미지 url get 요청으로 받아오기
         if response.status_code == 200:
-            if ('user_images/' + user_nickname + '/') in user.image_file.name: #기존 이미지가 있으면 삭제
+            if ('user_images/' + str(user.id) + '/') in user.image_file.name: #기존 이미지가 있으면 삭제
                 default_storage.delete(user.image_file.name)
             #이미지 장고 스토리지에 저장
-            file_path = default_storage.save('user_images/' + user_nickname + '/' + config['type'] + '.jpg', ContentFile(response.content))
+            file_path = default_storage.save('user_images/' + str(user.id) + '/' + config['type'] + '.jpg', ContentFile(response.content))
             user.image_file = file_path #이미지 경로 db에 저장
             user.save()
     return user
