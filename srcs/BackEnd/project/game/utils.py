@@ -1,6 +1,6 @@
 from channels.db import database_sync_to_async
 from user.views import get_image
-from .models import Ball, Paddle
+from .models import Ball, Paddle, Item
 from user.models import MatchHistory
 
 async def serialize_player(player):
@@ -52,10 +52,18 @@ def generate_round_info(round, mode):
     if not round:
         return {"error": "Player or round information is missing."}
     
-    # item = None
-    
-    # if round.item is not None: #hard모드일때만 item이 생김
-        # item = { "x": round.item.x, "y": round.item.y }
+    balls = []
+    for ball in round.balls:
+        serialized_ball = {
+            "x": ball.x,
+            "y": ball.y,
+            "radius": ball.radius
+        }
+        balls.append(serialized_ball)
+        
+    item = None
+    if round.item is not None: #hard모드일때만 item이 생김
+        item = { "x": round.item.x, "y": round.item.y }
     
     game_info = {
         "type": "round_ing",
@@ -63,19 +71,16 @@ def generate_round_info(round, mode):
             {
                 "paddle": {"x": round.paddle_1.x, "y": round.paddle_1.y, "height": round.paddle_1.height},
                 "heart": round.heart_1,
-                # "item": round.slot_1, # True or False
+                "item": round.slot_1.status,
             },
             {
                 "paddle": {"x": round.paddle_2.x, "y": round.paddle_2.y, "height": round.paddle_2.height},
                 "heart": round.heart_2,
-                # "item": round.slot_2, # True or False
+                "item": round.slot_2.status,
             }
         ],
-        "balls": [
-            {"x": round.ball_1.x, "y": round.ball_1.y, "radius": round.ball_1.radius, "type": "default"},
-            # {"x": 0.0, "y": 0.0, "radius": 0.0, "type": "optional"},
-        ],
-        # "item": item, # 없으면 null
+        "balls": balls,
+        "item": item,
     }
     
     return game_info

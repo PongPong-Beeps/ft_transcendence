@@ -162,7 +162,7 @@ class Paddle():
         #패들 고정값
         self.width = 10
         self.height = 150
-        self.speed = 10
+        self.speed = 5
         self.player_area = 25
     
     async def change_direction(self, key):
@@ -177,27 +177,52 @@ class Paddle():
             self.y = min(self.y + self.speed, canvas_height - self.height)
 
 class Ball:
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.dirX, self.dirY = self.get_random_direction()
+    def __init__(self, radius=5, speed=1, to='random', WIDTH=500, HEIGHT=500):
+        self.x = WIDTH/2
+        self.y = HEIGHT/2
+        self.dirX, self.dirY = self.get_random_direction(to)
         self.is_ball_moving = False
         
         #볼 고정값
-        self.radius = 5
-        self.speed = 5
+        self.radius = radius
+        self.speed = speed
 
-    def get_random_direction(self):
+    def get_random_direction(self, to='random'):
         # 20도에서 40도를 라디안으로 변환
         min_angle = 20 * math.pi / 180
         max_angle = 40 * math.pi / 180
+        
         # 랜덤 각도 생성
         angle = random.uniform(min_angle, max_angle)
-        # 무작위로 방향 뒤집기
-        dirX = math.cos(angle) * (1 if random.random() < 0.5 else -1)
-        dirY = math.sin(angle) * (1 if random.random() < 0.5 else -1)
+        
+        if to == 'player_1':
+            dirX = -math.cos(angle)
+            dirY = -math.sin(angle)
+        elif to == 'player_2':
+            dirX = math.cos(angle)
+            dirY = -math.sin(angle)
+        else: #random
+            dirX = math.cos(angle) * (1 if random.random() < 0.5 else -1)
+            dirY = math.sin(angle) * (1 if random.random() < 0.5 else -1)
+        
         return dirX, dirY
 
+#Ball클래스 상속
+class Item:
+    def __init__(self, to='random', WIDTH=500, HEIGHT=500):
+        self.x = WIDTH/2
+        self.y = HEIGHT/2
+        self.dirX, self.dirY = Ball().get_random_direction(to)
+        self.radius = 30
+        self.speed = 2.5
+        
+class Slot:
+    def __init__(self):
+        self.status = False
+    
+    def __str__(self):
+        return str(self.status)
+        
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
     
@@ -208,11 +233,15 @@ class Round(models.Model):
     paddle_1 = Paddle()
     paddle_2 = Paddle()
     
-    ball_1 = Ball()
-    ball_2 = Ball()
+    balls = [ Ball() ]
     
-    heart_1 = models.IntegerField(default=5)
-    heart_2 = models.IntegerField(default=5)
+    item = None
+        
+    slot_1 = Slot()
+    slot_2 = Slot()
+    
+    heart_1 = models.IntegerField(default=10)
+    heart_2 = models.IntegerField(default=10)
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')

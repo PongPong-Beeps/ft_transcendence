@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Game, Player
+from .models import Game, Player, Ball, Paddle
 from channels.db import database_sync_to_async
 from connect.models import Client
 from user.views import get_image #이미지를 가져오는 함수
@@ -12,6 +12,7 @@ from .utils import serialize_player, serialize_round_players, serialize_fixed_da
 from .game_logic import update, init_game_objects
 import asyncio
 from asyncio import Event
+import random
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -142,6 +143,69 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif type == 'paddle':
             direction = text_data_json.get("direction")
             asyncio.create_task(self.move_paddle(self.scope['user'], direction))
+        elif type == 'item':
+            asyncio.create_task(self.using_item(self.scope['user']))
+    
+    async def get_player_number(self, round, user):
+        if round is None:
+            print("get_player_number: round is None")
+            return None
+        player_num = None
+        players = await database_sync_to_async(round.get_players)()
+        for i, player in enumerate(players):
+            if player == user:
+                if i == 0:
+                    player_num = 1
+                else:
+                    player_num = 2
+                break
+        return player_num
+ 
+    async def using_item(self, user):
+        game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        round = await database_sync_to_async(game.get_next_round)()
+        player_num = await self.get_player_number(round, user)
+        
+        if player_num == 1 and round.slot_1.status:
+            to = 'player_2'
+            round.slot_1.status = False #슬롯 비워주기
+        elif player_num == 2 and round.slot_2.status:
+            to = 'player_1'
+            round.slot_2.status = False #슬롯 비워주기
+        else: #플레이어가 아니거나, 슬롯에 아이템이 없을 경우
+            print("player is not in the round or slot is empty")
+            return
+
+        #b_add(공추가)는 1/11 확률, b_up(공속도업), p_down(패들크기줄이기)는 각 5/11확률
+        item_type = random.choice(["b_add"] * 5 + ["b_up", "p_down"] * 5)
+
+        balls=round.balls
+        ball=round.balls[0]
+
+        if item_type == 'b_up': # 공속도 업 (최대 기본 속도 x 4)
+            ball.speed = ball.speed + 2 if ball.speed < Ball().speed * 10 else ball.speed
+        elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
+            balls.append(Ball(10, 0.5, to))
+        elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
+            if to == 'player_1':
+                round.paddle_1.height = round.paddle_1.height - (Paddle().height / 5 * 1) if round.paddle_1.height > Paddle().height / 5 * 1 else round.paddle_1.height
+            elif to == 'player_2':
+                round.paddle_2.height = round.paddle_2.height - (Paddle().height / 5 * 1) if round.paddle_2.height > Paddle().height / 5 * 1 else round.paddle_2.height
+        
+        # await database_sync_to_async(round.save)()
+        
+        await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "item",
+                    "nickname": user.nickname,
+                    "item_type": item_type,
+                }
+        )
+        print("item used")
+        
+    async def item(self, event):
+        await self.send(text_data=json.dumps(event))   
             
     async def move_paddle(self, user, direction):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
