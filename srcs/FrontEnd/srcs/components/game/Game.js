@@ -80,7 +80,7 @@ export default function Game($container, data) {
                let playerPos = { "x" : (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2)};
                drawPlayerPaddle(paddle, playerData[index].image, playerPos);
                // 점수, 아이템
-               drawHeart(index, player.heart);
+               drawItemHeart(index, player.item, player.heart);
           });
           balls.forEach((ball, index) => {
                let ballPos = { "x": adjustScale(ball.x, 'x'), "y": adjustScale(ball.y, 'y') };
@@ -100,11 +100,23 @@ export default function Game($container, data) {
           gameCtx.drawImage(playerImage, playerPos.x, playerPos.y, playerArea, playerArea);
      };
 
-     const drawHeart = (index, heart) => {
-          const playerHeartContainer = $container.querySelector(`#player${index + 1}`);
-          playerHeartContainer.innerHTML = '';
+     const drawItemHeart = (index, item, heart) => {
+          const playerInfoContainer = $container.querySelector(`#player${index + 1}`);
+          playerInfoContainer.innerHTML = '';
+          let heartsHTML = '';
+          let itemHTML = data.game_mode === 'hard' // 아이템 모드일 때만 슬롯 표시
+              ? item ? '<img src="../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
+                  : '<img src="../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />'
+              : '';
+
           for (let i = 0; i < heart; i++) {
-               playerHeartContainer.innerHTML += '<img src="../../assets/image/heart.png" style="height: 30px;" />';
+               heartsHTML += '<img src="../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
+          }
+
+          if (index === 0) {
+               playerInfoContainer.innerHTML = itemHTML + heartsHTML;
+          } else {
+               playerInfoContainer.innerHTML = heartsHTML + itemHTML;
           }
      }
 
