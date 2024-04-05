@@ -14,9 +14,15 @@ export default function Header($container, connWsManager) {
             header.innerHTML = `
                 <div id="header-container">
                     <img src="../../assets/image/logo.png" alt="logo">
-                    <button id="logout-btn" class="non-outline-btn">
-                        <span id="logout-icon"></span>
-                    </button>
+                    <div id="header-button-container">
+                        <button id="help-btn" class="non-outline-btn">
+                            <span id="help-icon"></span>
+                            <div id="guide-image"></div>
+                        </button>
+                        <button id="logout-btn" class="non-outline-btn">
+                            <span id="logout-icon"></span>
+                        </button>
+                    </div>
                 </div>
             `;
         }
