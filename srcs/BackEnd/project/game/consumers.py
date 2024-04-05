@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth.models import AnonymousUser
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Game, Player, Ball, Paddle
+from .models import Game, Player, Ball, Paddle, GameInfo
 from channels.db import database_sync_to_async
 from connect.models import Client
 from user.views import get_image #이미지를 가져오는 함수
@@ -15,6 +15,10 @@ from asyncio import Event
 import random
 
 class GameConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.gameinfo = None
+
     async def connect(self):
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
@@ -145,6 +149,16 @@ class GameConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(self.move_paddle(self.scope['user'], direction))
         elif type == 'item':
             asyncio.create_task(self.using_item(self.scope['user']))
+        elif type == 'test':
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "test"}
+            )
+            # asyncio.create_task(self.test(self.scope['user']))
+            
+    async def test(self, user):
+        print("received test")
+        if self.gameinfo:
+            self.gameinfo.heart_1 -= 1
     
     async def get_player_number(self, round, user):
         if round is None:
@@ -241,6 +255,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if all_ready:
             print("All players are ready. Starting the game...")
             asyncio.create_task(self.process_game(game))
+            self.gameinfo = GameInfo()
         else:
             print("Not all players are ready.")
     
@@ -329,15 +344,17 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             { "type": "round_start" }
         )
-        await database_sync_to_async(init_game_objects)(round, mode)
-        while not round.is_roundEnded:
-            await database_sync_to_async(update)(round, mode)
-            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode)
-            await self.channel_layer.group_send(
-                    self.room_group_name,
-                    round_ing_info
-            )
-            await asyncio.sleep(0.01) #게임 속도 조절을 위한 sleep
+        while True :
+            await database_sync_to_async(init_game_objects)(self.gameinfo)
+        # await database_sync_to_async(init_game_objects)(round, mode)
+        # while not round.is_roundEnded:
+        #     await database_sync_to_async(update)(round, mode)
+        #     round_ing_info = await database_sync_to_async(generate_round_info)(round, mode)
+        #     await self.channel_layer.group_send(
+        #             self.room_group_name,
+        #             round_ing_info
+        #     )
+        #     await asyncio.sleep(0.01) #게임 속도 조절을 위한 sleep
         print("round is end = ", round) #test code
     
     async def round_start(self, event):

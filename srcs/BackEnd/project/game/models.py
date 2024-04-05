@@ -5,7 +5,7 @@ from user.views import get_image
 from user.models import User
 import random
 import math
-
+from typing import Optional
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
     is_ready = models.BooleanField(default=False)
@@ -231,27 +231,49 @@ class Sound:
         self.b_up = False #ball 속도 증가
         self.p_down = False #paddle 길이 감소
 
+class GameInfo:
+    balls: Ball
+    paddle_1: Paddle
+    paddle_2: Paddle
+
+    # def __init__(self, balls: Ball, paddle_1: Paddle, paddle_2: Paddle):
+    #     self.ball_1 = balls
+    #     self.paddle_1 = paddle_1
+    #     self.paddle_2 = paddle_2
+
+
+    def __init__(self):
+        self.sound = Sound()
+        self.paddle_1 = Paddle()
+        self.paddle_2 = Paddle()
+        self.balls = [ Ball() ]
+        self.slot_1 = Slot()
+        self.slot_2 = Slot()
+        self.heart_1 = 5
+        self.heart_2 = 5
+
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
     
     #서버 로직 계산을 위한 고정 크기
     width = 500
     height = 500
-    
-    sound = Sound()
-    
-    paddle_1 = Paddle()
-    paddle_2 = Paddle()
-    
-    balls = [ Ball() ]
-    
     item = None
-        
-    slot_1 = Slot()
-    slot_2 = Slot()
     
-    heart_1 = models.IntegerField(default=10)
-    heart_2 = models.IntegerField(default=10)
+    
+    # sound = Sound()
+    
+    # paddle_1 = Paddle()
+    # paddle_2 = Paddle()
+    
+    # balls = [ Ball() ]
+    
+        
+    # slot_1 = Slot()
+    # slot_2 = Slot()
+    
+    # heart_1 = models.IntegerField(default=10)
+    # heart_2 = models.IntegerField(default=10)
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')

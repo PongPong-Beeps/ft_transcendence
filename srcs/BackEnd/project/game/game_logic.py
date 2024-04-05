@@ -6,7 +6,19 @@ def set_ball_moving(round):
     ball = round.balls[0]
     ball.is_ball_moving = True
 
-def init_game_objects(round, mode):
+# def init_game_objects(round, mode):
+def init_game_objects(gameinfo):
+    print("gameinfo: ", gameinfo)
+    print("heart1 : ", gameinfo.heart_1)
+    # print("paddle_1 x : ", gameinfo.paddle_1.x)
+    # print("paddle_2 x : ", gameinfo['paddle_2']['x'])
+    # print("paddle_1 y : ", gameinfo.paddle_1.y)
+    # print("paddle_2 y : ", gameinfo['paddle_2']['y'])
+    # print("ball x : ", gameinfo['balls'][0]['x'])
+    # print("ball y : ", gameinfo['balls'][0]['y'])
+    # print("ball dirX : ", gameinfo['balls'][0]['dirX'])
+    # print("ball dirY : ", gameinfo['balls'][0]['dirY'])
+    return
     WIDTH = round.width
     HEIGHT = round.height
     
