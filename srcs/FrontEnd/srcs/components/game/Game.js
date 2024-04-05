@@ -129,6 +129,22 @@ export default function Game($container, data) {
           gameCtx.closePath();
      };
 
+     const drawText = (text, clear = false) => {
+          gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+          if (clear) return;
+          gameCtx.font = '2vw DNF Bit Bit v2';
+          gameCtx.fillStyle = '#ffffff';
+          gameCtx.strokeStyle = '#5C7320';
+          gameCtx.lineWidth = 2;
+          gameCtx.textAlign = 'center';
+          const lines = text.split('\n');
+          const lineHeight = gameCtx.measureText('M').width * 1.5; // Increase line height
+          lines.forEach((line, i) => {
+              gameCtx.fillText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight);
+              gameCtx.strokeText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight); // Draw border
+          });
+      };
+
      const render = () => {
           const main = $container.querySelector('#main');
           if (!main) return;
@@ -173,6 +189,7 @@ export default function Game($container, data) {
      gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_ready') {
                // 플레이어 정보 저장
+               $container.querySelector('#page').style.display = 'none';
                playerData = []; // 빈 배열로 초기화
                roundData.player_data.map(player => {
                     let image = new Image();
@@ -187,13 +204,13 @@ export default function Game($container, data) {
                itemRadius = adjustScale(roundData.fix.item_radius, 'x');
                // 배경 그리기
                drawBackground();
+               drawText("곧 게임이 시작됩니다");
           }
      });
 
      gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_start') {
-               // 대진표 아웃 !
-               $container.querySelector('#page').style.display = 'none';
+               drawText('', true);
           }
      });
 
@@ -202,6 +219,12 @@ export default function Game($container, data) {
                drawGame(gameData.players, gameData.balls, gameData.item);
           }
      });
+
+     gameWsManager.addMessageHandler(function (roundData) {
+          if (roundData.type === 'round_end') {
+               drawText(`${roundData.winner.nickname}님이\n 이겼습니다.`);
+          }
+     })
 
      gameWsManager.addMessageHandler(function (gameData) {
           if (gameData.type === 'item') {
@@ -213,6 +236,7 @@ export default function Game($container, data) {
      gameWsManager.addMessageHandler(function (gameData) {
           if (gameData.type === "game_end") {
                gameWsManager.ws.close();
+               drawText('', true);
                new GameWinner($container, gameData, connWsManager);
           }
      });
