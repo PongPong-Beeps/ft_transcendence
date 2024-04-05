@@ -13,8 +13,9 @@
 
 .game-info-container {
     display: flex;
-    flex-direction: column;
-    margin: 10px 50px;
+    color: white;
+    font-size: 1em;
+    justify-content: space-evenly;
 }
 
 .game-player-nickname-container {
@@ -42,6 +43,12 @@
     justify-content: flex-end;
 }
 
+.game-title-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 50px;
+}
+
 .game-back-btn {
     border: none;
     background-color: transparent;
@@ -63,13 +70,6 @@
 
 .game-mode-btn.selected {
     background-color: #8DAA4E;
-}
-
-.game-info-container {
-    display: flex;
-    color: white;
-    font-size: 1em;
-    justify-content: space-evenly;
 }
 
 .game-canvas-container {
