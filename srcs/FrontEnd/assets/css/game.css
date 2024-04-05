@@ -20,14 +20,25 @@
 
 .game-player-nickname-container {
     color: white;
-    font-size: 1em;
+    font-size: 1.2em;
     display: flex;
     justify-content: space-evenly;
 }
 
 .game-player-info-container {
-    background-color: #e73c7e;
-    height: 50px;
+    height: 30px;
+}
+
+.game-player-info-container > div {
+    display: flex;
+}
+
+#player1 {
+    justify-content: flex-start;
+}
+
+#player2 {
+    justify-content: flex-end;
 }
 
 .game-back-btn {

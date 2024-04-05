@@ -80,6 +80,7 @@ export default function Game($container, data) {
                let playerPos = { "x" : (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2)};
                drawPlayerPaddle(paddle, playerData[index].image, playerPos);
                // 점수, 아이템
+               drawHeart(index, player.heart);
           });
           balls.forEach((ball, index) => {
                let ballPos = { "x": adjustScale(ball.x, 'x'), "y": adjustScale(ball.y, 'y') };
@@ -98,6 +99,14 @@ export default function Game($container, data) {
           gameCtx.fillRect(paddle.x, paddle.y, paddleWidth, paddle.height);
           gameCtx.drawImage(playerImage, playerPos.x, playerPos.y, playerArea, playerArea);
      };
+
+     const drawHeart = (index, heart) => {
+          const playerHeartContainer = $container.querySelector(`#player${index + 1}`);
+          playerHeartContainer.innerHTML = '';
+          for (let i = 0; i < heart; i++) {
+               playerHeartContainer.innerHTML += '<img src="../../assets/image/heart.png" style="height: 30px;" />';
+          }
+     }
 
      const drawBall = (ballPos, radius, color) => {
           gameCtx.beginPath();
