@@ -80,7 +80,8 @@ export default function GameRoom($container, wsManagers) {
             const gameRoomDetail = $container.querySelector('.game-room-detail');
             if (gameRoomDetail) {
                 gameRoomDetail.innerHTML = `
-                    타입:<img style="width: 30px" src="../../../assets/image/${data.game_type}.png" alt="type">  모드: ${data.game_mode}
+                    타입:<img style="height: 30px" src="../../../assets/image/${data.game_type}.png" alt="type">  
+                    모드:<img style="height: 30px" src="../../../assets/image/${data.game_mode}.png" alt="mode">
                 `;
             }
             if (data.game_type === 'one_to_one') {
