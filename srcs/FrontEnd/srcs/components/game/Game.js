@@ -201,11 +201,16 @@ export default function Game($container, data) {
                          break;
                }
           });
+
+          document.addEventListener('leave-game', () => {
+               fadeOutAudio(bgm_game, 1000);
+          });
      };
 
      gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_ready') {
                // 플레이어 정보 저장
+               fadeOutAudio(bgm_versus, 3000);
                $container.querySelector('#page').style.display = 'none';
                playerData = []; // 빈 배열로 초기화
                roundData.player_data.map(player => {
@@ -228,7 +233,6 @@ export default function Game($container, data) {
      gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_start') {
                // 대진표 아웃 !
-               fadeOutAudio(bgm_versus, 1000);
                $container.querySelector('#page').style.display = 'none';
                bgm_game.play();
                drawText('', true);
