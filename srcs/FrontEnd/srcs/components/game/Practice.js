@@ -1,8 +1,14 @@
 import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
+import fadeOutAudio from "../../utils/audio.js";
 
 export default function Practice($container, connWsManager) {
+    let bgm_game = new Audio("../../../assets/sound/bgm_game.mp3");
+    let audio_pong = new Audio("../../../assets/sound/pong.mp3");
+    let audio_out = new Audio("../../../assets/sound/out.mp3");
+    let playerImage = new Image();
+
     let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
-    let paddle, pong, player1, player2, balls, playerImage = new Image(), playerArea = 50;
+    let paddle, pong, player1, player2, balls, playerArea = 50;
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
     let isBallMoving;
     let gameMode = 'easy'; // 기본 게임 모드를 'easy'로 설정
@@ -33,6 +39,9 @@ export default function Practice($container, connWsManager) {
         pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.015, color: '#ffa939' };
         // 이미지 초기화
         playerImage.src = "../../assets/image/character.png";
+        // 배경 음악 초기화
+        bgm_game.volume = 0.3;
+        bgm_game.play();
     }
 
     function getRandomDirection() {
@@ -94,6 +103,7 @@ export default function Practice($container, connWsManager) {
 
     const resetPosition = () => {
         isBallMoving = false;
+        audio_out.play();
         initGameObjects(); // 위치만 재설정, 점수는 유지
 
         setTimeout(() => {
@@ -125,6 +135,7 @@ export default function Practice($container, connWsManager) {
             // 벽 충돌 검사
             if (ball.y + pong.radius > gameCanvas.height || ball.y - pong.radius < 0) {
                 ball.dirY = -ball.dirY; // Y 방향 반전
+                audio_pong.play();
             }
             // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
             if (ball.x - pong.radius < playerArea) { // 왼쪽 벽에 충돌
@@ -142,6 +153,7 @@ export default function Practice($container, connWsManager) {
                 && ball.y + pong.radius >= nearestPlayer.y) {
                 ball.dirX = -ball.dirX; // X 방향 반전
                 ball.x += ball.dirX;
+                audio_pong.play();
             }
         });
     };
@@ -217,6 +229,8 @@ export default function Practice($container, connWsManager) {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
+                cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
+                fadeOutAudio(bgm_game, 1000);
                 new ExitConfirmationAlert($container, { "connWsManager": connWsManager });
             });
         }
