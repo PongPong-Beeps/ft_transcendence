@@ -222,13 +222,23 @@ class Slot:
     
     def __str__(self):
         return str(self.status)
-        
+
+class Sound:
+    def __init__(self):
+        self.pong = False
+        self.item = False
+        self.b_add = False #ball 추가
+        self.b_up = False #ball 속도 증가
+        self.p_down = False #paddle 길이 감소
+
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
     
     #서버 로직 계산을 위한 고정 크기
     width = 500
     height = 500
+    
+    sound = Sound()
     
     paddle_1 = Paddle()
     paddle_2 = Paddle()

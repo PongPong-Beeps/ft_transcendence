@@ -91,9 +91,10 @@ def update(round, mode):
         #벽 충돌 검사(맵 상단, 하단)
         if ball.y + ball.radius > HEIGHT or ball.y - ball.radius < 0:
             ball.dirY = -ball.dirY
+            round.sound.pong = True
 
         ball_type = 'basic' if i == 0 else 'additional'
-            
+
         #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
         if ball.x - ball.radius < Paddle().player_area\
             or ball.x + ball.radius > WIDTH - Paddle().player_area:
@@ -103,10 +104,12 @@ def update(round, mode):
                 round.heart_1 -= 1
                 round.save()
                 init_game_objects(round, mode)
+                round.sound.pong = True
             elif ball.x + ball.radius > WIDTH - Paddle().player_area:
                 round.heart_2 -= 1
                 round.save()
                 init_game_objects(round, mode)
+                round.sound.pong = True
                 
         #패들 충돌검사
         nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]
@@ -117,8 +120,10 @@ def update(round, mode):
             if ball_type == 'basic':
                 ball.dirX = -ball.dirX
                 ball.x += ball.dirX * 2 #볼이 패들을 타는 버그 방지
+                round.sound.pong = True
             elif ball_type == 'additional':
                 balls.remove(ball)
+                round.sound.pong = True
                 continue
 
 def update_item(round):
@@ -154,6 +159,7 @@ def update_item(round):
        and item.x + item.radius >= nearest_paddle.x\
        and item.y - item.radius <= nearest_paddle.y + nearest_paddle.height\
        and item.y + item.radius >= nearest_paddle.y:
+       round.sound.item = True
        if paddle_idx == 'paddle_1':
             round.slot_1.status = True
        else:
