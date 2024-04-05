@@ -97,7 +97,6 @@ export default function GameRoom($container, wsManagers) {
             delete data.type;
             data.additionalData = { "wsManagers": wsManagers };
             navigate('game', data);
-            new VsSchedule($container, data.round_data);
         }
     });
     

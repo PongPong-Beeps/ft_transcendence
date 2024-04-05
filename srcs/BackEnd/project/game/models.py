@@ -250,8 +250,8 @@ class Round(models.Model):
     slot_1 = Slot()
     slot_2 = Slot()
     
-    heart_1 = models.IntegerField(default=10)
-    heart_2 = models.IntegerField(default=10)
+    heart_1 = models.IntegerField(default=5)
+    heart_2 = models.IntegerField(default=5)
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')

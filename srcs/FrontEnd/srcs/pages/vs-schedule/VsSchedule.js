@@ -9,6 +9,7 @@ import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 export default function VsSchedule($container, roundData) {
     if (hasUndefinedArgs($container, roundData))
         return;
+
     const createPlayerCard = (player) => VsScheduleUserCard(player.nickname, `data:image/png;base64,${player.image}`);
     const createVsText = (index, round) => index < round.length - 1 ? '<div class="vs-text">vs</div>' : '';
     const createRound = (round) => round.map((player, index) => `${createPlayerCard(player)}${createVsText(index, round)}`).join('');

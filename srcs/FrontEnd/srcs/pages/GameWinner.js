@@ -1,10 +1,13 @@
 import hasUndefinedArgs from "../utils/hasUndefinedArgs.js";
 import { importCss } from "../utils/importCss.js";
 import { navigate } from "../utils/navigate.js";
+import fadeOutAudio from "../utils/audio.js";
 
 export default function GameWinner($container, gameData, connWsManager) {
     if (hasUndefinedArgs($container, gameData, connWsManager))
         return;
+
+    let bgm_room = new Audio("../../../assets/sound/bgm_room.mp3");
     const image = 'data:image/jpeg;base64,' + gameData.winner.image;
     const nickname = gameData.winner.nickname;
     const render = () => {
@@ -33,6 +36,7 @@ export default function GameWinner($container, gameData, connWsManager) {
         const moveButton = $container.querySelector('#move-button');
         if (moveButton) {
             moveButton.addEventListener('click', () => {
+                fadeOutAudio(bgm_room, 1000);
                 navigate('lobby', connWsManager);
                 $container.querySelector('#page').style.display = 'none';
                 const confettiElements = document.querySelectorAll('.confetti');
@@ -56,6 +60,7 @@ export default function GameWinner($container, gameData, connWsManager) {
         }
     }
 
+    bgm_room.play();
     importCss("assets/css/game-winner.css");
     render();
     setupEventListener();

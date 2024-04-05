@@ -1,7 +1,7 @@
 import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 import GameWinner from "../../pages/GameWinner.js";
-import { navigate } from "../../utils/navigate.js";
+import fadeOutAudio from "../../utils/audio.js";
 
 /**
  * @param { HTMLElement } $container
@@ -13,31 +13,39 @@ export default function Game($container, data) {
 
      const { gameWsManager, connWsManager } = data.additionalData.wsManagers;
 
+     let bgm_game = new Audio("../../../assets/sound/bgm_game.mp3");
+     let bgm_versus = new Audio("../../../assets/sound/bgm_versus.mp3");
+     let audio_pong = new Audio("../../../assets/sound/pong.mp3");
+     let audio_out = new Audio("../../../assets/sound/out.mp3");
+     let audio_item = new Audio("../../../assets/sound/item.mp3");
+     let audio_b_up = new Audio("../../../assets/sound/b_up.mp3");
+     let audio_b_add = new Audio("../../../assets/sound/b_add.mp3");
+     let audio_p_down = new Audio("../../../assets/sound/p_down.mp3");
+
      let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
      let itemImage = new Image();
      const paddleColor = '#ffffff', pongColor = '#ffa939', attackBallColor = '#ff396e', backgroundColor = '#27522d';
      let playerData, playerArea, fixWidth, fixHeight, paddleWidth, itemRadius; // round_ready 때 받을 정보
      let currentKey = '';
 
-     const initCanvas = () => {
+     const init = () => {
           const container = $container.querySelector('.game-canvas-container');
           const containerWidth = container.offsetWidth;
           const containerHeight = container.offsetHeight;
-
           // 배경용 캔버스 초기화
           backgroundCanvas = $container.querySelector('#background-canvas');
           backgroundCtx = backgroundCanvas.getContext('2d');
           backgroundCanvas.width = containerWidth;
           backgroundCanvas.height = containerHeight;
-
           // 게임 오브젝트용 캔버스 초기화
           gameCanvas = $container.querySelector('#game-canvas');
           gameCtx = gameCanvas.getContext('2d');
           gameCanvas.width = containerWidth;
           gameCanvas.height = containerHeight;
-
-          // 필요한 이미지 초기화
-          itemImage.src = "../../assets/image/item.png";
+          // 이미지
+          itemImage.src = "../../../assets/image/item.png";
+          // 오디오
+          bgm_game.volume = 0.3;
      }
 
      const drawBackground = () => {
@@ -74,7 +82,7 @@ export default function Game($container, data) {
           }
      }
 
-     const drawGame = (players, balls, item) => {
+     const drawGame = (players, balls, item, sound) => {
           gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           players.forEach((player, index) => {
                let paddle = { "x": adjustScale(player.paddle.x, 'x'), "y": adjustScale(player.paddle.y, 'y'), "height": adjustScale(player.paddle.height, 'y') }
@@ -106,12 +114,12 @@ export default function Game($container, data) {
           playerInfoContainer.innerHTML = '';
           let heartsHTML = '';
           let itemHTML = data.game_mode === 'hard' // 아이템 모드일 때만 슬롯 표시
-              ? item ? '<img src="../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
-                  : '<img src="../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />'
+              ? item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
+                  : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />'
               : '';
 
           for (let i = 0; i < heart; i++) {
-               heartsHTML += '<img src="../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
+               heartsHTML += '<img src="../../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
           }
 
           if (index === 0) {
@@ -128,6 +136,15 @@ export default function Game($container, data) {
           gameCtx.fill();
           gameCtx.closePath();
      };
+
+     const playSound = (sound) => {
+          if (sound.pong) audio_pong.play();
+          if (sound.out) audio_out.play();
+          if (sound.item) audio_item.play();
+          if (sound.b_up) audio_b_up.play();
+          if (sound.b_add) audio_b_add.play();
+          if (sound.p_down) audio_p_down.play();
+     }
 
      const render = () => {
           const main = $container.querySelector('#main');
@@ -193,13 +210,16 @@ export default function Game($container, data) {
      gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_start') {
                // 대진표 아웃 !
+               fadeOutAudio(bgm_versus, 1000);
                $container.querySelector('#page').style.display = 'none';
+               bgm_game.play();
           }
      });
 
      gameWsManager.addMessageHandler(function (gameData) {
           if (gameData.type === 'round_ing') {
                drawGame(gameData.players, gameData.balls, gameData.item);
+               playSound(gameData.sound);
           }
      });
 
@@ -210,6 +230,12 @@ export default function Game($container, data) {
           }
      });
 
+     gameWsManager.addMessageHandler(function (roundData) {
+          if (roundData.type === 'round_end') {
+               fadeOutAudio(bgm_game, 2000);
+          }
+     });
+
      gameWsManager.addMessageHandler(function (gameData) {
           if (gameData.type === "game_end") {
                gameWsManager.ws.close();
@@ -217,7 +243,9 @@ export default function Game($container, data) {
           }
      });
 
+     new VsSchedule($container, data.round_data);
+     bgm_versus.play();
      render();
      setupEventListener();
-     initCanvas();
+     init();
 }
