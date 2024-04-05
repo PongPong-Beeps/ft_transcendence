@@ -374,8 +374,5 @@ class GameConsumer(AsyncWebsocketConsumer):
                 game_info
         )
         
-        await asyncio.sleep(5) #빵빠레 띄우는 시간
-        await database_sync_to_async(game.delete)()
-        
     async def game_end(self, event):
         await self.send(text_data=json.dumps(event))
