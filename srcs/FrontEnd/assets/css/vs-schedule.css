@@ -7,12 +7,11 @@
 .vs-screen {
     display: flex;
     flex-direction: column;
-    /* background-image: url('../image/galaxy.jpg'); */
-    /* background-size: cover; */
     background: linear-gradient(-45deg, #fcf1ee, #e73c7e, #23a6d5, #23d5ab);
     animation: gradient 15s ease infinite;
     background-size: 300% 300%;
     background-position: center;
+    font-family: "DNF Bit Bit v2", serif;
     justify-content: center;
     align-items: center;
     height: 100vh;

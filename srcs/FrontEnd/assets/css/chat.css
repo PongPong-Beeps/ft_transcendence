@@ -14,13 +14,14 @@
 }
 
 #Chat {
-  /* width: 58.5vw; */
   width: 100%;
   height: 26vh;
   padding: 0;
   margin: 0;
   max-width: 100%;
   box-sizing: border-box;
+  font-family: "DNF Bit Bit v2", serif;
+  font-weight: 100;
 }
 
 .chat-box {

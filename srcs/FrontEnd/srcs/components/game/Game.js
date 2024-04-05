@@ -36,6 +36,7 @@ export default function Game($container, data) {
      }
 
      const drawBackground = () => {
+          gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           backgroundCtx.fillStyle = backgroundColor;
           backgroundCtx.fillRect(player_area, 0, backgroundCanvas.width - player_area * 2, backgroundCanvas.height);
           backgroundCtx.strokeStyle = paddleColor;
