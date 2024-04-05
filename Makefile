@@ -21,7 +21,8 @@ delete:
 	rm -rf $(STORAGE_VOLUME)
 
 re:
-	make fclean
+#make fclean
+	make delete
 	make all
 
 .PHONY:

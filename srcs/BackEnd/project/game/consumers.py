@@ -220,10 +220,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         for i, player in enumerate(players):
             if player == user:
                 if i == 0:
-                    await round.paddle_1.change_direction(direction)
+                    # await database_sync_to_async(round.paddle_1.change_direction)(direction)
+                    round.paddle_1.direction = direction
                 else:
-                    await round.paddle_2.change_direction(direction)
+                    # await database_sync_to_async(round.paddle_2.change_direction)(direction)
+                    round.paddle_2.direction = direction
                 print("paddle moved ", round.paddle_1.direction) #test code
+                await database_sync_to_async(round.save)()
                 break
             
     async def ready(self, event):

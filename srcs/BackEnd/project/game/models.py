@@ -5,6 +5,8 @@ from user.views import get_image
 from user.models import User
 import random
 import math
+import pickle
+import redis
 
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
@@ -130,6 +132,7 @@ class Game(models.Model):
                 player2=players[1].client.user
             )
             self.round1 = round1
+            
         elif self.type == "tournament":
             # 'tournament' 게임 타입의 경우 두 개의 Round 인스턴스 생성
             round1 = Round.objects.create(
@@ -165,8 +168,9 @@ class Paddle():
         self.speed = 5
         self.player_area = 25
     
-    async def change_direction(self, key):
+    def change_direction(self, key):
         self.direction = key
+        print("change_direction : ", self.direction)
         
     def move_paddle(self, canvas_height):
         if self.direction == 'stop':
@@ -175,6 +179,8 @@ class Paddle():
             self.y = max(self.y - self.speed, 0)
         elif self.direction == 'down':
             self.y = min(self.y + self.speed, canvas_height - self.height)
+            
+        print("move_paddle : ", self.direction)
 
 class Ball:
     def __init__(self, radius=5, speed=1, to='random', WIDTH=500, HEIGHT=500):
@@ -232,23 +238,7 @@ class Sound:
         self.p_down = False #paddle 길이 감소
 
 class Round(models.Model):
-    is_roundEnded = models.BooleanField(default=False)
-    
-    #서버 로직 계산을 위한 고정 크기
-    width = 500
-    height = 500
-    
-    sound = Sound()
-    
-    paddle_1 = Paddle()
-    paddle_2 = Paddle()
-    
-    balls = [ Ball() ]
-    
-    item = None
-        
-    slot_1 = Slot()
-    slot_2 = Slot()
+    is_roundEnded = models.BooleanField(default=False)    
     
     heart_1 = models.IntegerField(default=10)
     heart_2 = models.IntegerField(default=10)
@@ -259,6 +249,65 @@ class Round(models.Model):
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
     
     created_at = models.DateTimeField(auto_now_add=True)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.is_roundEnded = models.BooleanField(default=False)
+        
+        self.redis = redis.Redis(host='127.0.0.1', port=6379, db=0)
+        
+        #서버 로직 계산을 위한 고정 크기
+        self.width = 500
+        self.height = 500
+    
+        self.sound = Sound()
+    
+        self.paddle_1 = Paddle()
+        self.paddle_2 = Paddle()
+    
+        self.balls = [ Ball() ]
+    
+        self.item = None
+        
+        self.slot_1 = Slot()
+        self.slot_2 = Slot()
+    
+        # self.heart_1 = models.IntegerField(default=10)
+        # self.heart_2 = models.IntegerField(default=10)
+    
+        # self.player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
+        # self.player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
+    
+        # self.winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
+    
+        # self.created_at = models.DateTimeField(auto_now_add=True)
+        
+    # is_roundEnded = models.BooleanField(default=False)
+    
+    #서버 로직 계산을 위한 고정 크기
+    # width = 500
+    # height = 500
+    
+    # sound = Sound()
+    
+    # paddle_1 = Paddle()
+    # paddle_2 = Paddle()
+    
+    # balls = [ Ball() ]
+    
+    # item = None
+        
+    # slot_1 = Slot()
+    # slot_2 = Slot()
+    
+    # heart_1 = models.IntegerField(default=10)
+    # heart_2 = models.IntegerField(default=10)
+    
+    # player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
+    # player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
+    
+    # winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
+    
+    # created_at = models.DateTimeField(auto_now_add=True)
     
     def get_players(self):
         players = []
