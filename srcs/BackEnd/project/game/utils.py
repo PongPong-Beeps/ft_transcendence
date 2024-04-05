@@ -87,10 +87,11 @@ def generate_round_info(round, mode):
             'b_add': round.sound.b_add,
             'b_up': round.sound.b_up,
             'p_down': round.sound.p_down,
+            'out': round.sound.out,
         }
     }
 
-    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down']
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out']
 
     for attr in sound_attributes:
         if getattr(round.sound, attr):

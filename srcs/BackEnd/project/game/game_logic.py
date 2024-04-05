@@ -104,12 +104,12 @@ def update(round, mode):
                 round.heart_1 -= 1
                 round.save()
                 init_game_objects(round, mode)
-                round.sound.pong = True
+                round.sound.out = True
             elif ball.x + ball.radius > WIDTH - Paddle().player_area:
                 round.heart_2 -= 1
                 round.save()
                 init_game_objects(round, mode)
-                round.sound.pong = True
+                round.sound.out = True
                 
         #패들 충돌검사
         nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]

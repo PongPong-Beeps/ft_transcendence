@@ -230,6 +230,7 @@ class Sound:
         self.b_add = False #ball 추가
         self.b_up = False #ball 속도 증가
         self.p_down = False #paddle 길이 감소
+        self.out = False
 
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
