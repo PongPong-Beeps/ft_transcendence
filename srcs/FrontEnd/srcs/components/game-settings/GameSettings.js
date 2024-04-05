@@ -47,7 +47,7 @@ export default function GameSettings($container, connWsManager) {
         const practiceButton = $container.querySelector('#practice-btn');
         if (practiceButton) {
             practiceButton.addEventListener('click', () => {
-                navigate('practice');
+                navigate('practice', [null, connWsManager]);
             });
         }
 

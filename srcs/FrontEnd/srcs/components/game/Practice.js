@@ -1,11 +1,10 @@
 import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
 
-export default function Practice($container) {
+export default function Practice($container, wsManagers) {
     let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
-    let paddle, pong, player1, player2, balls, playerImage = new Image();
+    let paddle, pong, player1, player2, ball, playerImage = new Image();
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
     let isBallMoving;
-    let gameMode = 'easy'; // 기본 게임 모드를 'easy'로 설정
     let keys = {
         'w': false,
         's': false,
@@ -60,13 +59,8 @@ export default function Practice($container) {
             player2.score = 0;
         }
         // 공의 위치와 방향 초기화
-        balls = []; // 공 배열 초기화
         let initialBallDirection = getRandomDirection();
-        balls.push({ x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...initialBallDirection });
-        if (gameMode === 'hard') {
-            let ball2Direction = { dirX: -initialBallDirection.dirX, dirY: -initialBallDirection.dirY };
-            balls.push({ x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball2Direction });
-        }
+        ball = { x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...initialBallDirection };
 
         // 키 입력 상태 초기화
         for (const key in keys) {
@@ -120,32 +114,30 @@ export default function Practice($container) {
 
     const update = () => {
         if (!isBallMoving) return;
-        balls.forEach(ball => {
-            // 공의 위치 업데이트
-            ball.x += pong.speed * ball.dirX;
-            ball.y += pong.speed * ball.dirY;
-            // 벽 충돌 검사
-            if (ball.y + pong.radius > gameCanvas.height || ball.y - pong.radius < 0) {
-                ball.dirY = -ball.dirY; // Y 방향 반전
-            }
-            // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
-            if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
-                player2.score++;
-                resetPosition();
-            } else if (ball.x + pong.radius > gameCanvas.width - 50) { // 오른쪽 벽에 충돌
-                player1.score++;
-                resetPosition();
-            }
-            // 패들 충돌 검사
-            let nearestPlayer = (ball.x < gameCanvas.width / 2) ? player1 : player2;
-            if (ball.x - pong.radius <= nearestPlayer.x + paddle.width
-                && ball.x + pong.radius >= nearestPlayer.x
-                && ball.y - pong.radius <= nearestPlayer.y + paddle.height
-                && ball.y + pong.radius >= nearestPlayer.y) {
-                ball.dirX = -ball.dirX; // X 방향 반전
-                ball.x += ball.dirX;
-            }
-        });
+        // 공의 위치 업데이트
+        ball.x += pong.speed * ball.dirX;
+        ball.y += pong.speed * ball.dirY;
+        // 벽 충돌 검사
+        if (ball.y + pong.radius > gameCanvas.height || ball.y - pong.radius < 0) {
+            ball.dirY = -ball.dirY; // Y 방향 반전
+        }
+        // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
+        if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
+            player2.score++;
+            resetPosition();
+        } else if (ball.x + pong.radius > gameCanvas.width - 50) { // 오른쪽 벽에 충돌
+            player1.score++;
+            resetPosition();
+        }
+        // 패들 충돌 검사
+        let nearestPlayer = (ball.x < gameCanvas.width / 2) ? player1 : player2;
+        if (ball.x - pong.radius <= nearestPlayer.x + paddle.width
+            && ball.x + pong.radius >= nearestPlayer.x
+            && ball.y - pong.radius <= nearestPlayer.y + paddle.height
+            && ball.y + pong.radius >= nearestPlayer.y) {
+            ball.dirX = -ball.dirX; // X 방향 반전
+            ball.x += ball.dirX;
+        }
     };
 
     const drawBackground = () => {
@@ -178,17 +170,15 @@ export default function Practice($container) {
         gameCtx.fillStyle = paddle.color;
         gameCtx.fillRect(player2.x, player2.y, paddle.width, paddle.height);
         if (playerImage.complete) {
-            gameCtx.drawImage(playerImage, player1.x - 50, player1.y, 50, 50);
-            gameCtx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y, 50, 50);
+            gameCtx.drawImage(playerImage, player1.x - 50, player1.y + (paddle.height / 2) - 25, 50, 50);
+            gameCtx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y + (paddle.height / 2) - 25, 50, 50);
         }
         // 공 그리기
-        balls.forEach(ball => {
-            gameCtx.beginPath();
-            gameCtx.arc(ball.x, ball.y, pong.radius, 0, Math.PI*2, true);
-            gameCtx.fillStyle = pong.color;
-            gameCtx.fill();
-            gameCtx.closePath();
-        });
+        gameCtx.beginPath();
+        gameCtx.arc(ball.x, ball.y, pong.radius, 0, Math.PI*2, true);
+        gameCtx.fillStyle = pong.color;
+        gameCtx.fill();
+        gameCtx.closePath();
     };
 
     const render = () => {
@@ -196,12 +186,8 @@ export default function Practice($container) {
         if (!main) return;
         main.innerHTML = `
             <div class="game-container">
-                <div class="game-info-container">
+                <div class="game-title-container">
                     <button class="game-back-btn non-outline-btn">< 로비로 돌아가기</button>
-                    <div id="game-mode-button-container">
-                        <button id="easy-btn" class="game-mode-btn green-btn non-outline-btn">이지</button>
-                        <button id="hard-btn" class="game-mode-btn green-btn non-outline-btn">하드</button>
-                    </div>
                 </div>
                 <div class="game-canvas-container">
                     <canvas id="background-canvas"></canvas>
@@ -209,36 +195,13 @@ export default function Practice($container) {
                 </div>
             </div>
         `;
-        const easyButton = $container.querySelector('#easy-btn');
-        if (easyButton) {
-            easyButton.classList.add('selected');
-        }
     };
 
     const setupEventListener = () => {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
-                new ExitConfirmationAlert($container);
-            });
-        }
-
-        const gameModeButtonContainer = $container.querySelector('#game-mode-button-container');
-        if (gameModeButtonContainer) {
-            gameModeButtonContainer.addEventListener('click', (event) => {
-                // 클릭된 요소가 게임 모드 버튼인지 확인
-                if (event.target.matches('#easy-btn') || event.target.matches('#hard-btn')) {
-                    gameMode = event.target.matches('#easy-btn') ? 'easy' : 'hard';
-                    $container.querySelectorAll('.game-mode-btn').forEach(btn => {
-                        btn.classList.remove('selected');
-                    });
-                    event.target.classList.add('selected');
-                    cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
-                    for (const key in keys) {
-                        keys[key] = false;
-                    }
-                    gameInit(); // 게임 초기화
-                }
+                new ExitConfirmationAlert($container, wsManagers);
             });
         }
 
