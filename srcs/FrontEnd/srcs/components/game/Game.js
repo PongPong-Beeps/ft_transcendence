@@ -11,7 +11,7 @@ export default function Game($container, data) {
      if (hasUndefinedArgs($container, data))
           return;
 
-     const { gameWsManager, connWsManager } = data.additionalData.wsManagers;
+     const { gameWsManager, connWsManager } = data.additionalData.wsManagers; // 둘 다 무조건 있음 !
 
      let bgm_game = new Audio("../../../assets/sound/bgm_game.mp3");
      let bgm_versus = new Audio("../../../assets/sound/bgm_versus.mp3");

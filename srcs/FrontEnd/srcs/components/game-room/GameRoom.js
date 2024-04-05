@@ -11,13 +11,13 @@ import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
 
 /**
  * @param {HTMLElement} $container
- * @param { [WebSocketManager] } wsManagers
+ * @param { Object } wsManagers
  */
 export default function GameRoom($container, wsManagers) {
     if (hasUndefinedArgs($container, wsManagers))
         return;
     
-    const { gameWsManager, connWsManager } = wsManagers;
+    const { gameWsManager, connWsManager } = wsManagers; // 둘 다 무조건 있음 !
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
 
     const init = () => {

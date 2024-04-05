@@ -1,6 +1,6 @@
 import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
 
-export default function Practice($container) {
+export default function Practice($container, connWsManager) {
     let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
     let paddle, pong, player1, player2, balls, playerImage = new Image();
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
@@ -219,7 +219,7 @@ export default function Practice($container) {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
-                new ExitConfirmationAlert($container);
+                new ExitConfirmationAlert($container, { "connWsManager": connWsManager });
             });
         }
 

@@ -3,7 +3,7 @@ import {navigate} from "../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { [WebSocketManager] } wsManagers
+ * @param { Object } wsManagers
  */
 export default function ExitConfirmationAlert($container, wsManagers) {
     const { gameWsManager, connWsManager } = wsManagers;

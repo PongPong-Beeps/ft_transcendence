@@ -47,7 +47,7 @@ export default function GameSettings($container, connWsManager) {
         const practiceButton = $container.querySelector('#practice-btn');
         if (practiceButton) {
             practiceButton.addEventListener('click', () => {
-                navigate('practice');
+                navigate('practice', connWsManager);
             });
         }
 
@@ -92,8 +92,8 @@ export default function GameSettings($container, connWsManager) {
                 const gameWs = new WebSocket(`wss://${BACKEND}/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
                 gameWs.onopen = function (event) {
                     console.log("게임 웹 소켓 생성 완료");
-                    const data = { "gameWsManager": new WebSocketManager(gameWs), "connWsManager": connWsManager };
-                    navigate('game-room', data);
+                    const wsManagers = { "gameWsManager": new WebSocketManager(gameWs), "connWsManager": connWsManager };
+                    navigate('game-room', wsManagers);
                 }
                 gameWs.onclose = function (event) {
                     console.log("게임 웹 소켓 닫힘");
