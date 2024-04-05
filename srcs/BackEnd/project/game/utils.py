@@ -81,8 +81,21 @@ def generate_round_info(round, mode):
         ],
         "balls": balls,
         "item": item,
+        "sound": {
+            'pong':round.sound.pong,
+            'item': round.sound.item,
+            'b_add': round.sound.b_add,
+            'b_up': round.sound.b_up,
+            'p_down': round.sound.p_down,
+        }
     }
-    
+
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down']
+
+    for attr in sound_attributes:
+        if getattr(round.sound, attr):
+            setattr(round.sound, attr, False)
+
     return game_info
 
 def update_match_history(round, game):

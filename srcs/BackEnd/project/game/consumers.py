@@ -184,13 +184,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         if item_type == 'b_up': # 공속도 업 (최대 기본 속도 x 4)
             ball.speed = ball.speed + 2 if ball.speed < Ball().speed * 10 else ball.speed
+            round.sound.b_up = True
         elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
             balls.append(Ball(10, 0.5, to))
+            round.sound.b_add = True
         elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
             if to == 'player_1':
                 round.paddle_1.height = round.paddle_1.height - (Paddle().height / 5 * 1) if round.paddle_1.height > Paddle().height / 5 * 1 else round.paddle_1.height
             elif to == 'player_2':
                 round.paddle_2.height = round.paddle_2.height - (Paddle().height / 5 * 1) if round.paddle_2.height > Paddle().height / 5 * 1 else round.paddle_2.height
+            round.sound.p_down = True
         
         # await database_sync_to_async(round.save)()
         
