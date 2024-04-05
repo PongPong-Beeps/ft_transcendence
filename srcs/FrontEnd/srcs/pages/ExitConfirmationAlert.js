@@ -30,6 +30,7 @@ export default function ExitConfirmationAlert($container, wsManagers) {
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
             if (gameWsManager)
                 gameWsManager.ws.close();
+            document.dispatchEvent(new Event('leave-game'));
             navigate("lobby", connWsManager);
         });
 

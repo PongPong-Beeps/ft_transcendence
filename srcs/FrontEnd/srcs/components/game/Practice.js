@@ -229,8 +229,6 @@ export default function Practice($container, connWsManager) {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
-                cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
-                fadeOutAudio(bgm_game, 1000);
                 new ExitConfirmationAlert($container, { "connWsManager": connWsManager });
             });
         }
@@ -261,6 +259,11 @@ export default function Practice($container, connWsManager) {
                 case 'ArrowUp': keys['ArrowDown'] = false; keys['ArrowUp'] = true; break;
                 case 'ArrowDown': keys['ArrowUp'] = false; keys['ArrowDown'] = true; break;
             }
+        });
+
+        document.addEventListener('leave-game', () => {
+            fadeOutAudio(bgm_game, 1000);
+            cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
         });
     };
 
