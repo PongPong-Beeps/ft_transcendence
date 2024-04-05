@@ -11,10 +11,35 @@
     gap: 10px;
 }
 
-.game-title-container {
+.game-info-container {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 50px;
+}
+
+.game-player-nickname-container {
+    color: white;
+    font-size: 1.2em;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.game-player-info-container {
     display: flex;
     justify-content: space-between;
-    padding: 10px 50px 10px 50px;
+    height: 30px;
+}
+
+.game-player-info-container > div {
+    display: flex;
+}
+
+#player1 {
+    justify-content: flex-start;
+}
+
+#player2 {
+    justify-content: flex-end;
 }
 
 .game-back-btn {
@@ -40,7 +65,7 @@
     background-color: #8DAA4E;
 }
 
-.game-title-container {
+.game-info-container {
     display: flex;
     color: white;
     font-size: 1em;

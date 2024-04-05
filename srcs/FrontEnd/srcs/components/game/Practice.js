@@ -196,7 +196,7 @@ export default function Practice($container) {
         if (!main) return;
         main.innerHTML = `
             <div class="game-container">
-                <div class="game-title-container">
+                <div class="game-info-container">
                     <button class="game-back-btn non-outline-btn">< 로비로 돌아가기</button>
                     <div id="game-mode-button-container">
                         <button id="easy-btn" class="game-mode-btn green-btn non-outline-btn">이지</button>
