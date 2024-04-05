@@ -13,12 +13,14 @@ async def serialize_player(player):
     }
     return serialized_player
 
-async def serialize_round_players(round):
+async def serialize_round_players(round, type):
     if not round:
         return None
 
     player1 = await database_sync_to_async(lambda: round.player1)() if round.player1 else None
     player2 = await database_sync_to_async(lambda: round.player2)() if round.player2 else None
+    player3 = await database_sync_to_async(lambda: round.player3)() if round.player3 else None
+    player4 = await database_sync_to_async(lambda: round.player4)() if round.player4 else None
     
     serialized_players = []
     
@@ -29,6 +31,14 @@ async def serialize_round_players(round):
     if player2:
         serialized_player2 = await serialize_player(player2)
         serialized_players.append(serialized_player2)
+        
+    if type == "tournament":
+        if player3:
+            serialized_player3 = await serialize_player(player3)
+            serialized_players.append(serialized_player3)
+        if player4:
+            serialized_player4 = await serialize_player(player4)
+            serialized_players.append(serialized_player4)
 
     return serialized_players
 
@@ -48,7 +58,7 @@ async def serialize_fixed_data(round):
     
     return fixed_data
 
-def generate_round_info(round, mode):
+def generate_round_info(round, mode, type):
     if not round:
         return {"error": "Player or round information is missing."}
     
@@ -65,9 +75,7 @@ def generate_round_info(round, mode):
     if round.item is not None: #hard모드일때만 item이 생김
         item = { "x": round.item.x, "y": round.item.y }
     
-    game_info = {
-        "type": "round_ing",
-        "players": [
+    players = [
             {
                 "paddle": {"x": round.paddle_1.x, "y": round.paddle_1.y, "height": round.paddle_1.height},
                 "heart": round.heart_1,
@@ -78,7 +86,27 @@ def generate_round_info(round, mode):
                 "heart": round.heart_2,
                 "item": round.slot_2.status,
             }
-        ],
+    ]
+    
+    if type == "tournament":
+        players.append(
+            {
+                "paddle": {"x": round.paddle_3.x, "y": round.paddle_3.y, "height": round.paddle_3.height},
+                "heart": round.heart_1,
+                "item": round.slot_1.status,
+            }
+        )
+        players.append(
+            {
+                "paddle": {"x": round.paddle_4.x, "y": round.paddle_4.y, "height": round.paddle_4.height},
+                "heart": round.heart_2,
+                "item": round.slot_2.status,
+            }
+        )
+    
+    game_info = {
+        "type": "round_ing",
+        "players": players,
         "balls": balls,
         "item": item,
     }

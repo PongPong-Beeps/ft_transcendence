@@ -127,22 +127,27 @@ class Game(models.Model):
             # 'one_to_one' 게임 타입의 경우 한 개의 Round 인스턴스 생성
             round1 = Round.objects.create(
                 player1=players[0].client.user, 
-                player2=players[1].client.user
+                player2=players[1].client.user,
+                player3=None,
+                player4=None,
             )
             self.round1 = round1
         elif self.type == "tournament":
             # 'tournament' 게임 타입의 경우 두 개의 Round 인스턴스 생성
             round1 = Round.objects.create(
                 player1=players[0].client.user, 
-                player2=players[1].client.user
-            )
-            round2 = Round.objects.create(
-                player1=players[2].client.user, 
-                player2=players[3].client.user
+                player2=players[1].client.user,
+                player3=players[2].client.user,
+                player4=players[3].client.user,
             )
             self.round1 = round1
-            self.round2 = round2
-            self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
+            # round2 = Round.objects.create(
+            #     player1=players[2].client.user, 
+            #     player2=players[3].client.user
+            # )
+            # self.round1 = round1
+            # self.round2 = round2
+            # self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
         self.is_gameRunning = True
         self.save()
     
@@ -175,6 +180,11 @@ class Paddle():
             self.y = max(self.y - self.speed, 0)
         elif self.direction == 'down':
             self.y = min(self.y + self.speed, canvas_height - self.height)
+
+# class Paddles():
+#     def __init__(self):
+#         self.1 = Paddle()
+#         self.2 = Paddle()
 
 class Ball:
     def __init__(self, radius=5, speed=1, to='random', WIDTH=500, HEIGHT=500):
@@ -232,6 +242,8 @@ class Round(models.Model):
     
     paddle_1 = Paddle()
     paddle_2 = Paddle()
+    paddle_3 = Paddle()
+    paddle_4 = Paddle()
     
     balls = [ Ball() ]
     
@@ -245,12 +257,15 @@ class Round(models.Model):
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
+    player3 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player3')
+    player4 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player4')
+
     
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
     
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def get_players(self):
+    def get_players(self, type="one_to_one"):
         players = []
         if self.player1_id:
             try:
@@ -265,5 +280,20 @@ class Round(models.Model):
                 players.append(player2)
             except User.DoesNotExist:
                 print("Player2 does not exist.")
+
+        if type == "tournament":
+            if self.player3_id:
+                try:
+                    player3 = User.objects.get(pk=self.player3_id)
+                    players.append(player3)
+                except User.DoesNotExist:
+                    print("Player3 does not exist.")
+
+            if self.player4_id:
+                try:
+                    player4 = User.objects.get(pk=self.player4_id)
+                    players.append(player4)
+                except User.DoesNotExist:
+                    print("Player4 does not exist.")
         
         return players

@@ -146,17 +146,17 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif type == 'item':
             asyncio.create_task(self.using_item(self.scope['user']))
     
-    async def get_player_number(self, round, user):
+    async def get_player_number(self, round, user, type):
         if round is None:
             print("get_player_number: round is None")
             return None
         player_num = None
-        players = await database_sync_to_async(round.get_players)()
+        players = await database_sync_to_async(round.get_players)(type)
         for i, player in enumerate(players):
             if player == user:
-                if i == 0:
+                if i == 0 or i == 2:
                     player_num = 1
-                else:
+                elif i == 1 or i == 3:
                     player_num = 2
                 break
         return player_num
@@ -164,17 +164,30 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def using_item(self, user):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
         round = await database_sync_to_async(game.get_next_round)()
-        player_num = await self.get_player_number(round, user)
+        type = game.type
+        player_num = await self.get_player_number(round, user, type)
         
-        if player_num == 1 and round.slot_1.status:
-            to = 'player_2'
-            round.slot_1.status = False #슬롯 비워주기
-        elif player_num == 2 and round.slot_2.status:
-            to = 'player_1'
-            round.slot_2.status = False #슬롯 비워주기
-        else: #플레이어가 아니거나, 슬롯에 아이템이 없을 경우
-            print("player is not in the round or slot is empty")
-            return
+        if type == 'one_to_one':
+            if player_num == 1 and round.slot_1.status:
+                to = 'player_2'
+                round.slot_1.status = False #슬롯 비워주기
+            elif player_num == 2 and round.slot_2.status:
+                to = 'player_1'
+                round.slot_2.status = False #슬롯 비워주기
+            else: #플레이어가 아니거나, 슬롯에 아이템이 없을 경우
+                print("player is not in the round or slot is empty")
+                return
+            
+        elif type == 'tournament':
+            if player_num == 1 and round.slot_1.status:
+                to = 'player_2'
+                round.slot_1.status = False #슬롯 비워주기
+            elif player_num == 2 and round.slot_2.status:
+                to = 'player_1'
+                round.slot_2.status = False #슬롯 비워주기
+            else: #플레이어가 아니거나, 슬롯에 아이템이 없을 경우
+                print("player is not in the round or slot is empty")
+                return
 
         #b_add(공추가)는 1/11 확률, b_up(공속도업), p_down(패들크기줄이기)는 각 5/11확률
         item_type = random.choice(["b_add"] * 5 + ["b_up", "p_down"] * 5)
@@ -187,10 +200,18 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
             balls.append(Ball(10, 0.5, to))
         elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
-            if to == 'player_1':
-                round.paddle_1.height = round.paddle_1.height - (Paddle().height / 5 * 1) if round.paddle_1.height > Paddle().height / 5 * 1 else round.paddle_1.height
-            elif to == 'player_2':
-                round.paddle_2.height = round.paddle_2.height - (Paddle().height / 5 * 1) if round.paddle_2.height > Paddle().height / 5 * 1 else round.paddle_2.height
+            if type == 'one_to_one':
+                if to == 'player_1':
+                    round.paddle_1.height = round.paddle_1.height - (Paddle().height / 5 * 1) if round.paddle_1.height > Paddle().height / 5 * 1 else round.paddle_1.height
+                elif to == 'player_2':
+                    round.paddle_2.height = round.paddle_2.height - (Paddle().height / 5 * 1) if round.paddle_2.height > Paddle().height / 5 * 1 else round.paddle_2.height
+            elif type == 'tournament':
+                if to == 'player_1':
+                    round.paddle_1.height = round.paddle_1.height - (Paddle().height / 5 * 1) if round.paddle_1.height > Paddle().height / 5 * 1 else round.paddle_1.height
+                    round.paddle_3.height = round.paddle_3.height - (Paddle().height / 5 * 1) if round.paddle_3.height > Paddle().height / 5 * 1 else round.paddle_3.height
+                elif to == 'player_2':
+                    round.paddle_2.height = round.paddle_2.height - (Paddle().height / 5 * 1) if round.paddle_2.height > Paddle().height / 5 * 1 else round.paddle_2.height
+                    round.paddle_4.height = round.paddle_4.height - (Paddle().height / 5 * 1) if round.paddle_4.height > Paddle().height / 5 * 1 else round.paddle_4.height
         
         # await database_sync_to_async(round.save)()
         
@@ -210,16 +231,22 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def move_paddle(self, user, direction):
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
         round = await database_sync_to_async(game.get_next_round)()
+        type = game.type
+        
         if round is None:
             print("round is None")
             return
-        players = await database_sync_to_async(round.get_players)()
+        players = await database_sync_to_async(round.get_players)(type)
         for i, player in enumerate(players):
             if player == user:
                 if i == 0:
                     await round.paddle_1.change_direction(direction)
-                else:
+                elif i == 1:
                     await round.paddle_2.change_direction(direction)
+                elif i == 2:
+                    await round.paddle_3.change_direction(direction)
+                elif i == 3:
+                    await round.paddle_4.change_direction(direction)
                 print("paddle moved ", round.paddle_1.direction) #test code
                 break
             
@@ -267,8 +294,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def process_game_start(self, game):
         await database_sync_to_async(game.initialize_rounds)()
         rounds_data = await asyncio.gather(
-            serialize_round_players(game.round1),
-            serialize_round_players(game.round2)
+            serialize_round_players(game.round1, game.type),
+            serialize_round_players(game.round2, game.type)
         )
         game_info = {
             "type": "game_start",
@@ -292,8 +319,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             print("next_round:", next_round) #test code
             if next_round:
                 print("round is started") #test code
-                await self.process_round_start(next_round)
-                await self.process_round_ing(next_round, game.mode)
+                await self.process_round_start(next_round, game.type)
+                await self.process_round_ing(next_round, game.mode, game.type)
                 winner = await self.process_round_end(next_round)
                 await database_sync_to_async(update_match_history)(next_round, game)
                 print("round is end") #test code
@@ -304,8 +331,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                 break
         print("game is End") #test code
 
-    async def process_round_start(self, round):
-        round_info = await serialize_round_players(round)
+    async def process_round_start(self, round, type):
+        round_info = await serialize_round_players(round, type)
         fixed_data = await serialize_fixed_data(round)
         round_ready_info = {
             "type": "round_ready",
@@ -320,16 +347,16 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_ready(self, event):
         await self.send(text_data=json.dumps(event))
 
-    async def process_round_ing(self, round, mode):
+    async def process_round_ing(self, round, mode, type):
         await asyncio.sleep(5)
         await self.channel_layer.group_send(
             self.room_group_name,
             { "type": "round_start" }
         )
-        await database_sync_to_async(init_game_objects)(round, mode)
+        await database_sync_to_async(init_game_objects)(round, mode, type)
         while not round.is_roundEnded:
-            await database_sync_to_async(update)(round, mode)
-            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode)
+            await database_sync_to_async(update)(round, mode, type)
+            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode, type)
             await self.channel_layer.group_send(
                     self.room_group_name,
                     round_ing_info
