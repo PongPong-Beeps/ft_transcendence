@@ -258,9 +258,8 @@ export default function Game($container, data) {
 
      gameWsManager.addMessageHandler(function (gameData) {
           if (gameData.type === "game_end") {
-               gameWsManager.ws.close();
                drawText('', true);
-               new GameWinner($container, gameData, connWsManager);
+               new GameWinner($container, gameData, data.additionalData.wsManagers);
           }
      });
 

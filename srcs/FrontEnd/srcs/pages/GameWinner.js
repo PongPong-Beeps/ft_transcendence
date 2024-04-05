@@ -3,8 +3,8 @@ import { importCss } from "../utils/importCss.js";
 import { navigate } from "../utils/navigate.js";
 import fadeOutAudio from "../utils/audio.js";
 
-export default function GameWinner($container, gameData, connWsManager) {
-    if (hasUndefinedArgs($container, gameData, connWsManager))
+export default function GameWinner($container, gameData, wsManagers) {
+    if (hasUndefinedArgs($container, gameData, wsManagers))
         return;
 
     let bgm_room = new Audio("../../../assets/sound/bgm_room.mp3");
@@ -37,7 +37,8 @@ export default function GameWinner($container, gameData, connWsManager) {
         if (moveButton) {
             moveButton.addEventListener('click', () => {
                 fadeOutAudio(bgm_room, 1000);
-                navigate('lobby', connWsManager);
+                wsManagers.gameWsManager.ws.close();
+                navigate('lobby', wsManagers.connWsManager);
                 $container.querySelector('#page').style.display = 'none';
                 const confettiElements = document.querySelectorAll('.confetti');
                 confettiElements.forEach(confetti => confetti.remove());
