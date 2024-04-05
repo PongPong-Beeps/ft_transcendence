@@ -41,6 +41,7 @@ export default function Game($container, data) {
      }
 
      const drawBackground = () => {
+          gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           // 플레이어 닉네임
           const playerNicknameContainer = $container.querySelector('.game-player-nickname-container');
           if (playerNicknameContainer) {

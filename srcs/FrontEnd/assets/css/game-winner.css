@@ -9,7 +9,9 @@
 }
 
 #game-winner-container {
+  display: grid;
   position: fixed;
+  font-family: "DNF Bit Bit v2", serif;
   top: 50%;
   left: 50%;
   width: 30vw;
@@ -18,28 +20,104 @@
   background-color: transparent;
   padding: 20px;
   border-radius: 10px;
+  grid-template-rows: 1fr 5fr 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
 }
 
 #game-winner-title {
-  font-size: 3vw;
-  font-weight: bold;
+  grid-row: 1;
+  font-size: 2vw;
   text-align: center;
+  margin-bottom: 0.5vw;
+  color: #5C7320;
+  animation: slideInFromLeft 1s ease-out;
 }
 
 #game-winner-img {
+  grid-row: 2;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 50%;
-  height: 50%
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 1s forwards;
 }
 
 #game-winner-img img {
-  max-height: 100%;
-  max-width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10%;
 }
 
 #player-nickname {
-  font-size: 2vw;
+  grid-row: 3;
+  font-size: 1.5vw;
   text-align: center;
+  opacity: 0;
+  color: #38631D;
+  text-shadow: 0 0 0.5vw #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #38631D;
+  animation: fadeIn 1s ease-out 1s forwards;
+}
+
+#move-message {
+  grid-row: 4;
+  font-size: 1vw;
+  color: #5C7320;
+  text-align: center;
+}
+
+#move-button-container {
+  grid-row: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#move-button {
+  width: 20%;
+  height: 100%;
+  font-size: 1.5vw;
+  border-radius: 5px;
+  border: 4px solid #38631D;
+  outline: none;
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: #B7D768;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(100vh) rotate(360deg); }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
