@@ -6,17 +6,51 @@
     justify-content: space-between;
 }
 
-#header-container img, #header-container button {
+#header-container img {
     height: 80%;
-    margin: 0 20px 0 20px;
+    margin: 0 20px;
 }
 
-#logout-btn {
+#header-button-container {
+    display: flex;
+    gap: 20px;
+}
+
+#help-btn, #logout-btn {
+    height: 80%;
     background-color: transparent;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#help-btn {
+    position: relative;
+}
+
+#help-icon {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    background-image: url('../../assets/image/help.png');
+    background-size: cover;
+}
+
+#guide-image {
+    display: none;
+    width: 400px;
+    height: 220px;
+    background-image: url('../../assets/image/guide.png');
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    left: -400px;
+    z-index: 999;
+}
+
+#help-btn:hover #guide-image {
+    display: block;
 }
 
 #logout-icon {
