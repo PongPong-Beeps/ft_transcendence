@@ -1,8 +1,14 @@
 import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
+import fadeOutAudio from "../../utils/audio.js";
 
-export default function Practice($container) {
+export default function Practice($container, connWsManager) {
+    let bgm_game = new Audio("../../../assets/sound/bgm_game.mp3");
+    let audio_pong = new Audio("../../../assets/sound/pong.mp3");
+    let audio_out = new Audio("../../../assets/sound/out.mp3");
+    let playerImage = new Image();
+
     let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
-    let paddle, pong, player1, player2, balls, playerImage = new Image();
+    let paddle, pong, player1, player2, balls, playerArea = 50;
     let animationFrameId; // 게임 루프를 관리하는 데 사용될 id
     let isBallMoving;
     let gameMode = 'easy'; // 기본 게임 모드를 'easy'로 설정
@@ -17,23 +23,25 @@ export default function Practice($container) {
         const container = $container.querySelector('.game-canvas-container');
         const containerWidth = container.offsetWidth;
         const containerHeight = container.offsetHeight;
-        playerImage.src = "../../assets/image/character.png";
-
-        paddle = { width: containerHeight * 0.03, height: containerHeight * 0.15, speed: containerHeight * 0.015, color: 'WHITE' };
-        pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.02, color: '#ffa939' };
-
         // 배경용 캔버스 초기화
         backgroundCanvas = $container.querySelector('#background-canvas');
         backgroundCtx = backgroundCanvas.getContext('2d');
         backgroundCanvas.width = containerWidth;
         backgroundCanvas.height = containerHeight;
         drawBackground();
-
         // 게임 오브젝트용 캔버스 초기화
         gameCanvas = $container.querySelector('#game-canvas');
         gameCtx = gameCanvas.getContext('2d');
         gameCanvas.width = containerWidth;
         gameCanvas.height = containerHeight;
+        // 게임 오브젝트 초기화
+        paddle = { width: containerHeight * 0.03, height: containerHeight * 0.2, speed: containerHeight * 0.015, color: 'WHITE' };
+        pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.015, color: '#ffa939' };
+        // 이미지 초기화
+        playerImage.src = "../../assets/image/character.png";
+        // 배경 음악 초기화
+        bgm_game.volume = 0.3;
+        bgm_game.play();
     }
 
     function getRandomDirection() {
@@ -67,7 +75,6 @@ export default function Practice($container) {
             let ball2Direction = { dirX: -initialBallDirection.dirX, dirY: -initialBallDirection.dirY };
             balls.push({ x: gameCanvas.width / 2, y: gameCanvas.height / 2, ...ball2Direction });
         }
-
         // 키 입력 상태 초기화
         for (const key in keys) {
             keys[key] = false;
@@ -76,8 +83,8 @@ export default function Practice($container) {
 
     const gameInit = () => {
         isBallMoving = false;
-        player1 = { x: 50, y: 0, score: 0 }
-        player2 = { x: gameCanvas.width - paddle.width - 50, y: 0, score: 0 }
+        player1 = { x: playerArea, y: 0, score: 0 }
+        player2 = { x: gameCanvas.width - paddle.width - playerArea, y: 0, score: 0 }
         initGameObjects(true);
 
         setTimeout(() => {
@@ -96,6 +103,7 @@ export default function Practice($container) {
 
     const resetPosition = () => {
         isBallMoving = false;
+        audio_out.play();
         initGameObjects(); // 위치만 재설정, 점수는 유지
 
         setTimeout(() => {
@@ -127,12 +135,13 @@ export default function Practice($container) {
             // 벽 충돌 검사
             if (ball.y + pong.radius > gameCanvas.height || ball.y - pong.radius < 0) {
                 ball.dirY = -ball.dirY; // Y 방향 반전
+                audio_pong.play();
             }
             // 공이 왼쪽 또는 오른쪽 끝에 도달했을 때 점수 처리
-            if (ball.x - pong.radius < 50) { // 왼쪽 벽에 충돌
+            if (ball.x - pong.radius < playerArea) { // 왼쪽 벽에 충돌
                 player2.score++;
                 resetPosition();
-            } else if (ball.x + pong.radius > gameCanvas.width - 50) { // 오른쪽 벽에 충돌
+            } else if (ball.x + pong.radius > gameCanvas.width - playerArea) { // 오른쪽 벽에 충돌
                 player1.score++;
                 resetPosition();
             }
@@ -144,19 +153,20 @@ export default function Practice($container) {
                 && ball.y + pong.radius >= nearestPlayer.y) {
                 ball.dirX = -ball.dirX; // X 방향 반전
                 ball.x += ball.dirX;
+                audio_pong.play();
             }
         });
     };
 
     const drawBackground = () => {
         backgroundCtx.fillStyle = '#27522d';
-        backgroundCtx.fillRect(50, 0, backgroundCanvas.width - 100, backgroundCanvas.height);
+        backgroundCtx.fillRect(playerArea, 0, backgroundCanvas.width - playerArea * 2, backgroundCanvas.height);
         backgroundCtx.strokeStyle = "WHITE";
         backgroundCtx.lineWidth = 1;
         backgroundCtx.beginPath();
         backgroundCtx.setLineDash([]);
-        backgroundCtx.moveTo(50, backgroundCanvas.height / 2);
-        backgroundCtx.lineTo(backgroundCanvas.width - 50, backgroundCanvas.height / 2);
+        backgroundCtx.moveTo(playerArea, backgroundCanvas.height / 2);
+        backgroundCtx.lineTo(backgroundCanvas.width - playerArea, backgroundCanvas.height / 2);
         backgroundCtx.stroke();
         backgroundCtx.beginPath();
         backgroundCtx.setLineDash([]);
@@ -170,16 +180,16 @@ export default function Practice($container) {
         // 점수 그리기
         gameCtx.font = "2em DNF Bit Bit v2";
         gameCtx.fillStyle = "WHITE";
-        gameCtx.fillText(player1.score.toString(), gameCanvas.width / 4, 50);
-        gameCtx.fillText(player2.score.toString(), (3 * gameCanvas.width) / 4, 50);
+        gameCtx.fillText(player1.score.toString(), gameCanvas.width / 4, playerArea);
+        gameCtx.fillText(player2.score.toString(), (3 * gameCanvas.width) / 4, playerArea);
         // 플레이어 패들 그리기
         gameCtx.fillStyle = paddle.color;
         gameCtx.fillRect(player1.x, player1.y, paddle.width, paddle.height);
         gameCtx.fillStyle = paddle.color;
         gameCtx.fillRect(player2.x, player2.y, paddle.width, paddle.height);
         if (playerImage.complete) {
-            gameCtx.drawImage(playerImage, player1.x - 50, player1.y, 50, 50);
-            gameCtx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y, 50, 50);
+            gameCtx.drawImage(playerImage, player1.x - playerArea, player1.y + (paddle.height / 2) - (playerArea / 2), playerArea, playerArea);
+            gameCtx.drawImage(playerImage, player2.x + paddle.width + 5, player2.y + (paddle.height / 2) - (playerArea / 2) , playerArea, playerArea);
         }
         // 공 그리기
         balls.forEach(ball => {
@@ -196,11 +206,11 @@ export default function Practice($container) {
         if (!main) return;
         main.innerHTML = `
             <div class="game-container">
-                <div class="game-info-container">
+                <div class="game-title-container">
                     <button class="game-back-btn non-outline-btn">< 로비로 돌아가기</button>
                     <div id="game-mode-button-container">
-                        <button id="easy-btn" class="game-mode-btn green-btn non-outline-btn">이지</button>
-                        <button id="hard-btn" class="game-mode-btn green-btn non-outline-btn">하드</button>
+                        <button id="easy-btn" class="game-mode-btn green-btn non-outline-btn">공 1개</button>
+                        <button id="hard-btn" class="game-mode-btn green-btn non-outline-btn">공 2개</button>
                     </div>
                 </div>
                 <div class="game-canvas-container">
@@ -219,7 +229,7 @@ export default function Practice($container) {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
-                new ExitConfirmationAlert($container);
+                new ExitConfirmationAlert($container, { "connWsManager": connWsManager });
             });
         }
 
@@ -249,6 +259,11 @@ export default function Practice($container) {
                 case 'ArrowUp': keys['ArrowDown'] = false; keys['ArrowUp'] = true; break;
                 case 'ArrowDown': keys['ArrowUp'] = false; keys['ArrowDown'] = true; break;
             }
+        });
+
+        document.addEventListener('leave-game', () => {
+            fadeOutAudio(bgm_game, 1000);
+            cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
         });
     };
 

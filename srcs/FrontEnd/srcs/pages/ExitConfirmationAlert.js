@@ -3,7 +3,7 @@ import {navigate} from "../utils/navigate.js";
 
 /**
  * @param { HTMLElement } $container
- * @param { [WebSocketManager] } wsManagers
+ * @param { Object } wsManagers
  */
 export default function ExitConfirmationAlert($container, wsManagers) {
     const { gameWsManager, connWsManager } = wsManagers;
@@ -30,6 +30,7 @@ export default function ExitConfirmationAlert($container, wsManagers) {
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
             if (gameWsManager)
                 gameWsManager.ws.close();
+            document.dispatchEvent(new Event('leave-game'));
             navigate("lobby", connWsManager);
         });
 
