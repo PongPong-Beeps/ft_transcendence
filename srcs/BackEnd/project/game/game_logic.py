@@ -33,7 +33,8 @@ def init_game_objects(round, mode):
     for i, ball in enumerate(balls.copy()):
         #아이템에서 바뀐 추가볼 삭제
         if i > 0:
-            balls.remove(ball)
+            if ball in balls:
+                balls.remove(ball)
             continue
         ball.x = WIDTH / 2
         ball.y = HEIGHT / 2
@@ -99,7 +100,8 @@ def update(round, mode):
         if ball.x - ball.radius < Paddle().player_area\
             or ball.x + ball.radius > WIDTH - Paddle().player_area:
             if ball_type == 'additional':
-               balls.remove(ball)
+                if ball in balls:
+                    balls.remove(ball)
             if ball.x - ball.radius < Paddle().player_area:
                 round.heart_1 -= 1
                 round.save()
@@ -110,6 +112,7 @@ def update(round, mode):
                 round.save()
                 init_game_objects(round, mode)
                 round.sound.out = True
+            continue
                 
         #패들 충돌검사
         nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]
@@ -122,7 +125,8 @@ def update(round, mode):
                 ball.x += ball.dirX * 2 #볼이 패들을 타는 버그 방지
                 round.sound.pong = True
             elif ball_type == 'additional':
-                balls.remove(ball)
+                if ball in balls:
+                    balls.remove(ball)
                 round.sound.pong = True
                 continue
 
