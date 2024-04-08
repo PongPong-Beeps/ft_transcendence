@@ -99,7 +99,8 @@ export default function Game($container, data) {
           });
           if (item) {
                let itemPos = { "x": adjustScale(item.x, 'x'), "y": adjustScale(item.y, 'y') };
-               gameCtx.drawImage(itemImage, itemPos.x, itemPos.y, itemRadius * 2, itemRadius * 2);
+               // drawBall(itemPos, itemRadius, '#4F3096');
+               gameCtx.drawImage(itemImage, itemPos.x - itemRadius, itemPos.y - itemRadius, itemRadius * 2, itemRadius * 2);
           }
      }
 
