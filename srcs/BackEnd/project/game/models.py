@@ -160,10 +160,10 @@ class Paddle():
         self.direction = 'stop'
         
         #패들 고정값
-        self.width = 10
+        self.width = 20
         self.height = 150
         self.speed = 5
-        self.player_area = 25
+        self.player_area = 50
     
     async def change_direction(self, key):
         self.direction = key
@@ -209,11 +209,11 @@ class Ball:
 
 #Ball클래스 상속
 class Item:
-    def __init__(self, to='random', WIDTH=500, HEIGHT=500):
+    def __init__(self, to='random', WIDTH=1000, HEIGHT=500):
         self.x = WIDTH/2
         self.y = HEIGHT/2
         self.dirX, self.dirY = Ball().get_random_direction(to)
-        self.radius = 30
+        self.radius = 20
         self.speed = 2.5
         
 class Slot:
@@ -236,7 +236,7 @@ class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
     
     #서버 로직 계산을 위한 고정 크기
-    width = 500
+    width = 1000
     height = 500
     
     sound = Sound()
