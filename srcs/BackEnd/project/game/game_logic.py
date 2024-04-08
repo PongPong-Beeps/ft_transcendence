@@ -1,6 +1,7 @@
 import threading
 from .models import Paddle, Item, Ball
 import random
+import math
 
 def set_ball_moving(round):
     ball = round.balls[0]
@@ -123,6 +124,7 @@ def update(round, mode):
             if ball_type == 'basic':
                 ball.dirX = -ball.dirX
                 ball.x += ball.dirX * 2 #볼이 패들을 타는 버그 방지
+                adjust_ball_direction_on_paddle_contact(ball, nearest_paddle)
                 round.sound.pong = True
             elif ball_type == 'additional':
                 if ball in balls:
@@ -186,3 +188,16 @@ def generate_item(round):
     to = random.choice(loser * 3 + winner * 1)
     round.item = Item(to, round.width, round.height)
     #round.save()
+
+def adjust_ball_direction_on_paddle_contact(ball, nearest_paddle):
+    if (nearest_paddle.y < ball.y < nearest_paddle.y + nearest_paddle.height / 8) or \
+       (nearest_paddle.y + nearest_paddle.height * 7 / 8 < ball.y < nearest_paddle.y + nearest_paddle.height):
+        ball.dirY += (15 / 180 * math.pi)
+    elif nearest_paddle.y + nearest_paddle.height * 3 / 8 <= ball.y <= nearest_paddle.y + nearest_paddle.height * 5 / 8:
+        ball.dirY -= (15 / 180 * math.pi)
+    elif (nearest_paddle.y + nearest_paddle.height * 1 / 8 < ball.y < nearest_paddle.y + nearest_paddle.height * 2 / 8) or \
+         (nearest_paddle.y + nearest_paddle.height * 6 / 8 < ball.y < nearest_paddle.y + nearest_paddle.height * 7 / 8):
+        ball.dirY += (5 / 180 * math.pi)
+    elif (nearest_paddle.y + nearest_paddle.height * 2 / 8 < ball.y < nearest_paddle.y + nearest_paddle.height * 3 / 8) or \
+         (nearest_paddle.y + nearest_paddle.height * 5 / 8 < ball.y < nearest_paddle.y + nearest_paddle.height * 6 / 8):
+        ball.dirY -= (5 / 180 * math.pi)
