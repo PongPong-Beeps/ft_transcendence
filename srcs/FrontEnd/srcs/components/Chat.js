@@ -51,7 +51,12 @@ export default function Chat($container, connWsManager) {
 
     function appendMessageToChat(messageElement) {
         const chatMessages = document.querySelector('#chat-messages');
+        const maxMessages = 100;
+    
         chatMessages.appendChild(messageElement);
+        while (chatMessages.children.length > maxMessages) {
+            chatMessages.removeChild(chatMessages.firstChild);
+        }
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 

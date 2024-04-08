@@ -1,7 +1,7 @@
 export default function InfoTab(isMe, infoData) {
     const totalWinRateBar = createWinRateBar(infoData.total, 'TOTAL');
-    const easyWinRateBar = createWinRateBar(infoData.easy, 'EASY');
-    const hardWinRateBar = createWinRateBar(infoData.hard, 'HARD');
+    const basicWinRateBar = createWinRateBar(infoData.easy, 'BASIC');
+    const itemWinRateBar = createWinRateBar(infoData.hard, 'ITEM');
     const nicknameBox = createNicknameBox(infoData.nickname, isMe);
     const profilePicture = createProfilePicture(isMe, infoData.image);
     
@@ -16,11 +16,11 @@ export default function InfoTab(isMe, infoData) {
             <div id="total-win-rate-container">
                 ${totalWinRateBar}
             </div>
-            <div id="easy-win-rate-container">
-                ${easyWinRateBar}
+            <div id="basic-win-rate-container">
+                ${basicWinRateBar}
             </div>
-            <div id="hard-win-rate-container">
-                ${hardWinRateBar}
+            <div id="item-win-rate-container">
+                ${itemWinRateBar}
             </div>
         </div>
      `;
