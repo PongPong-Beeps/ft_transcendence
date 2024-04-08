@@ -114,6 +114,7 @@ export default function Game($container, data) {
                const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
                playerItemContainer.innerHTML = item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
                    : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+               if (item) currentKey = ''; // 아이템 갱신될 때 키 리셋
           }
 
           if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
