@@ -26,7 +26,7 @@ export default function Game($container, data) {
      let itemImage = new Image();
      const paddleColor = '#ffffff', pongColor = '#ffa939', attackBallColor = '#ff396e', backgroundColor = '#27522d';
      let playerData, playerArea, fixWidth, fixHeight, paddleWidth, itemRadius; // round_ready 때 받을 정보
-     let currentKey = '';
+     let currentKey = '', currentHeart = [0, 0];
 
      const init = () => {
           const container = $container.querySelector('.game-canvas-container');
@@ -110,23 +110,24 @@ export default function Game($container, data) {
      };
 
      const drawItemHeart = (index, item, heart) => {
+          if (heart === currentHeart[index]) return; // 하트 값이 갱신됐을 때만 그리기
+
           const playerInfoContainer = $container.querySelector(`#player${index + 1}`);
           playerInfoContainer.innerHTML = '';
-          let heartsHTML = '';
+
           let itemHTML = data.game_mode === 'hard' // 아이템 모드일 때만 슬롯 표시
               ? item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
                   : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />'
               : '';
 
-          for (let i = 0; i < heart; i++) {
+          let heartsHTML = '';
+          for (let i = 0; i < heart; i++)
                heartsHTML += '<img src="../../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
-          }
 
-          if (index === 0) {
-               playerInfoContainer.innerHTML = itemHTML + heartsHTML;
-          } else {
-               playerInfoContainer.innerHTML = heartsHTML + itemHTML;
-          }
+          if (index === 0) playerInfoContainer.innerHTML = itemHTML + heartsHTML;
+          else playerInfoContainer.innerHTML = heartsHTML + itemHTML;
+
+          currentKey = ''; // 하트 갱신될 때 키 리셋
      }
 
      const drawBall = (ballPos, radius, color) => {
