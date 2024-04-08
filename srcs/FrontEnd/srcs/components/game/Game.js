@@ -126,6 +126,8 @@ export default function Game($container, data) {
 
           if (index === 0) playerInfoContainer.innerHTML = itemHTML + heartsHTML;
           else playerInfoContainer.innerHTML = heartsHTML + itemHTML;
+
+          currentKey = ''; // 하트 갱신될 때 키 리셋
      }
 
      const drawBall = (ballPos, radius, color) => {
