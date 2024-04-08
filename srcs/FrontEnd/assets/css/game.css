@@ -37,12 +37,8 @@
     display: flex;
 }
 
-#player1 {
-    justify-content: flex-start;
-}
-
-#player2 {
-    justify-content: flex-end;
+#player1-heart {
+    flex-grow: 1;
 }
 
 .game-title-container {

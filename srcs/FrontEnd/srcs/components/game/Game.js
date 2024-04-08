@@ -110,24 +110,21 @@ export default function Game($container, data) {
      };
 
      const drawItemHeart = (index, item, heart) => {
-          if (heart === currentHeart[index]) return; // 하트 값이 갱신됐을 때만 그리기
+          if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
+               const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
+               playerItemContainer.innerHTML = item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
+                   : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+          }
 
-          const playerInfoContainer = $container.querySelector(`#player${index + 1}`);
-          playerInfoContainer.innerHTML = '';
-
-          let itemHTML = data.game_mode === 'hard' // 아이템 모드일 때만 슬롯 표시
-              ? item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
-                  : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />'
-              : '';
-
-          let heartsHTML = '';
-          for (let i = 0; i < heart; i++)
-               heartsHTML += '<img src="../../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
-
-          if (index === 0) playerInfoContainer.innerHTML = itemHTML + heartsHTML;
-          else playerInfoContainer.innerHTML = heartsHTML + itemHTML;
-
-          currentKey = ''; // 하트 갱신될 때 키 리셋
+          if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
+               currentHeart[index] = heart;
+               let heartsHTML = '';
+               for (let i = 0; i < heart; i++)
+                    heartsHTML += '<img src="../../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
+               const playerHeartContainer = $container.querySelector(`#player${index + 1}-heart`);
+               playerHeartContainer.innerHTML = heartsHTML;
+               currentKey = ''; // 하트 갱신될 때 키 리셋
+          }
      }
 
      const drawBall = (ballPos, radius, color) => {
@@ -167,19 +164,21 @@ export default function Game($container, data) {
           const main = $container.querySelector('#main');
           if (!main) return;
           main.innerHTML = `
-            <div class="game-container">
-                <div class="game-info-container">
-                    <div class="game-player-nickname-container"></div>
-                    <div class="game-player-info-container">
-                        <div id="player1"></div>
-                        <div id="player2"></div>
-                    </div>
-                </div>
-                <div class="game-canvas-container">
-                    <canvas id="background-canvas"></canvas>
-                    <canvas id="game-canvas"></canvas>
-                </div>
-            </div>
+              <div class="game-container">
+              <div class="game-info-container">
+                  <div class="game-player-nickname-container"></div>
+                      <div class="game-player-info-container">
+                          <div id="player1-item"></div>
+                          <div id="player1-heart"></div>
+                          <div id="player2-heart"></div>
+                          <div id="player2-item""></div>
+                      </div>
+                  </div>
+                  <div class="game-canvas-container">
+                      <canvas id="background-canvas"></canvas>
+                      <canvas id="game-canvas"></canvas>
+                  </div>
+              </div>
         `;
      };
 
