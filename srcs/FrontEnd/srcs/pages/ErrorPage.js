@@ -11,6 +11,7 @@ export default function ErrorPage($container, errorCode = 0) {
         if (page) {
             page.innerHTML = `
                 <div id="error-container">
+                    <div id="click_message">아래 얼굴을 클릭하면 이동합니다</div>
                     <div id="home">
                         <img id="error_face" src="../../assets/image/error_face.png"  alt="error_face" />
                     </div>

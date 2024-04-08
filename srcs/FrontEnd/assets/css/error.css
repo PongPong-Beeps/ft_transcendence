@@ -9,9 +9,17 @@
     gap: 50px;
 }
 
+#click_message {
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 1em;
+    text-align: center;
+    color: #86a635;
+}
+
 #error_face {
     width: 9vw;
     cursor: pointer;
+    animation: pulse 2s infinite;
 }
 
 #error_message {
@@ -19,4 +27,16 @@
     font-size: 3em;
     text-align: center;
     color: #5B7320;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
