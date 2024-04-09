@@ -2,6 +2,10 @@ from channels.db import database_sync_to_async
 from user.views import get_image
 from .models import Ball, Paddle, Item
 from user.models import MatchHistory
+import os
+
+WIDTH = int(os.getenv('WIDTH'))
+HEIGHT = int(os.getenv('HEIGHT'))
 
 async def serialize_player(player):
     if not player:
@@ -40,8 +44,8 @@ async def serialize_fixed_data(round):
     
     fixed_data["player_area"] = Paddle().player_area
     fixed_data["canvas"] = {
-            "width": round.width,
-            "height": round.height
+            "width": WIDTH,
+            "height": HEIGHT
         }
     fixed_data["paddle_width"] = Paddle().width
     fixed_data["item_radius"] = Item().radius

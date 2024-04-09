@@ -5,6 +5,10 @@ from user.views import get_image
 from user.models import User
 import random
 import math
+import os
+
+WIDTH = int(os.getenv('WIDTH'))
+HEIGHT = int(os.getenv('HEIGHT'))
 
 class Player(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='player')
@@ -160,10 +164,10 @@ class Paddle():
         self.direction = 'stop'
         
         #패들 고정값
-        self.width = 20
-        self.height = 150
-        self.speed = 5
-        self.player_area = 50
+        self.width = float(os.getenv('PADDLE_WIDTH'))
+        self.height = float(os.getenv('PADDLE_HEIGHT'))
+        self.speed = float(os.getenv('PADDLE_SPEED'))
+        self.player_area = float(os.getenv('PADDLE_PLAYER_AREA'))
     
     async def change_direction(self, key):
         self.direction = key
@@ -177,15 +181,15 @@ class Paddle():
             self.y = min(self.y + self.speed, canvas_height - self.height)
 
 class Ball:
-    def __init__(self, radius=5, speed=1, to='random', WIDTH=500, HEIGHT=500):
-        self.x = WIDTH/2
-        self.y = HEIGHT/2
+    def __init__(self, type='basic', to='random'):
+        self.x = WIDTH / 2
+        self.y = HEIGHT / 2
         self.dirX, self.dirY = self.get_random_direction(to)
         self.is_ball_moving = False
         
         #볼 고정값
-        self.radius = radius
-        self.speed = speed
+        self.radius = float(os.getenv('BALL_RADIUS')) if type == 'basic' else float(os.getenv('BALL_RADIUS')) * 1.5
+        self.speed = float(os.getenv('BALL_SPEED')) if type == 'basic' else float(os.getenv('BALL_SPEED')) / 1.5
 
     def get_random_direction(self, to='random'):
         # 20도에서 40도를 라디안으로 변환
@@ -209,12 +213,12 @@ class Ball:
 
 #Ball클래스 상속
 class Item:
-    def __init__(self, to='random', WIDTH=1000, HEIGHT=500):
-        self.x = WIDTH/2
-        self.y = HEIGHT/2
+    def __init__(self, to='random'):
+        self.x = WIDTH / 2
+        self.y = HEIGHT / 2
         self.dirX, self.dirY = Ball().get_random_direction(to)
-        self.radius = 20
-        self.speed = 2.5
+        self.radius = float(os.getenv('ITEM_RADIUS'))
+        self.speed = float(os.getenv('ITEM_SPEED'))
         
 class Slot:
     def __init__(self):
@@ -234,11 +238,7 @@ class Sound:
 
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)
-    
-    #서버 로직 계산을 위한 고정 크기
-    width = 1000
-    height = 500
-    
+        
     sound = Sound()
     
     paddle_1 = Paddle()
@@ -251,8 +251,8 @@ class Round(models.Model):
     slot_1 = Slot()
     slot_2 = Slot()
     
-    heart_1 = models.IntegerField(default=5)
-    heart_2 = models.IntegerField(default=5)
+    heart_1 = models.IntegerField(default=int(os.getenv('HEART_NUM')))
+    heart_2 = models.IntegerField(default=int(os.getenv('HEART_NUM')))
     
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
