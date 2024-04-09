@@ -224,7 +224,7 @@
     border: 3px solid #ffffff;
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.24);
     overflow: hidden;
-    cursor: pointer;
+    cursor: url('../image/pointer.png') 1 1, auto;
 }
 
 #profile-picture-label::after {

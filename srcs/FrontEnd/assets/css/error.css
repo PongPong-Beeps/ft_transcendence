@@ -18,7 +18,7 @@
 
 #error_face {
     width: 9vw;
-    cursor: pointer;
+    cursor: url('../image/pointer.png') 1 1, auto;
     animation: pulse 2s infinite;
 }
 
