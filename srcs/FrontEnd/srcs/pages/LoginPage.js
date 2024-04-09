@@ -15,13 +15,17 @@ export default function LoginPage($container) {
             page.innerHTML = `
                 <div id="login-container">
                     <img id="logo" src="../../assets/image/logo.png"  alt="logo" />
-                    <button id="login-btn" class="green-btn non-outline-btn">42 계정으로 로그인</button>
-                    <button id="google-login-btn" class="non-outline-btn">
-                        <img src="../../assets/image/web_neutral_sq_SI@2x.png" alt="google" />
-                    </button>
-                    <button id="kakao-login-btn" class="social-login-btn non-outline-btn">
-                        <img src="../../assets/image/kakao_login_large_narrow.png" alt="kakao" />
-                    </button>
+                    <div id="login-button-container">
+                        <button id="login-btn" class="green-btn non-outline-btn">
+                            <img src="../../assets/image/login.png" alt="42" />
+                        </button>
+                        <button id="kakao-login-btn" class="social-login-btn non-outline-btn">
+                            <img src="../../assets/image/kakao_login_large_narrow.png" alt="kakao" />
+                        </button>
+                        <button id="google-login-btn" class="non-outline-btn">
+                            <img src="../../assets/image/web_neutral_sq_SI@2x.png" alt="google" />
+                        </button>
+                    </div>
                 </div>
             `;
             page.style.display = 'block';
