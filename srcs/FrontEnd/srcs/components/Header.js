@@ -2,6 +2,7 @@ import { importCss } from "../utils/importCss.js";
 import { BACKEND, fetchWithAuth } from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
 import { navigate } from "../utils/navigate.js";
+import getDevelopersPage from "../pages/developersPage.js";
 
 /**
  * @param { HTMLElement } $container
@@ -46,6 +47,16 @@ export default function Header($container, connWsManager) {
                     new ErrorPage($container, error.status);
                 });
         });
+        const logoImage = $container.querySelector('#header-container img');
+        if (logoImage) {
+            logoImage.addEventListener('click', (event) => {
+                const totalWidth = logoImage.offsetWidth;
+                const clickPosition = event.offsetX;
+                if (clickPosition > totalWidth * 0.9) {
+                    new getDevelopersPage($container);
+                }
+            });
+        }
     }
 
     importCss("assets/css/header.css");

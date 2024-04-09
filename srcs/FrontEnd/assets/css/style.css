@@ -2,6 +2,11 @@ html, body {
     margin: 0;
     padding: 0;
     background-color: #B7D768;
+    cursor: url('../image/arrow.png') 1 1, auto;
+}
+
+a, button, [role="button"], input[type="submit"], input[type="button"], .clickable {
+    cursor: url('../image/pointer.png') 1 1, auto !important;
 }
 
 @font-face {
