@@ -97,17 +97,17 @@ def update(round, mode):
         ball_type = 'basic' if i == 0 else 'additional'
 
         #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
-        if ball.x - ball.radius < Paddle().player_area\
-            or ball.x + ball.radius > WIDTH - Paddle().player_area:
+        if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2\
+            or ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
             if ball_type == 'additional':
                 if ball in balls:
                     balls.remove(ball)
-            if ball.x - ball.radius < Paddle().player_area:
+            if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2:
                 round.heart_1 -= 1
                 round.save()
                 init_game_objects(round, mode)
                 round.sound.out = True
-            elif ball.x + ball.radius > WIDTH - Paddle().player_area:
+            elif ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
                 round.heart_2 -= 1
                 round.save()
                 init_game_objects(round, mode)
@@ -122,7 +122,7 @@ def update(round, mode):
             and ball.y + ball.radius >= nearest_paddle.y:
             if ball_type == 'basic':
                 ball.dirX = -ball.dirX
-                ball.x += ball.dirX * 2 #볼이 패들을 타는 버그 방지
+                ball.x += ball.dirX * abs(nearest_paddle.width - abs(nearest_paddle.x - ball.x)) #볼이 패들을 타는 버그 방지
                 round.sound.pong = True
             elif ball_type == 'additional':
                 if ball in balls:
