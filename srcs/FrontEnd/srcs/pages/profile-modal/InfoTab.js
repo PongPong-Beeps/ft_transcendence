@@ -45,12 +45,16 @@ function createProfilePicture(isMe, image) {
 function createWinRateBar(winRate, type) {
     const barWidth = winRate + '%';
     let gaugeColor;
-    if (winRate >= 70) {
-        gaugeColor = 'steelblue';
-    } else if (winRate >= 30) {
+    if (winRate >= 80) {
+        gaugeColor = 'dodgerblue';
+    } else if (winRate >= 60) {
+        gaugeColor = 'limegreen';
+    } else if (winRate >= 40) {
         gaugeColor = 'gold';
-    } else {
+    } else if (winRate >= 20) {
         gaugeColor = 'coral';
+    } else {
+        gaugeColor = 'orangered';
     }
     return `
         <div class="win-rate-box">

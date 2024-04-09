@@ -72,8 +72,8 @@
 
 .game-canvas-container {
     position: relative;
-    width: 55vw;
     height: 43vh;
+    aspect-ratio: 2 / 1;
     margin: auto;
 }
 
