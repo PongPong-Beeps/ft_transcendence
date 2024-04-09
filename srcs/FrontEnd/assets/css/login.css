@@ -15,31 +15,28 @@
     height: auto;
 }
 
-#login-btn {
-    border-radius: 12px;
-    border: 5px solid #5C7320;
-    font-size: 2em;
-    padding: 15px;
+#login-button-container {
+    display: flex;
+    flex-direction: column;
+    width: 17vw;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
 }
 
-#google-login-btn {
+#login-button-container > button {
+    width: 100%;
     border-radius: 12px;
     border: transparent;
-    padding: 0;
+    background-color: transparent;
     transition: transform 0.1s ease-in-out;
 }
 
-#google-login-btn:active {
+#login-button-container > button:active {
     transform: scale(0.95);
 }
 
-#kakao-login-btn {
-    border-radius: 12px;
-    border: transparent;
-    padding: 0;
-    transition: transform 0.1s ease-in-out;
-}
-
-#kakao-login-btn:active {
-    transform: scale(0.95);
+#login-button-container > button > img {
+    width: 100%;
+    height: 100%;
 }
