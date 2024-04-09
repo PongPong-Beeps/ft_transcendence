@@ -186,7 +186,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             ball.speed = ball.speed + 2 if ball.speed < Ball().speed * 10 else ball.speed
             round.sound.b_up = True
         elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
-            balls.append(Ball(10, 0.5, to))
+            balls.append(Ball('add', to))
             round.sound.b_add = True
         elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
             if to == 'player_1':

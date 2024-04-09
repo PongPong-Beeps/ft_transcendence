@@ -2,14 +2,16 @@ import threading
 from .models import Paddle, Item, Ball
 import random
 import math
+import os
+
+WIDTH = int(os.getenv('WIDTH'))
+HEIGHT = int(os.getenv('HEIGHT'))
 
 def set_ball_moving(round):
     ball = round.balls[0]
     ball.is_ball_moving = True
 
 def init_game_objects(round, mode):
-    WIDTH = round.width
-    HEIGHT = round.height
     
     #아이템 슬롯 초기화
     round.slot_1.status = False
@@ -67,8 +69,6 @@ def check_round_ended(round):
 def update(round, mode):
     if check_round_ended(round):
         return
-    WIDTH = round.width
-    HEIGHT = round.height
     
     if mode == 'hard':
         if round.balls[0].is_ball_moving == False:
@@ -140,8 +140,6 @@ def update_item(round):
     if item == None: #아이템이 없으면 do nothing
         return
     
-    WIDTH = round.width
-    HEIGHT = round.height
     
     paddles = [ round.paddle_1, round.paddle_2 ]
 
@@ -182,11 +180,11 @@ def generate_item(round):
         loser = 'player_2'
     else: #동점
         to = 'random'
-        round.item = Item(to, round.width, round.height)
+        round.item = Item(to)
         return
     
     to = random.choice(loser * 3 + winner * 1)
-    round.item = Item(to, round.width, round.height)
+    round.item = Item(to)
     #round.save()
 
 def adjust_ball_direction_on_paddle_contact(ball, nearest_paddle):
