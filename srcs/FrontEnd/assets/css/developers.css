@@ -1,0 +1,33 @@
+#developers-page-background
+{
+    width: 100%;
+    height: 100%;
+    background-color: #B7D768;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#developers-page-container
+{
+    display: flex;
+    width: 80%;
+    height: 80%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#developers-page-img
+{
+    width: 100%;
+    height: 100%;
+}
+
+#developers-page-img img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
