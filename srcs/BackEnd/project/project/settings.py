@@ -72,11 +72,11 @@ SWAGGER_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=10),#테스트를 위해 days로 수정, 추후에 second로 바꿔야함    #access token 유효기간
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=14),      #refresh token 유효기간
-    'SIGNING_KEY': SECRET_KEY,                                    #토큰 서명에 사용할 키
-    'ALGORITHM': 'HS256',                                       #JWT를 설정하는데 사용되는 알고리즘
-    'AUTH_HEADER_TYPES': ('Bearer',),                              #인증 헤더의 유형
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=14),
+    'SIGNING_KEY': SECRET_KEY,
+    'ALGORITHM': 'HS256',
+    'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
 }
 
@@ -126,7 +126,6 @@ CHANNEL_LAYERS = {                           # channel layer 설정
     }
 }
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -134,20 +133,13 @@ CHANNEL_LAYERS = {                           # channel layer 설정
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['POSTGRES_DB'],  # POSTGRES_DB 환경변수의 값을 직접 참조
-        'USER': os.environ['POSTGRES_USER'],  # POSTGRES_USER 환경변수의 값을 직접 참조
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
         'PASSWORD': os.environ['POSTGRES_PASSWORD'], 
-        'HOST': 'db',  # db라는 컨테이너 이름을 사용하여 호스트를 지정합니다.
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 
 # Password validation
