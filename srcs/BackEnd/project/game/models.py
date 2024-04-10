@@ -158,17 +158,17 @@ class Game(models.Model):
         return None
 
 class Paddle():
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.direction = 'stop'
-        
+    def __init__(self, player='player1'):
         #패들 고정값
         self.width = float(os.getenv('PADDLE_WIDTH'))
         self.height = float(os.getenv('PADDLE_HEIGHT'))
         self.speed = float(os.getenv('PADDLE_SPEED'))
         self.player_area = float(os.getenv('PADDLE_PLAYER_AREA'))
-    
+        #패들 가변값
+        self.x = self.player_area if player == 'player1' else WIDTH - self.width - self.player_area
+        self.y = (HEIGHT / 2) - (self.height) / 2
+        self.direction = 'stop'
+        
     async def change_direction(self, key):
         self.direction = key
         
@@ -181,15 +181,15 @@ class Paddle():
             self.y = min(self.y + self.speed, canvas_height - self.height)
 
 class Ball:
-    def __init__(self, type='basic', to='random'):
+    def __init__(self, type='default', to='random'):
         self.x = WIDTH / 2
         self.y = HEIGHT / 2
         self.dirX, self.dirY = self.get_random_direction(to)
         self.is_ball_moving = False
         
         #볼 고정값
-        self.radius = float(os.getenv('BALL_RADIUS')) if type == 'basic' else float(os.getenv('BALL_RADIUS')) * 1.5
-        self.speed = float(os.getenv('BALL_SPEED')) if type == 'basic' else float(os.getenv('BALL_SPEED')) / 1.5
+        self.radius = float(os.getenv('BALL_RADIUS')) * 1.5 if type == 'add' else float(os.getenv('BALL_RADIUS'))
+        self.speed = float(os.getenv('BALL_SPEED')) * 2 if type == 'easy' else float(os.getenv('BALL_SPEED')) / 1.5 if type =='add' else float(os.getenv('BALL_SPEED'))
 
     def get_random_direction(self, to='random'):
         # 20도에서 40도를 라디안으로 변환
@@ -199,10 +199,10 @@ class Ball:
         # 랜덤 각도 생성
         angle = random.uniform(min_angle, max_angle)
         
-        if to == 'player_1':
+        if to == 'player1':
             dirX = -math.cos(angle)
             dirY = -math.sin(angle)
-        elif to == 'player_2':
+        elif to == 'player2':
             dirX = math.cos(angle)
             dirY = -math.sin(angle)
         else: #random

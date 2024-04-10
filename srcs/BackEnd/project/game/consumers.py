@@ -8,11 +8,11 @@ from user.views import get_image #이미지를 가져오는 함수
 import logging #로그를 남기기 위한 모듈
 from connect.models import InvitationQueue
 from user.models import User
-from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history, determine_winner
-from .game_logic import update, init_game_objects
+from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history, determine_winner, move_paddle, use_item
+from .game_logic import update, set_ball_moving
 import asyncio
 from asyncio import Event
-import random
+from .cache import set_game_info, delete_game_info, get_game_info, update_game_info, print_game_info
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -142,89 +142,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             )
         elif type == 'paddle':
             direction = text_data_json.get("direction")
-            asyncio.create_task(self.move_paddle(self.scope['user'], direction))
+            asyncio.create_task(move_paddle(self.room_group_name, self.scope['user'], direction))
         elif type == 'item':
-            asyncio.create_task(self.using_item(self.scope['user']))
-    
-    async def get_player_number(self, round, user):
-        if round is None:
-            print("get_player_number: round is None")
-            return None
-        player_num = None
-        players = await database_sync_to_async(round.get_players)()
-        for i, player in enumerate(players):
-            if player == user:
-                if i == 0:
-                    player_num = 1
-                else:
-                    player_num = 2
-                break
-        return player_num
- 
-    async def using_item(self, user):
-        game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        round = await database_sync_to_async(game.get_next_round)()
-        player_num = await self.get_player_number(round, user)
-        
-        if player_num == 1 and round.slot_1.status:
-            to = 'player_2'
-            round.slot_1.status = False #슬롯 비워주기
-        elif player_num == 2 and round.slot_2.status:
-            to = 'player_1'
-            round.slot_2.status = False #슬롯 비워주기
-        else: #플레이어가 아니거나, 슬롯에 아이템이 없을 경우
-            print("player is not in the round or slot is empty")
-            return
-
-        #b_add(공추가)는 1/11 확률, b_up(공속도업), p_down(패들크기줄이기)는 각 5/11확률
-        item_type = random.choice(["b_add"] * 5 + ["b_up", "p_down"] * 5)
-
-        balls=round.balls
-        ball=round.balls[0]
-
-        if item_type == 'b_up': # 공속도 업 (최대 기본 속도 x 4)
-            ball.speed = ball.speed + 2 if ball.speed < Ball().speed * 10 else ball.speed
-            round.sound.b_up = True
-        elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
-            balls.append(Ball('add', to))
-            round.sound.b_add = True
-        elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
-            if to == 'player_1':
-                round.paddle_1.height = round.paddle_1.height - (Paddle().height / 5 * 1) if round.paddle_1.height > Paddle().height / 5 * 1 else round.paddle_1.height
-            elif to == 'player_2':
-                round.paddle_2.height = round.paddle_2.height - (Paddle().height / 5 * 1) if round.paddle_2.height > Paddle().height / 5 * 1 else round.paddle_2.height
-            round.sound.p_down = True
-        
-        # await database_sync_to_async(round.save)()
-        
-        await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    "type": "item",
-                    "nickname": user.nickname,
-                    "item_type": item_type,
-                }
-        )
-        print("item used")
-        
-    async def item(self, event):
-        await self.send(text_data=json.dumps(event))   
-            
-    async def move_paddle(self, user, direction):
-        game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
-        round = await database_sync_to_async(game.get_next_round)()
-        if round is None:
-            print("round is None")
-            return
-        players = await database_sync_to_async(round.get_players)()
-        for i, player in enumerate(players):
-            if player == user:
-                if i == 0:
-                    await round.paddle_1.change_direction(direction)
-                else:
-                    await round.paddle_2.change_direction(direction)
-                print("paddle moved ", round.paddle_1.direction) #test code
-                break
+            asyncio.create_task(use_item(self.room_group_name, self.scope['user']))
             
     async def ready(self, event):
         user = self.scope['user']
@@ -296,7 +216,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             if next_round:
                 print("round is started") #test code
                 await self.process_round_start(next_round)
-                await self.process_round_ing(next_round, game.mode)
+                await self.process_round_ing(next_round, game.mode, game.id)
                 winner = await self.process_round_end(next_round)
                 await database_sync_to_async(update_match_history)(next_round, game)
                 print("round is end") #test code
@@ -323,21 +243,24 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_ready(self, event):
         await self.send(text_data=json.dumps(event))
 
-    async def process_round_ing(self, round, mode):
-        await asyncio.sleep(5)
+    async def process_round_ing(self, round, mode, game_id):
+        await asyncio.sleep(1)
         await self.channel_layer.group_send(
             self.room_group_name,
             { "type": "round_start" }
         )
-        await database_sync_to_async(init_game_objects)(round, mode)
+        
+        await database_sync_to_async(set_game_info)(game_id, mode)
+        await database_sync_to_async(set_ball_moving)(game_id)
         while not round.is_roundEnded:
-            await database_sync_to_async(update)(round, mode)
-            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode)
+            await database_sync_to_async(update)(round, mode, game_id)
+            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode, game_id)
             await self.channel_layer.group_send(
                     self.room_group_name,
                     round_ing_info
             )
             await asyncio.sleep(0.01) #게임 속도 조절을 위한 sleep
+        await database_sync_to_async(delete_game_info)(game_id)
         print("round is end = ", round) #test code
     
     async def round_start(self, event):
