@@ -1,6 +1,5 @@
 from django.shortcuts import redirect
 from django.views import View
-import json
 import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,8 +7,8 @@ from rest_framework import status
 import datetime
 from user.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.core.files.storage import default_storage #파일을 저장하기 위한 모듈
-from django.core.files.base import ContentFile #파일을 읽고 쓰기 위한 모듈
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 import os
 
 google = {
@@ -143,24 +142,6 @@ def create_jwt_token(user):
         'refresh_token': str(refresh),
     }
 
-#KAKAO
-# user_info: {
-    # 'properties' : {'nickname': 'nickname', profile_image : 'url'},
-    # }
-
-#GOOGLE
-# user_info: {
-    # 'email': 'geonwlee22@gmail.com', 
-    # 'given_name': 'geonwu', 
-    # 'picture': 'url',
-    # }
-
-#42
-# user_info: {
-    # 'email': 'geonwule@student.42seoul.kr',
-    #  login': 'geonwule', 
-    # 'image': { 'versions': { 'large': 'url', 'medium': 'url', 'small': 'url', 'migro': 'url' }
-        
 def generate_unique_nickname(nickname):
     original_nickname = nickname
     i = 1
@@ -182,7 +163,6 @@ def save_db(user_info, config):
     user_nickname = generate_unique_nickname(user_nickname)    
     save_user_to_db(user_email, user_nickname)
     user = User.objects.get(email=user_email)
-    #(장고 스토리지가 초기화됬거나(추후 volume설정 필요), DB에 이미지 저장이 안되어 있거나 or 프로필 사진을 변경안하고 카카오 프로필 이미지를 쓸경우는) 로그인 할때마다 프로필 이미지로 업데이트
     if not default_storage.exists('user_images/' + str(user.id)) or not user.image_file or config['type'] + '.jpg' in user.image_file.name.split('/')[2]:
         if config['type'] == 'kakao' :
             image_url = user_info.get('data', {}).get('properties', {}).get('profile_image')
