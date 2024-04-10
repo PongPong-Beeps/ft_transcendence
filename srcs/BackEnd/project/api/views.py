@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 import json
 import datetime
 
-#api/logout/
+# api/logout/
 class Logout(APIView):
     def post(self, request):
         response = Response({"message": "로그아웃이 완료되었습니다."})
@@ -12,33 +12,28 @@ class Logout(APIView):
         response.delete_cookie('refresh_token')
         return response
     
+# api/
 class Index(APIView):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated] # 있어야 하나?
-
+    # 인증된 사용자만 접근 가능
     def get(self, request):
-        print("I'm post func in Index")
         print(request)
-        # 인증된 사용자만 접근 가능한 API 뷰
         if request.user is not None:
-            user_nickname = request.user.nickname   # access_token 의 payload 에서 가져온 값
-            user_id = request.user.id               # access_token 의 payload 에서 가져온 값
+            user_nickname = request.user.nickname
+            user_id = request.user.id
             print(f"User's nickname: {user_nickname}")
             print(f"User's id: {user_id}")
             print("Token is valid")
-        else:   # 토큰이 만료되면 여기 안들어가지고, 자동 401 리턴됨
+        else:   # 토큰이 만료되면 여기 안들어가지고, 401 자동 return
             print("Token is invalid")
         content = {'message': 'Hello, World!'}
         return Response(content)
     
-    
+# api/token/refresh/
 class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            # 새로 발급받은 토큰을 쿠키에 저장
             access_token = response.data.get("access")
-            refresh_token = response.data.get("refresh")
             
             response.set_cookie(
                 key="access_token",
