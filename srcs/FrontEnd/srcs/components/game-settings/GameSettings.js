@@ -11,6 +11,7 @@ import { BACKEND } from "../../api.js";
  * @param { WebSocketManager } connWsManager
  */
 export default function GameSettings($container, connWsManager) {
+
     const typeOption = [
         { label: 'one_to_one', image: '../../../assets/image/one_to_one.png' },
         { label: 'tournament', image: '../../../assets/image/tournament.png' }

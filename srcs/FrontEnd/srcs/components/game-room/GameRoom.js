@@ -100,6 +100,7 @@ export default function GameRoom($container, wsManagers) {
             fetchWithAuth(`https://${BACKEND}/api/user/me/`)
                 .then(userMeData => {
                     data.additionalData = { "wsManagers": wsManagers, "id": userMeData.id };
+                    document.dispatchEvent(new Event("pause-lobby-bgm"));
                     navigate('game', data);
                 })
                 .catch(error => {

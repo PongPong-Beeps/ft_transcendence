@@ -1,8 +1,6 @@
 import ProfileModal from "../pages/profile-modal/ProfileModal.js";
-import getCookie from "../utils/cookie.js";
 import useState from "../utils/useState.js";
 import { importCss } from "../utils/importCss.js";
-import Router from "../router.js";
 import {BACKEND, fetchWithAuth} from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
 
