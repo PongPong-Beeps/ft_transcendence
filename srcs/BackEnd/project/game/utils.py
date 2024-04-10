@@ -229,24 +229,21 @@ async def use_item(room_group_name, user):
     print("item used")
         
 async def move_paddle(room_group_name, user, direction):
-    game = await database_sync_to_async(Game.objects.get)(id=room_group_name)
-    round = await database_sync_to_async(game.get_next_round)()
-    if round == None:
-        print("round is None")
+    
+    game_info = await database_sync_to_async(get_game_info)(room_group_name)
+    if game_info == None:
         return
     
-    player = await get_player_number(round, user)
-    if player == None:
-        print(user.nickname, " : Not player")
-        return
+    player_key = None
+    if game_info['player1'].id == user.id:
+        player_key = 'player1'
+    elif game_info['player2'].id == user.id:
+        player_key = 'player2'
     
-    game_info = await database_sync_to_async(get_game_info)(game.id)
-    player_info = await database_sync_to_async(get_game_info)(game.id, player)
-    if game_info == None or player_info == None or game_info['balls'][0].is_ball_moving == False:
+    player_info = await database_sync_to_async(get_game_info)(room_group_name, player_key)
+    if player_info == None or game_info['balls'][0].is_ball_moving == False:
         return
     
     await player_info['paddle'].change_direction(direction)
-    
-    await database_sync_to_async(update_game_info)(game.id, player_info, player)
-    
-    print(player, " paddle moved ", player_info['paddle'].direction) #test code
+    await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
+    print(player_key, " paddle moved ", player_info['paddle'].direction) #test code
