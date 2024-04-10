@@ -177,31 +177,32 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         sender = event['sender']
         receiver = event['receiver']
         message = event['message']
-        is_receiver = user.id == receiver
-        is_sender = user.id == sender
-        is_blocked_sender = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
-        is_blocked_receiver = await database_sync_to_async(lambda: user.blacklist.filter(id=receiver).exists())()
+        is_receiver = user.id == receiver   # user가 receiver인지
+        is_sender = user.id == sender       # user가 sender인지
         
-        if is_receiver and not is_blocked_sender:   # receiver가 sender를 차단하지 않은 경우
+        sender_info = await database_sync_to_async(get_user_info)(sender)
+        receiver_info = await database_sync_to_async(get_user_info)(receiver)
+        if sender_info and receiver in sender_info.get('black_list', []):       # receiver가 sender의 블랙리스트에 있는 경우
+            is_blocked = True
+        elif receiver_info and sender in receiver_info.get('black_list', []):   # sender가 receiver의 블랙리스트에 있는 경우
+            is_blocked = True
+        else:
+            is_blocked = False
+        
+        if is_receiver and not is_blocked:   # user가 receiver인 경우
             print("receiver: ", receiver, "sender: ", sender, "message: ", message)
-            sender_user = await database_sync_to_async(User.objects.get)(id=sender)
-            if sender_user:
-                sender_nick = sender_user.nickname
-            else:
-                sender_nick = "Unknown User"
+            sender_info = await database_sync_to_async(get_user_info)(sender)
+            sender_nick = sender_info['nickname']
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "sender": sender_nick,
                 "message": message
             }))
         
-        if is_sender and not is_blocked_receiver:   # sender가 receiver를 차단하지 않은 경우
+        if is_sender and not is_blocked:     # user가 sender인 경우
             print("receiver: ", receiver, "sender: ", sender, "message: ", message)
-            receiver_user = await database_sync_to_async(User.objects.get)(id=receiver)
-            if receiver_user:
-                receiver_nick = receiver_user.nickname
-            else:
-                receiver_nick = "Unknown User"
+            receiver_info = await database_sync_to_async(get_user_info)(receiver)
+            receiver_nick = receiver_info['nickname']
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "receiver": receiver_nick,
