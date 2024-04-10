@@ -196,6 +196,7 @@ export default function UserList($container, connWsManager) {
         });
     }
 
+    bgm_lobby.loop = true;
     bgm_lobby.play();
     importCss("assets/css/user-list.css");
     render();
