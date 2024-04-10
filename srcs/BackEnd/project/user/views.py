@@ -10,6 +10,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import MultiPartParser
 from swagger.serializer import ChangeImageSerializer, InputNickSerializer
 from swagger.serializer import user_list_schema, user_me_schema, user_info_schema
+from connect.cache import update_user_info
 
 #/api/user/list
 class UserListView(APIView):
@@ -51,6 +52,7 @@ class BlockUserView(APIView):
             target_id = request.data.get('id')
             user_target = User.objects.get(id=target_id)
             user_me.blacklist.add(user_target)
+            update_user_info(user_me)
             return Response({"message": f"{user_target.nickname}이(가) 정상적으로 블랙리스트 처리 되었습니다"}, status = 200)
         except User.DoesNotExist:
             return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=400)
@@ -70,6 +72,7 @@ class UnblockUserView(APIView):
             target_id = request.data.get('id')
             user_target = User.objects.get(id=target_id)
             user_me.blacklist.remove(user_target)
+            update_user_info(user_me)
             return Response({"message": f"{user_target.nickname}이(가) 정상적으로 블랙리스트에서 제거되었습니다"}, status=200)
         except User.DoesNotExist:
             return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=400)
@@ -122,6 +125,7 @@ class ChangeNicknameView(APIView):
             return Response({"error": "닉네임은 숫자와 알파벳만 사용"}, status=403)
         user.nickname = new_nickname
         user.save()
+        update_user_info(user) 
         return Response({"message": f"닉네임이 {new_nickname}으로 변경되었습니다."}, status=200)
 
 #프로필 정보 탭

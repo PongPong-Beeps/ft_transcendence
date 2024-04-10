@@ -13,6 +13,7 @@ from .game_logic import update, set_ball_moving
 import asyncio
 from asyncio import Event
 from .cache import set_game_info, delete_game_info, get_game_info, update_game_info, print_game_info
+from connect.cache import set_user_info, get_user_info, delete_user_info
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -39,6 +40,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name, self.channel_name
         )   
         await self.accept()
+        await database_sync_to_async(set_user_info)(user, self.room_group_name) 
         
         await self.send(text_data=json.dumps({
             'status': '2000',
@@ -57,6 +59,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.close(4002)
 
     async def disconnect(self, close_code):
+        user = self.scope['user']
         if close_code == 4000 :
             print('Game does not exist.')
             return
@@ -80,6 +83,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        await database_sync_to_async(set_user_info)(user, None)
         
     async def create_room(self, client):
         game = await database_sync_to_async(Game.objects.create)(type=self.scope['type'], mode=self.scope['mode'])
