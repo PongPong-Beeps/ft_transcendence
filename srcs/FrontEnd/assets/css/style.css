@@ -48,8 +48,23 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .clickab
     padding: 10px;
     width: 80vw;
     height: 85vh;
+    overflow: scroll;
     border: 8px solid #5C7320;
     border-radius: 30px;
+}
+
+#components::-webkit-scrollbar {
+    width: 1vw;
+    height: 1vw;
+}
+
+#components::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#components::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
 }
 
 #left-container {
