@@ -3,12 +3,14 @@ from .models import Paddle, Ball, Item, Slot, Sound
 import os
 
 #CREATE
-def set_game_info(game_id, mode):
+def set_game_info(game_id, mode, round):
     # 각 게임의 정보를 캐시에 저장
     game_info = {
         "balls": [ Ball(mode) ],
         "item": None,
         "sounds": Sound(),
+        "player1": round.player1,
+        "player2": round.player2,
     }
     # 캐시에 게임 정보 저장
     cache.set(game_id, game_info)

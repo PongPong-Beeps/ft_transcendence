@@ -250,7 +250,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             { "type": "round_start" }
         )
         
-        await database_sync_to_async(set_game_info)(game_id, mode)
+        await database_sync_to_async(set_game_info)(game_id, mode, round)
         await database_sync_to_async(set_ball_moving)(game_id)
         while not round.is_roundEnded:
             await database_sync_to_async(update)(round, mode, game_id)

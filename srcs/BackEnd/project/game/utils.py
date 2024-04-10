@@ -178,31 +178,29 @@ async def get_player_number(round, user):
     return None
  
 async def use_item(room_group_name, user):
-    game = await database_sync_to_async(Game.objects.get)(id=room_group_name)
-    round = await database_sync_to_async(game.get_next_round)()
-    if round == None:
-        print("round is None")
+    game_info = await database_sync_to_async(get_game_info)(room_group_name)
+    if game_info == None:
         return
     
-    player = await get_player_number(round, user)
-    if player == None:
-        print(user.nickname, " : Not player")
-        return
+    player_key = None
+    if game_info['player1'].id == user.id:
+        player_key = 'player1'
+    elif game_info['player2'].id == user.id:
+        player_key = 'player2'
     
-    if player == 'player1':
-        target_player = 'player2'
-    elif player == 'player2':
-        target_player = 'player1'
+    if player_key == 'player1':
+        target_player_key = 'player2'
+    elif player_key == 'player2':
+        target_player_key = 'player1'
     
-    game_info = await database_sync_to_async(get_game_info)(game.id)
-    player_info = await database_sync_to_async(get_game_info)(game.id, player)
-    target_player_info = await database_sync_to_async(get_game_info)(game.id, target_player)
+    player_info = await database_sync_to_async(get_game_info)(room_group_name, player_key)
+    target_player_info = await database_sync_to_async(get_game_info)(room_group_name, target_player_key)
     
-    if game_info == None or player_info == None or game_info['balls'][0].is_ball_moving == False:
+    if player_info == None or target_player_info == None or game_info['balls'][0].is_ball_moving == False:
         return
     
     if player_info['slot'].status == False:
-        print(player, " : don't have item")
+        print(player_key, " : don't have item")
         return
     player_info['slot'].status = False #슬롯 비워주기
     
@@ -216,37 +214,33 @@ async def use_item(room_group_name, user):
         ball.speed = ball.speed + 2 if ball.speed < Ball().speed * 10 else ball.speed
         sounds.b_up = True
     elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
-        balls.append(Ball('add', target_player))
+        balls.append(Ball('add', target_player_key))
         sounds.b_add = True
     elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
         paddle = target_player_info['paddle']
         paddle.height = paddle.height - (Paddle().height / 5 * 1) if paddle.height > Paddle().height / 5 * 1 else paddle.height
         sounds.p_down = True
     
-    await database_sync_to_async(update_game_info)(game.id, game_info)
-    await database_sync_to_async(update_game_info)(game.id, player_info, player)
-    await database_sync_to_async(update_game_info)(game.id, target_player_info, target_player)
+    await database_sync_to_async(update_game_info)(room_group_name, game_info)
+    await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
+    await database_sync_to_async(update_game_info)(room_group_name, target_player_info, target_player_key)
     print("item used")
         
 async def move_paddle(room_group_name, user, direction):
-    game = await database_sync_to_async(Game.objects.get)(id=room_group_name)
-    round = await database_sync_to_async(game.get_next_round)()
-    if round == None:
-        print("round is None")
+    game_info = await database_sync_to_async(get_game_info)(room_group_name)
+    if game_info == None:
         return
     
-    player = await get_player_number(round, user)
-    if player == None:
-        print(user.nickname, " : Not player")
-        return
+    player_key = None
+    if game_info['player1'].id == user.id:
+        player_key = 'player1'
+    elif game_info['player2'].id == user.id:
+        player_key = 'player2'
     
-    game_info = await database_sync_to_async(get_game_info)(game.id)
-    player_info = await database_sync_to_async(get_game_info)(game.id, player)
-    if game_info == None or player_info == None or game_info['balls'][0].is_ball_moving == False:
+    player_info = await database_sync_to_async(get_game_info)(room_group_name, player_key)
+    if player_info == None or game_info['balls'][0].is_ball_moving == False:
         return
     
     await player_info['paddle'].change_direction(direction)
-    
-    await database_sync_to_async(update_game_info)(game.id, player_info, player)
-    
-    print(player, " paddle moved ", player_info['paddle'].direction) #test code
+    await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
+    print(player_key, " paddle moved ", player_info['paddle'].direction) #test code
