@@ -46,6 +46,7 @@ export default function Game($container, data) {
           itemImage.src = "../../../assets/image/item.png";
           // 오디오
           bgm_game.volume = 0.3;
+          bgm_game.loop = true;
      }
 
      const drawBackground = () => {
