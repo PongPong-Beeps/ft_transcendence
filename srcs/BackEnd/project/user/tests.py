@@ -4,8 +4,6 @@ from rest_framework.response import Response
 from .models import User, MatchHistory
 
 class MakeUserAndMatchHistory(APIView):
-    # permission_classes = [IsAuthenticated]
-
     def get(self, request):
         try:
             user_id = request.user.id
