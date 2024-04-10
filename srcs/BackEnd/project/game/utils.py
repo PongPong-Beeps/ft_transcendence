@@ -1,8 +1,10 @@
 from channels.db import database_sync_to_async
 from user.views import get_image
-from .models import Ball, Paddle, Item
+from .models import Game, Ball, Paddle, Item
 from user.models import MatchHistory
 import os
+from .cache import get_game_info, update_game_info
+import random
 
 WIDTH = int(os.getenv('WIDTH'))
 HEIGHT = int(os.getenv('HEIGHT'))
@@ -52,57 +54,83 @@ async def serialize_fixed_data(round):
     
     return fixed_data
 
-def generate_round_info(round, mode):
+def generate_round_info(round, mode, game_id):
     if not round:
         return {"error": "Player or round information is missing."}
-    
-    balls = []
-    for ball in round.balls:
+        
+    try:
+        game_info = get_game_info(game_id)
+        players = [ get_game_info(game_id, 'player1'), get_game_info(game_id, 'player2') ]
+
+        game_info = {
+            "type": "round_ing",
+            "players": [ serialize_player_info(players[0]), serialize_player_info(players[1]) ],
+            "balls": serialize_balls_info(game_info['balls']),
+            "item": serialize_item_info(game_info['item']),
+            "sound": serialize_sounds_info(game_info['sounds']),
+        }
+        reset_sounds(game_id)
+        
+        return game_info
+    except Exception as e:
+        print("game info error : ", e)
+        return {"game info error : ", e}
+        
+def reset_sounds(game_id):
+    game_info = get_game_info(game_id)
+    sounds = game_info['sounds']
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out']
+    for attr in sound_attributes:
+        setattr(sounds, attr, False)
+    update_game_info(game_id, game_info)
+
+def serialize_player_info(player):
+    if not player:
+        return None
+    paddle = player['paddle']
+    serialized_player_info = {
+            'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
+            'heart': player['heart'],
+            'item': player['slot'].status
+    }
+    return serialized_player_info
+
+def serialize_balls_info(balls):
+    if balls == None:
+        return None
+    serialized_balls = []
+    for ball in balls:
         serialized_ball = {
             "x": ball.x,
             "y": ball.y,
-            "radius": ball.radius
+            "radius": ball.radius,
         }
-        balls.append(serialized_ball)
-        
-    item = None
-    if round.item is not None: #hard모드일때만 item이 생김
-        item = { "x": round.item.x, "y": round.item.y }
-    
-    game_info = {
-        "type": "round_ing",
-        "players": [
-            {
-                "paddle": {"x": round.paddle_1.x, "y": round.paddle_1.y, "height": round.paddle_1.height},
-                "heart": round.heart_1,
-                "item": round.slot_1.status,
-            },
-            {
-                "paddle": {"x": round.paddle_2.x, "y": round.paddle_2.y, "height": round.paddle_2.height},
-                "heart": round.heart_2,
-                "item": round.slot_2.status,
-            }
-        ],
-        "balls": balls,
-        "item": item,
-        "sound": {
-            'pong':round.sound.pong,
-            'item': round.sound.item,
-            'b_add': round.sound.b_add,
-            'b_up': round.sound.b_up,
-            'p_down': round.sound.p_down,
-            'out': round.sound.out,
-        }
+        serialized_balls.append(serialized_ball)
+    return serialized_balls
+
+def serialize_item_info(item):
+    if item == None:
+        return None
+    serialized_item = {
+        "x": item.x,
+        "y": item.y,
     }
+    return serialized_item
 
-    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out']
+def serialize_sounds_info(sounds):
+    if sounds == None:
+        return None
+    serialized_sounds = {
+        'pong': sounds.pong,
+        'item': sounds.item,
+        'b_add': sounds.b_add,
+        'b_up': sounds.b_up,
+        'p_down': sounds.p_down,
+        'out': sounds.out,
+    }
+    return serialized_sounds
 
-    for attr in sound_attributes:
-        if getattr(round.sound, attr):
-            setattr(round.sound, attr, False)
-
-    return game_info
-
+    
 def update_match_history(round, game):
     tournament = True if game.type == "tournament" else False
     easy_mode = True if game.mode == "easy" else False
@@ -137,3 +165,88 @@ async def determine_winner(game, winner, round_number):
             game.round3.player2 = winner
         else:
             game.winner = winner
+        await database_sync_to_async(game.round3.save)()
+            
+async def get_player_number(round, user):
+    players = await database_sync_to_async(round.get_players)()
+    for i, player in enumerate(players):
+        if player == user:
+            if i == 0:
+                return 'player1'
+            elif i == 1:
+                return 'player2'
+    return None
+ 
+async def use_item(room_group_name, user):
+    game = await database_sync_to_async(Game.objects.get)(id=room_group_name)
+    round = await database_sync_to_async(game.get_next_round)()
+    if round == None:
+        print("round is None")
+        return
+    
+    player = await get_player_number(round, user)
+    if player == None:
+        print(user.nickname, " : Not player")
+        return
+    
+    if player == 'player1':
+        target_player = 'player2'
+    elif player == 'player2':
+        target_player = 'player1'
+    
+    game_info = await database_sync_to_async(get_game_info)(game.id)
+    player_info = await database_sync_to_async(get_game_info)(game.id, player)
+    target_player_info = await database_sync_to_async(get_game_info)(game.id, target_player)
+    
+    if game_info == None or player_info == None or game_info['balls'][0].is_ball_moving == False:
+        return
+    
+    if player_info['slot'].status == False:
+        print(player, " : don't have item")
+        return
+    player_info['slot'].status = False #슬롯 비워주기
+    
+    #b_add(공추가)는 1/11 확률, b_up(공속도업), p_down(패들크기줄이기)는 각 5/11확률
+    item_type = random.choice(["b_add"] * 5 + ["b_up", "p_down"] * 5)
+    balls=game_info['balls']
+    ball=balls[0]
+    sounds = game_info['sounds']
+    
+    if item_type == 'b_up': # 공속도 업 (최대 기본 속도 x 4)
+        ball.speed = ball.speed + 2 if ball.speed < Ball().speed * 10 else ball.speed
+        sounds.b_up = True
+    elif item_type == 'b_add': # 공 추가 (상대방 쪽으로)
+        balls.append(Ball('add', target_player))
+        sounds.b_add = True
+    elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
+        paddle = target_player_info['paddle']
+        paddle.height = paddle.height - (Paddle().height / 5 * 1) if paddle.height > Paddle().height / 5 * 1 else paddle.height
+        sounds.p_down = True
+    
+    await database_sync_to_async(update_game_info)(game.id, game_info)
+    await database_sync_to_async(update_game_info)(game.id, player_info, player)
+    await database_sync_to_async(update_game_info)(game.id, target_player_info, target_player)
+    print("item used")
+        
+async def move_paddle(room_group_name, user, direction):
+    game = await database_sync_to_async(Game.objects.get)(id=room_group_name)
+    round = await database_sync_to_async(game.get_next_round)()
+    if round == None:
+        print("round is None")
+        return
+    
+    player = await get_player_number(round, user)
+    if player == None:
+        print(user.nickname, " : Not player")
+        return
+    
+    game_info = await database_sync_to_async(get_game_info)(game.id)
+    player_info = await database_sync_to_async(get_game_info)(game.id, player)
+    if game_info == None or player_info == None or game_info['balls'][0].is_ball_moving == False:
+        return
+    
+    await player_info['paddle'].change_direction(direction)
+    
+    await database_sync_to_async(update_game_info)(game.id, player_info, player)
+    
+    print(player, " paddle moved ", player_info['paddle'].direction) #test code

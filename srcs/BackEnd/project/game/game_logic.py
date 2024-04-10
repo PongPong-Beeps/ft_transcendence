@@ -3,22 +3,34 @@ from .models import Paddle, Item, Ball
 import random
 import math
 import os
+from .cache import set_game_info, get_game_info, update_game_info, print_game_info, print_balls, print_item
 
 WIDTH = int(os.getenv('WIDTH'))
 HEIGHT = int(os.getenv('HEIGHT'))
 
-def set_ball_moving(round):
-    ball = round.balls[0]
-    ball.is_ball_moving = True
+def set_ball_moving(game_id, type='init'):
+    if type == 'init':
+        timer = threading.Timer(1, lambda: set_ball_moving(game_id, 'start'))
+        timer.start()
+        print("timer start")
+        return
+    game_info = get_game_info(game_id)
+    if game_info == None:
+        return
+    balls = game_info['balls']
+    balls[0].is_ball_moving = True
+    update_game_info(game_id, game_info)
+    print("ball moving")
 
-def init_game_objects(round, mode):
+def reset_game_objects(game_id, game_info, mode, players):
+    balls = game_info['balls']
     
     #아이템 슬롯 초기화
-    round.slot_1.status = False
-    round.slot_2.status = False
+    players[0]['slot'].status = False
+    players[1]['slot'].status = False
     
     #패들 위치, 크기 초기화
-    paddles = [ round.paddle_1, round.paddle_2 ]
+    paddles = [ players[0]['paddle'], players[1]['paddle'] ]
     for i, paddle in enumerate(paddles):
         if i == 0:
             paddle.x = Paddle().player_area
@@ -27,12 +39,8 @@ def init_game_objects(round, mode):
         paddle.y = (HEIGHT / 2) - (paddle.height) / 2
         paddle.direction = 'stop'
         paddle.height = Paddle().height #아이템에서 바뀐 패들 크기 초기화
-
-    if mode == "easy":
-        round.ball_2 = None
     
     #볼 위치, 방향 초기화, 속도, 볼개수 초기화
-    balls = round.balls
     for i, ball in enumerate(balls.copy()):
         #아이템에서 바뀐 추가볼 삭제
         if i > 0:
@@ -42,50 +50,48 @@ def init_game_objects(round, mode):
         ball.x = WIDTH / 2
         ball.y = HEIGHT / 2
         ball.is_ball_moving = False
-        ball.speed = Ball().speed #아이템에서 바뀐 속도 초기화
-        if i == 0:
-            ball.dirX, ball.dirY = ball.get_random_direction()
-        else:
-            ball.dirX = -balls[0].dirX
-            ball.dirY = -balls[0].dirY    
-
-    round.save()
+        ball.speed = Ball(mode).speed #아이템에서 바뀐 속도 초기화
+        ball.dirX, ball.dirY = ball.get_random_direction()
 
     #1초 후에 공을 움직이게 함
-    timer = threading.Timer(1, lambda: set_ball_moving(round))
-    timer.start()
+    set_ball_moving(game_id)
 
-def check_round_ended(round):
-    if round.heart_1 == 0 or round.heart_2 == 0:
-        if round.heart_2 == 0:
+def check_round_ended(round, players):
+    heart_1 = players[0]['heart']
+    heart_2 = players[1]['heart']
+    if heart_1 == 0 or heart_2 == 0:
+        if heart_2 == 0:
             round.winner = round.player1
-        elif round.heart_1 == 0:
+        elif heart_1 == 0:
             round.winner = round.player2
         round.is_roundEnded = True
         round.save()
         return True
     return False
 
-def update(round, mode):
-    if check_round_ended(round):
+def update(round, mode, game_id):
+    game_info = get_game_info(game_id)
+    players = [ get_game_info(game_id, 'player1'), get_game_info(game_id, 'player2') ]
+    balls = game_info['balls']
+    sounds = game_info['sounds']
+    
+    if check_round_ended(round, players):
         return
     
     if mode == 'hard':
-        if round.balls[0].is_ball_moving == False:
-            round.item = None
+        if balls[0].is_ball_moving == False:
+            game_info['item'] = None
         else:
-            update_item(round)
+            update_item(round, game_info, players)
 
-    paddles = [ round.paddle_1, round.paddle_2 ]
+    paddles = [ players[0]['paddle'], players[1]['paddle'] ]
     # 패들 위치 업데이트
     for paddle in paddles:
         paddle.move_paddle(HEIGHT)
     
-    balls = round.balls
     for i, ball in enumerate(balls.copy()): #인덱스때문에 복사본 사용
         if i == 0 and ball.is_ball_moving == False: #기본 공 안움직이면 업데이트 안함
             break
-
         #공 위치 업데이트
         ball.x += ball.speed * ball.dirX
         ball.y += ball.speed * ball.dirY
@@ -93,27 +99,25 @@ def update(round, mode):
         #벽 충돌 검사(맵 상단, 하단)
         if ball.y + ball.radius > HEIGHT or ball.y - ball.radius < 0:
             ball.dirY = -ball.dirY
-            round.sound.pong = True
+            sounds.pong = True
 
         ball_type = 'basic' if i == 0 else 'additional'
 
         #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
         if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2\
             or ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
-            if ball_type == 'additional':
-                if ball in balls:
-                    balls.remove(ball)
+            # if ball_type == 'additional':
+            #     if ball in balls:
+            #         balls.remove(ball)
             if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2:
-                round.heart_1 -= 1
-                round.save()
-                init_game_objects(round, mode)
-                round.sound.out = True
+                players[0]['heart'] -= 1
+                sounds.out = True
+                reset_game_objects(game_id, game_info, mode, players)
             elif ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
-                round.heart_2 -= 1
-                round.save()
-                init_game_objects(round, mode)
-                round.sound.out = True
-            continue
+                players[1]['heart'] -= 1
+                sounds.out = True
+                reset_game_objects(game_id, game_info, mode, players)
+            break
                 
         #패들 충돌검사
         nearest_paddle = paddles[0] if ball.x < WIDTH / 2 else paddles[1]
@@ -125,23 +129,26 @@ def update(round, mode):
                 ball.dirX = -ball.dirX
                 ball.x += ball.dirX * abs(nearest_paddle.width - abs(nearest_paddle.x - ball.x)) #볼이 패들을 타는 버그 방지
                 adjust_ball_direction_on_paddle_contact(ball, nearest_paddle)
-                round.sound.pong = True
+                sounds.pong = True
             elif ball_type == 'additional':
                 if ball in balls:
                     balls.remove(ball)
-                round.sound.pong = True
-                continue
+                sounds.pong = True
+            
+    update_game_info(game_id, game_info)
+    update_game_info(game_id, players[0], 'player1')
+    update_game_info(game_id, players[1], 'player2')
 
-def update_item(round):
-    item = round.item
-    if item == None and random.random() < 0.1: # 10% 확률로 아이템 생성
-        generate_item(round)
+def update_item(round, game_info, players):
+    if game_info['item'] == None and random.random() < 0.5: # 10% 확률로 아이템 생성
+        generate_item(round, game_info, players)
     
+    item = game_info['item']
     if item == None: #아이템이 없으면 do nothing
         return
     
-    
-    paddles = [ round.paddle_1, round.paddle_2 ]
+    sounds = game_info['sounds']
+    paddles = [ players[0]['paddle'], players[1]['paddle'] ]
 
     #item 위치 업데이트
     item.x += item.speed * item.dirX
@@ -154,37 +161,33 @@ def update_item(round):
     #아이템 소멸 감지
     if item.x - item.radius < Paddle().player_area\
        or item.x + item.radius > WIDTH - Paddle().player_area:
-        round.item = None
+        game_info['item'] = None
         return
     
     #아이템 획득 감지
-    nearest_paddle, paddle_idx = (paddles[0], 'paddle_1') if item.x < WIDTH / 2 else (paddles[1], 'paddle_2')
+    nearest_paddle, idx = (paddles[0], 0) if item.x < WIDTH / 2 else (paddles[1], 1)
     if item.x - item.radius <= nearest_paddle.x + nearest_paddle.width\
        and item.x + item.radius >= nearest_paddle.x\
        and item.y - item.radius <= nearest_paddle.y + nearest_paddle.height\
        and item.y + item.radius >= nearest_paddle.y:
-       round.sound.item = True
-       if paddle_idx == 'paddle_1':
-            round.slot_1.status = True
-       else:
-            round.slot_2.status = True
-    #round.save()
-       round.item = None
+       sounds.item = True
+       players[idx]['slot'].status = True
+       game_info['item'] = None
 
-def generate_item(round):
-    if round.heart_1 < round.heart_2:
+def generate_item(round, game_info, players):
+    if players[0]['heart'] < players[1]['heart']:
         winner = 'player_2'
         loser = 'player_1'
-    elif round.heart_1 > round.heart_2:
+    elif players[0]['heart'] > players[1]['heart']:
         winner = 'player_1'
         loser = 'player_2'
     else: #동점
         to = 'random'
-        round.item = Item(to)
+        game_info['item'] = Item(to)
         return
     
     to = random.choice(loser * 3 + winner * 1)
-    round.item = Item(to)
+    game_info['item'] = Item(to)
     #round.save()
 
 def adjust_ball_direction_on_paddle_contact(ball, nearest_paddle):

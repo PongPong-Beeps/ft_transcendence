@@ -126,6 +126,13 @@ CHANNEL_LAYERS = {                           # channel layer 설정
     }
 }
 
+# Django 인메모리 캐시 설정
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
