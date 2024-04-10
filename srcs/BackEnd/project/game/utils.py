@@ -204,8 +204,7 @@ async def use_item(room_group_name, user):
         return
     player_info['slot'].status = False #슬롯 비워주기
     
-    #b_add(공추가)는 1/11 확률, b_up(공속도업), p_down(패들크기줄이기)는 각 5/11확률
-    item_type = random.choice(["b_add"] * 5 + ["b_up", "p_down"] * 5)
+    item_type = random.choice(["b_add"] * int(os.getenv('B_ADD')) + ["b_up"] * int(os.getenv('B_UP')) + ["p_down"] * int(os.getenv('P_DOWN')))
     balls=game_info['balls']
     ball=balls[0]
     sounds = game_info['sounds']
