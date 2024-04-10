@@ -227,7 +227,6 @@ async def use_item(room_group_name, user):
     print("item used")
         
 async def move_paddle(room_group_name, user, direction):
-    
     game_info = await database_sync_to_async(get_game_info)(room_group_name)
     if game_info == None:
         return
