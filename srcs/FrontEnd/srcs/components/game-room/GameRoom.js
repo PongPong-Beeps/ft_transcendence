@@ -8,6 +8,7 @@ import {navigate} from "../../utils/navigate.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 import GameWinner from "../../pages/GameWinner.js";
 import VsSchedule from "../../pages/vs-schedule/VsSchedule.js";
+import {BACKEND, fetchWithAuth} from "../../api.js";
 
 /**
  * @param {HTMLElement} $container
@@ -96,8 +97,15 @@ export default function GameRoom($container, wsManagers) {
     gameWsManager.addMessageHandler(function (data) {
         if (data.type === "game_start") {
             delete data.type;
-            data.additionalData = { "wsManagers": wsManagers };
-            navigate('game', data);
+            fetchWithAuth(`https://${BACKEND}/api/user/me/`)
+                .then(userMeData => {
+                    data.additionalData = { "wsManagers": wsManagers, "id": userMeData.id };
+                    navigate('game', data);
+                })
+                .catch(error => {
+                    console.error("게임 컴포넌트에서 user/me 실패");
+                    new ErrorPage($container, error.status);
+                });
         }
     });
     

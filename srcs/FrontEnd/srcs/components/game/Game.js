@@ -27,6 +27,7 @@ export default function Game($container, data) {
      const paddleColor = '#ffffff', pongColor = '#ffa939', attackBallColor = '#ff396e', backgroundColor = '#27522d';
      let playerData, playerArea, fixWidth, fixHeight, paddleWidth, itemRadius; // round_ready 때 받을 정보
      let currentKey = '', currentHeart = [0, 0];
+     let isPlaying = false;
 
      const init = () => {
           const container = $container.querySelector('.game-canvas-container');
@@ -187,7 +188,7 @@ export default function Game($container, data) {
 
      const setupEventListener = () => {
           document.addEventListener('keydown', (event) => {
-               if (currentKey === event.code) return; // 같은 키 이벤트 여러 번 보내는 것 방지
+               if (isPlaying === false || currentKey === event.code) return; // 같은 키 이벤트 여러 번 보내는 것 방지
                currentKey = event.code;
                switch (event.code) {
                     case 'KeyW':
@@ -217,10 +218,15 @@ export default function Game($container, data) {
                $container.querySelector('#page').style.display = 'none';
                // 플레이어 정보 저장
                playerData = []; // 빈 배열로 초기화
+               isPlaying = false;
                roundData.player_data.map(player => {
                     let image = new Image();
                     image.src = player.image ? 'data:image/jpeg;base64,' + player.image : "../../../assets/image/cruiser.gif";
                     playerData.push({ "nickname" : player.nickname, "image" : image });
+                    if (player.id === data.additionalData.id) {
+                         isPlaying = true;
+                    }
+
                });
                // 변수 저장
                fixWidth = roundData.fix.canvas.width;
