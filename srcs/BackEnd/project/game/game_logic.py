@@ -186,7 +186,7 @@ def generate_item(round, game_info, players):
         game_info['item'] = Item(to)
         return
     
-    to = random.choice(loser * 3 + winner * 1)
+    to = random.choice(loser * int(os.getenv('ITEM_LOSER')) + winner * int(os.getenv('ITEM_WINNER')))
     game_info['item'] = Item(to)
     #round.save()
 
