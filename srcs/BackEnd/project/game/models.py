@@ -158,10 +158,10 @@ class Game(models.Model):
         return None
 
 class Paddle():
-    def __init__(self, player='player1'):
+    def __init__(self, player='player1', mode='default'):
         #패들 고정값
         self.width = float(os.getenv('PADDLE_WIDTH'))
-        self.height = float(os.getenv('PADDLE_HEIGHT'))
+        self.height = float(os.getenv('PADDLE_HEIGHT')) / 2 if mode == 'easy' else float(os.getenv('PADDLE_HEIGHT')) 
         self.speed = float(os.getenv('PADDLE_SPEED'))
         self.player_area = float(os.getenv('PADDLE_PLAYER_AREA'))
         #패들 가변값

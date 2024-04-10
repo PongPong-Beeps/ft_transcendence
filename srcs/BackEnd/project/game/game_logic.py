@@ -38,7 +38,7 @@ def reset_game_objects(game_id, game_info, mode, players):
             paddle.x = WIDTH - paddle.width - Paddle().player_area
         paddle.y = (HEIGHT / 2) - (paddle.height) / 2
         paddle.direction = 'stop'
-        paddle.height = Paddle().height #아이템에서 바뀐 패들 크기 초기화
+        paddle.height = Paddle(None, mode).height #아이템에서 바뀐 패들 크기 초기화
     
     #볼 위치, 방향 초기화, 속도, 볼개수 초기화
     for i, ball in enumerate(balls.copy()):
