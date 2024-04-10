@@ -16,7 +16,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         else:
             print("user is authenticated:", user)
             
-            #중복유저에게 disconnect 하게 하기
+            #중복유저 disconnect
             double_clients = await database_sync_to_async(list)(Client.objects.filter(user=user))
             if double_clients: #중복유저가 있을 경우
                 for double_client in double_clients:
@@ -143,12 +143,6 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             })
         friendList_json = json.dumps({"friendList": friendList})
         return friendList_json
-    
-    ## print user's friends       
-    async def print_user_friends(self, user):
-        friends = await database_sync_to_async(lambda: list(user.friendlist.all()))()
-        for friend in friends:
-            print("Friend: ", friend.nickname)
     
     async def all_chat(self, event):
         user = self.scope['user']
