@@ -2,19 +2,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User, MatchHistory
 from rest_framework.permissions import IsAuthenticated
-from .serializer import BlackListSerializer, MatchHistorySerializer #가정한 시리얼라이저 임포트 경로
-from django.core.files.storage import default_storage #파일을 저장하기 위한 모듈
-from django.core.files.base import ContentFile #파일을 읽고 쓰기 위한 모듈
-import base64 #base64 인코딩을 위한 모듈
-from drf_yasg.utils import swagger_auto_schema #swagger
-from rest_framework.parsers import MultiPartParser #swagger 파일 업로드를 위한 파서 클래스
-from swagger.serializer import ChangeImageSerializer, InputNickSerializer#, UserInfoSerializer #swagger 시리얼라이저
-from swagger.serializer import user_list_schema, user_me_schema, user_info_schema #swagger 스키마
-import os #디렉토리 생성/삭제를 위한 모듈
+from .serializer import BlackListSerializer, MatchHistorySerializer
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import base64
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.parsers import MultiPartParser
+from swagger.serializer import ChangeImageSerializer, InputNickSerializer
+from swagger.serializer import user_list_schema, user_me_schema, user_info_schema
 
 #/api/user/list
 class UserListView(APIView):
-#    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(
         tags=['User'],
         responses=user_list_schema
@@ -52,7 +50,7 @@ class BlockUserView(APIView):
             user_me = User.objects.get(id=request.user.id)
             target_id = request.data.get('id')
             user_target = User.objects.get(id=target_id)
-            user_me.blacklist.add(user_target)  # Add the target to the blacklist
+            user_me.blacklist.add(user_target)
             return Response({"message": f"{user_target.nickname}이(가) 정상적으로 블랙리스트 처리 되었습니다"}, status = 200)
         except User.DoesNotExist:
             return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=400)
@@ -71,7 +69,7 @@ class UnblockUserView(APIView):
             user_me = User.objects.get(id=request.user.id)
             target_id = request.data.get('id')
             user_target = User.objects.get(id=target_id)
-            user_me.blacklist.remove(user_target)  # Remove the target from the blacklist
+            user_me.blacklist.remove(user_target)
             return Response({"message": f"{user_target.nickname}이(가) 정상적으로 블랙리스트에서 제거되었습니다"}, status=200)
         except User.DoesNotExist:
             return Response({"error": f"{user_target.nickname}사용자가 존재하지 않습니다."}, status=400)
@@ -80,7 +78,6 @@ class UnblockUserView(APIView):
 
 #/api/user/me
 class CurrentUserView(APIView):
-    # permission_classes = [IsAuthenticated]
     @swagger_auto_schema(
         tags=['Profile'],
         responses=user_me_schema
@@ -91,7 +88,7 @@ class CurrentUserView(APIView):
             user = User.objects.get(id=user_id)
             print(user)
             response_data = {
-                    "image" : get_image(user), #user/me 이미지
+                    "image" : get_image(user),
                     "id" : user.id,
                     "nickname": user.nickname,
             }
@@ -106,7 +103,6 @@ class CurrentUserView(APIView):
 #내 닉네임 변경
 #/api/user/me/nickname
 class ChangeNicknameView(APIView):
-    # permission_classes = [IsAuthenticated]
     @swagger_auto_schema(
         tags=['Profile'], 
         request_body=InputNickSerializer,
@@ -122,7 +118,7 @@ class ChangeNicknameView(APIView):
             return Response({"error": f"닉네임({new_nickname}) 이미 존재"}, status=401)
         elif len(new_nickname) < 2 or len(new_nickname) > 8:
             return Response({"error": "닉네임은 2자 이상 8자 이하"}, status=402)
-        elif not new_nickname.isalnum(): #isalnum 숫자, 알파벳으로만 이루어졌는지 확인하는 파이썬 내장함수
+        elif not new_nickname.isalnum():
             return Response({"error": "닉네임은 숫자와 알파벳만 사용"}, status=403)
         user.nickname = new_nickname
         user.save()
@@ -131,8 +127,6 @@ class ChangeNicknameView(APIView):
 #프로필 정보 탭
 #/api/user/info
 class UserInfoView(APIView):
-    # permission_classes = [IsAuthenticated]
-    
     def calculate_user_info(self, user, data):
         nickname = user.nickname
 
@@ -169,8 +163,8 @@ class UserInfoView(APIView):
             "total": int(total_winning_percentage),
             "easy": int(easy_winning_percentage),
             "hard": int(hard_winning_percentage),
-            "friend": data['is_friend'], #친구인지 여부
-            "block": data['is_blocked'], #블랙리스트에 있는지 여부
+            "friend": data['is_friend'],
+            "block": data['is_blocked'],
         }
         return response_data
 
@@ -178,12 +172,12 @@ class UserInfoView(APIView):
         tags=['Profile'], 
         responses=user_info_schema
     )
-    # get 이면 나의 프로필 정보 리턴
+    
+    # get 이면 나의 정보
     def get(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
         
-        #친구여부, 블랙여부 데이터, 본인 자신이니 친구도 블랙도 아님
         data = {
             'is_friend' : False,
             'is_blocked' : False,
@@ -196,16 +190,15 @@ class UserInfoView(APIView):
         request_body=InputNickSerializer,
         responses=user_info_schema
     )
-    # get 이면 나의 프로필 정보 리턴
+    
+    #post 이면 상대방 정보
     def post(self, request):
         target_id = request.data.get('id')
         user_target = User.objects.get(id=target_id)
         
-        # 현재 로그인한 나의 정보
         user_id = request.user.id
         user_me = User.objects.get(id=user_id)
         
-        #친구여부, 블랙여부 데이터
         data = {
             'is_friend' : False,
             'is_blocked' : False,
@@ -228,11 +221,11 @@ class MatchHistoryView(APIView):
         tags=['Profile'], 
         responses={200: MatchHistorySerializer(many=True)}
     )
-    def get(self, request): #내 프로필 - 전적
+    def get(self, request):
         user_id = request.user.id
         user_me = User.objects.get(id=user_id)
         my_match = MatchHistory.objects.filter(user=user_me).order_by('-datetime')
-        serializer = MatchHistorySerializer(my_match, many=True) #many=True : 하나가 아닌 여러개의 데이터를 직렬화
+        serializer = MatchHistorySerializer(my_match, many=True)
         response_data = {"history" : serializer.data}
         return Response(response_data, status=200)
         
@@ -241,7 +234,7 @@ class MatchHistoryView(APIView):
         request_body=InputNickSerializer, 
         responses={200: MatchHistorySerializer(many=True)}
     )
-    def post(self, request): #상대 프로필 - 전적
+    def post(self, request):
         target_id = request.data.get('id')
         target_user = User.objects.get(id=target_id)
         target_match = MatchHistory.objects.filter(user=target_user).order_by('-datetime')
@@ -252,10 +245,9 @@ class MatchHistoryView(APIView):
 
 #/api/user/me/image/ 내 프로필 이미지 변경
 #[ POST ] 이미지 변경하기
-#[ GET ]  이미지 가져오기(임시) -> 추후에 함수로 빼서 내 프로필, 프로필 모달에서 사용할 예정
+#[ GET ]  이미지 가져오기
 class ChangeImageView(APIView):
-    #permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser,) #이미지 업로드 버튼을 위한 파서 클래스
+    parser_classes = (MultiPartParser,)
     @swagger_auto_schema(
         tags=['Profile'], 
         request_body=ChangeImageSerializer,
@@ -265,13 +257,10 @@ class ChangeImageView(APIView):
         try :
             user_id = request.user.id
             user = User.objects.get(id=user_id)
-            image = request.data.get('image') # body내 key값이 'image'인 value를 가져옴
-            # resize_image(image, 150, 150) # 이미지 리사이징 (150x150으로 리사이징) 추후 필요 # django-imagekit 라이브러리 활용
+            image = request.data.get('image')
             if ('user_images/' + str(user.id) + '/') in user.image_file.name:
-                default_storage.delete(user.image_file.name) # 기존 이미지 삭제
-            #django컨테이너 내부 WORKDIR / user_images/geonwule/ 에 이미지 저장
+                default_storage.delete(user.image_file.name)
             file_path = default_storage.save('user_images/' + str(user.id) + '/' + image.name, ContentFile(image.read()))
-            # ImageField에 파일 경로 저장
             user.image_file = file_path
             user.save()
             
@@ -292,18 +281,13 @@ class ChangeImageView(APIView):
         try :
             user_id = request.user.id
             user = User.objects.get(id=user_id)
-            # 이미지 파일을 읽어옵니다.
             image_file = user.image_file
-            #with는 파일을 안전하게 열고 닫는다.
-            with open(image_file.path, "rb") as f: # "rb" : 이미지 파일을 바이너리 읽기 모드로 엽니다.
+            with open(image_file.path, "rb") as f:
                 image_data = f.read()
 
-            # 이미지를 Base64로 인코딩합니다.
-            # image -> base64로 인코딩 -> FrontEnd에서 다시 디코딩하여 이미지로 사용 (<img src="data:image/png;base64, <base64 code>" alt="이미지">)
             image_base64 = base64.b64encode(image_data)
             print("image_base64: ", image_base64)
 
-            # 응답 데이터에 이미지 Base64 문자열을 포함시킵니다.
             response_data = {
                 "message": "프로필 이미지가 정상적으로 가져와졌습니다",
                 "image": image_base64,
@@ -319,8 +303,7 @@ def get_image(user):
         with open(image_file.path, "rb") as f:
             image_data = f.read()
         image_base64 = base64.b64encode(image_data).decode('utf-8')
-        # print("image_base64: ", image_base64)
 
         return image_base64
-    except Exception as e: # 이미지가 없을 경우 read()에서 예외 발생!
-        return ('') # 이미지가 없을 경우 빈 문자열을 반환
+    except Exception as e:
+        return ('')
