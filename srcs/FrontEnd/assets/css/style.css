@@ -48,7 +48,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .clickab
     padding: 10px;
     width: 80vw;
     height: 85vh;
-    overflow: scroll;
+    overflow: auto;
     border: 8px solid #5C7320;
     border-radius: 30px;
 }
