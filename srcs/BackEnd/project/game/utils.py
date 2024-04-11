@@ -1,6 +1,6 @@
 from channels.db import database_sync_to_async
 from user.views import get_image
-from .models import Game, Ball, Paddle, Item
+from .models import Ball, Paddle, Item
 from user.models import MatchHistory
 import os
 from .cache import get_game_info, update_game_info
@@ -54,7 +54,7 @@ async def serialize_fixed_data(round):
     
     return fixed_data
 
-def generate_round_info(round, mode, game_id):
+def generate_round_info(round, game_id):
     if not round:
         return {"error": "Player or round information is missing."}
         

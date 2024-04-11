@@ -3,7 +3,7 @@ from .models import Paddle, Item, Ball
 import random
 import math
 import os
-from .cache import set_game_info, get_game_info, update_game_info, print_game_info, print_balls, print_item
+from .cache import get_game_info, update_game_info
 
 WIDTH = int(os.getenv('WIDTH'))
 HEIGHT = int(os.getenv('HEIGHT'))
@@ -82,7 +82,7 @@ def update(round, mode, game_id):
         if balls[0].is_ball_moving == False:
             game_info['item'] = None
         else:
-            update_item(round, game_info, players)
+            update_item(game_info, players)
 
     paddles = [ players[0]['paddle'], players[1]['paddle'] ]
     # 패들 위치 업데이트
@@ -106,9 +106,6 @@ def update(round, mode, game_id):
         #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
         if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2\
             or ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
-            # if ball_type == 'additional':
-            #     if ball in balls:
-            #         balls.remove(ball)
             if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2:
                 players[0]['heart'] -= 1
                 sounds.out = True
@@ -139,9 +136,9 @@ def update(round, mode, game_id):
     update_game_info(game_id, players[0], 'player1')
     update_game_info(game_id, players[1], 'player2')
 
-def update_item(round, game_info, players):
+def update_item(game_info, players):
     if game_info['item'] == None and random.random() < 0.5: # 10% 확률로 아이템 생성
-        generate_item(round, game_info, players)
+        generate_item(game_info, players)
     
     item = game_info['item']
     if item == None: #아이템이 없으면 do nothing
@@ -174,7 +171,7 @@ def update_item(round, game_info, players):
        players[idx]['slot'].status = True
        game_info['item'] = None
 
-def generate_item(round, game_info, players):
+def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:
         winner = 'player_2'
         loser = 'player_1'
@@ -188,7 +185,6 @@ def generate_item(round, game_info, players):
     
     to = random.choice(loser * int(os.getenv('ITEM_LOSER')) + winner * int(os.getenv('ITEM_WINNER')))
     game_info['item'] = Item(to)
-    #round.save()
 
 def adjust_ball_direction_on_paddle_contact(ball, nearest_paddle):
     if (nearest_paddle.y < ball.y < nearest_paddle.y + nearest_paddle.height / 8) or \
