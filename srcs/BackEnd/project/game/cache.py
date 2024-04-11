@@ -17,7 +17,7 @@ def set_game_info(game_id, mode, round):
     
     for player in ['player1', 'player2']:
         player_info = {
-            "paddle": Paddle(player, mode),
+            "paddle": Paddle(player),
             "heart": int(os.getenv('HEART_NUM')),
             "slot": Slot(),
         }

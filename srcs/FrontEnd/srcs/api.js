@@ -1,5 +1,6 @@
 import getCookie from "./utils/cookie.js";
 
+// export const BACKEND = 'https://127.0.0.1/api';
 export const BACKEND = '127.0.0.1';
 
 async function refreshToken() {
