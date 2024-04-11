@@ -213,8 +213,8 @@ export default function Game($container, data) {
 
      gameWsManager.addMessageHandler(function (roundData) {
           if (roundData.type === 'round_ready') {
+               fadeOutAudio(bgm_versus, 500);
                // 대진표 아웃 !
-               fadeOutAudio(bgm_versus, 3000);
                $container.querySelector('#page').style.display = 'none';
                // 플레이어 정보 저장
                playerData = []; // 빈 배열로 초기화

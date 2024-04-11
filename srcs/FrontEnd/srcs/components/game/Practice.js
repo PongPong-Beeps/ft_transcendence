@@ -2,7 +2,6 @@ import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
 import fadeOutAudio from "../../utils/audio.js";
 
 export default function Practice($container, connWsManager) {
-    let bgm_game = new Audio("../../../assets/sound/bgm_game.mp3");
     let audio_pong = new Audio("../../../assets/sound/pong.mp3");
     let audio_out = new Audio("../../../assets/sound/out.mp3");
     let playerImage = new Image();
@@ -39,9 +38,6 @@ export default function Practice($container, connWsManager) {
         pong = { radius: containerHeight * 0.03, speed: containerHeight * 0.015, color: '#ffa939' };
         // 이미지 초기화
         playerImage.src = "../../assets/image/character.png";
-        // 배경 음악 초기화
-        bgm_game.volume = 0.3;
-        bgm_game.play();
     }
 
     function getRandomDirection() {
@@ -262,7 +258,6 @@ export default function Practice($container, connWsManager) {
         });
 
         document.addEventListener('leave-game', () => {
-            fadeOutAudio(bgm_game, 1000);
             cancelAnimationFrame(animationFrameId); // 현재 게임 루프 중지
         });
     };

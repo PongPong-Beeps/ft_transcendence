@@ -11,6 +11,7 @@ import InviteModal from "../../pages/InviteModal.js";
 import hasUndefinedArgs from "../../utils/hasUndefinedArgs.js";
 import DuplicateInviteAlert from "../../pages/DuplicateInviteAlert.js";
 import AlreadyInGameAlert from "../../pages/AlreadyInGameAlert.js";
+import fadeOutAudio from "../../utils/audio.js";
 
 /**
  * @param { HTMLElement } $container
@@ -19,7 +20,9 @@ import AlreadyInGameAlert from "../../pages/AlreadyInGameAlert.js";
 export default function UserList($container, connWsManager) {
     if(hasUndefinedArgs($container, connWsManager))
         return;
-    
+
+    let bgm_lobby = new Audio("../../../assets/sound/bgm_lobby.mp3");
+
     let id;
     let [getFriendList, setFriendList] = useState([], this, 'renderFriendList');
     let [getAllUserList, setAllUserList] = useState([], this, 'renderAllUserList');
@@ -176,6 +179,12 @@ export default function UserList($container, connWsManager) {
                 setFriendList(data.friendList);
             }
         });
+        document.addEventListener('pause-lobby-bgm', () => {
+            fadeOutAudio(bgm_lobby, 500);
+        });
+        document.addEventListener('play-lobby-bgm', () => {
+            bgm_lobby.play();
+        });
     }
 
     if (connWsManager) {
@@ -187,6 +196,8 @@ export default function UserList($container, connWsManager) {
         });
     }
 
+    bgm_lobby.loop = true;
+    bgm_lobby.play();
     importCss("assets/css/user-list.css");
     render();
     setupEventListener();

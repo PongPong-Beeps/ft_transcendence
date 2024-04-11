@@ -39,6 +39,7 @@ export default function Header($container, connWsManager) {
                     connWsManager.ws.close();
                     const event = new CustomEvent('logout');
                     document.dispatchEvent(event);
+                    document.dispatchEvent(new Event('pause-lobby-bgm'));
                     document.dispatchEvent(new Event('leave-game'));
                     navigate('/');
                 })
