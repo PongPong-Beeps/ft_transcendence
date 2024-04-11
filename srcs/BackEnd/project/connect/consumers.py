@@ -5,6 +5,8 @@ from .models import Client, InvitationQueue
 from channels.db import database_sync_to_async
 from user.models import User
 from game.models import Game
+from .cache import set_user_info, get_user_info, delete_user_info
+from django.core.cache import cache
 
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -37,6 +39,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
           self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
+        await database_sync_to_async(set_user_info)(user, None)
         
     async def disconnect(self, close_code):
         user = self.scope['user']        
@@ -51,6 +54,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
           self.room_group_name, {"type": "friend_list", "sender": user.id}
         )
+        await database_sync_to_async(delete_user_info)(user)
         
     async def remove_clinet_and_invitation(self, user):
         client = await database_sync_to_async(Client.objects.get)(channel_name=self.channel_name)
@@ -149,19 +153,19 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         sender = event['sender']
         message = event['message']
         
-        sender_user = await database_sync_to_async(User.objects.get)(id=sender)
-        sender_nick = sender_user.nickname
+        sender_info = await database_sync_to_async(get_user_info)(sender)
+        if sender_info:
+            sender_nick = sender_info['nickname']
+            sender_game = sender_info['game_id']
+            
+        user_info = await database_sync_to_async(get_user_info)(user.id)
+        if user_info:
+            user_game = user_info['game_id']
         
-        sender_client = await database_sync_to_async(Client.objects.filter(user__id=sender).first)()
-        sender_game = await database_sync_to_async(Game.objects.filter(players__client=sender_client).first)() if sender_client else None
-        user_client = await database_sync_to_async(Client.objects.filter(user=user).first)()
-        user_game = await database_sync_to_async(Game.objects.filter(players__client=user_client).first)() if user_client else None
-        
-        is_blocked = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
-        if is_blocked:
+        if user_info and sender in user_info.get('black_list', []): #sender가 user의 블랙리스트에 있는 경우
             return
         
-        if sender_game == user_game:
+        if user_game == sender_game:
             await self.send(text_data=json.dumps({
                 "type": "all_chat",
                 "sender": sender_nick,
@@ -173,31 +177,32 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         sender = event['sender']
         receiver = event['receiver']
         message = event['message']
-        is_receiver = user.id == receiver
-        is_sender = user.id == sender
-        is_blocked_sender = await database_sync_to_async(lambda: user.blacklist.filter(id=sender).exists())()
-        is_blocked_receiver = await database_sync_to_async(lambda: user.blacklist.filter(id=receiver).exists())()
+        is_receiver = user.id == receiver   # user가 receiver인지
+        is_sender = user.id == sender       # user가 sender인지
         
-        if is_receiver and not is_blocked_sender:   # receiver가 sender를 차단하지 않은 경우
+        sender_info = await database_sync_to_async(get_user_info)(sender)
+        receiver_info = await database_sync_to_async(get_user_info)(receiver)
+        if sender_info and receiver in sender_info.get('black_list', []):       # receiver가 sender의 블랙리스트에 있는 경우
+            is_blocked = True
+        elif receiver_info and sender in receiver_info.get('black_list', []):   # sender가 receiver의 블랙리스트에 있는 경우
+            is_blocked = True
+        else:
+            is_blocked = False
+        
+        if is_receiver and not is_blocked:   # user가 receiver인 경우
             print("receiver: ", receiver, "sender: ", sender, "message: ", message)
-            sender_user = await database_sync_to_async(User.objects.get)(id=sender)
-            if sender_user:
-                sender_nick = sender_user.nickname
-            else:
-                sender_nick = "Unknown User"
+            sender_info = await database_sync_to_async(get_user_info)(sender)
+            sender_nick = sender_info['nickname']
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "sender": sender_nick,
                 "message": message
             }))
         
-        if is_sender and not is_blocked_receiver:   # sender가 receiver를 차단하지 않은 경우
+        if is_sender and not is_blocked:     # user가 sender인 경우
             print("receiver: ", receiver, "sender: ", sender, "message: ", message)
-            receiver_user = await database_sync_to_async(User.objects.get)(id=receiver)
-            if receiver_user:
-                receiver_nick = receiver_user.nickname
-            else:
-                receiver_nick = "Unknown User"
+            receiver_info = await database_sync_to_async(get_user_info)(receiver)
+            receiver_nick = receiver_info['nickname']
             await self.send(text_data=json.dumps({
                 "type": "dm_chat",
                 "receiver": receiver_nick,

@@ -130,6 +130,7 @@ CHANNEL_LAYERS = {                           # channel layer 설정
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        'TIMEOUT': None,
     }
 }
 

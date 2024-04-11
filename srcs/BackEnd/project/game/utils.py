@@ -230,6 +230,9 @@ async def move_paddle(room_group_name, user, direction):
     game_info = await database_sync_to_async(get_game_info)(room_group_name)
     if game_info == None:
         return
+    balls = game_info['balls']
+    if balls[0].is_ball_moving == False:
+        return
     
     player_key = None
     if game_info['player1'].id == user.id:
@@ -238,7 +241,7 @@ async def move_paddle(room_group_name, user, direction):
         player_key = 'player2'
     
     player_info = await database_sync_to_async(get_game_info)(room_group_name, player_key)
-    if player_info == None or game_info['balls'][0].is_ball_moving == False:
+    if player_info == None:
         return
     
     await player_info['paddle'].change_direction(direction)
