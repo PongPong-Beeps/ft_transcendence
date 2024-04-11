@@ -1,6 +1,6 @@
 from channels.db import database_sync_to_async
 from user.views import get_image
-from .models import Game, Ball, Paddle, Item
+from .models import Ball, Paddle, Item
 from user.models import MatchHistory
 import os
 from .cache import get_game_info, update_game_info
@@ -54,7 +54,7 @@ async def serialize_fixed_data(round):
     
     return fixed_data
 
-def generate_round_info(round, mode, game_id):
+def generate_round_info(round, game_id):
     if not round:
         return {"error": "Player or round information is missing."}
         
@@ -166,16 +166,6 @@ async def determine_winner(game, winner, round_number):
         else:
             game.winner = winner
         await database_sync_to_async(game.round3.save)()
-            
-async def get_player_number(round, user):
-    players = await database_sync_to_async(round.get_players)()
-    for i, player in enumerate(players):
-        if player == user:
-            if i == 0:
-                return 'player1'
-            elif i == 1:
-                return 'player2'
-    return None
  
 async def use_item(room_group_name, user):
     game_info = await database_sync_to_async(get_game_info)(room_group_name)
@@ -204,8 +194,7 @@ async def use_item(room_group_name, user):
         return
     player_info['slot'].status = False #슬롯 비워주기
     
-    #b_add(공추가)는 1/11 확률, b_up(공속도업), p_down(패들크기줄이기)는 각 5/11확률
-    item_type = random.choice(["b_add"] * 5 + ["b_up", "p_down"] * 5)
+    item_type = random.choice(["b_add"] * int(os.getenv('B_ADD')) + ["b_up"] * int(os.getenv('B_UP')) + ["p_down"] * int(os.getenv('P_DOWN')))
     balls=game_info['balls']
     ball=balls[0]
     sounds = game_info['sounds']
