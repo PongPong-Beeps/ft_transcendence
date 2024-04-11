@@ -4,6 +4,7 @@ from .models import InvitationQueue, Client
 from drf_yasg.utils import swagger_auto_schema #swagger
 from swagger.serializer import InviteSerializer
 from game.models import Game
+from user.models import User
 from rest_framework import status
 
 # connect/invite/ #초대 대기열 생성하는 뷰
