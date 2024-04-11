@@ -218,7 +218,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await database_sync_to_async(set_ball_moving)(game_id)
         while not round.is_roundEnded:
             await database_sync_to_async(update)(round, mode, game_id)
-            round_ing_info = await database_sync_to_async(generate_round_info)(round, mode, game_id)
+            round_ing_info = await database_sync_to_async(generate_round_info)(round, game_id)
             await self.channel_layer.group_send(
                     self.room_group_name,
                     round_ing_info

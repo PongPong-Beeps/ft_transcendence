@@ -62,7 +62,7 @@ def generate_round_info(round, game_id):
         game_info = get_game_info(game_id)
         players = [ get_game_info(game_id, 'player1'), get_game_info(game_id, 'player2') ]
 
-        game_info = {
+        round_info = {
             "type": "round_ing",
             "players": [ serialize_player_info(players[0]), serialize_player_info(players[1]) ],
             "balls": serialize_balls_info(game_info['balls']),
@@ -71,7 +71,7 @@ def generate_round_info(round, game_id):
         }
         reset_sounds(game_id)
         
-        return game_info
+        return round_info
     except Exception as e:
         print("game info error : ", e)
         return {"game info error : ", e}
