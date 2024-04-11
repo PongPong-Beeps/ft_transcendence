@@ -166,16 +166,6 @@ async def determine_winner(game, winner, round_number):
         else:
             game.winner = winner
         await database_sync_to_async(game.round3.save)()
-            
-async def get_player_number(round, user):
-    players = await database_sync_to_async(round.get_players)()
-    for i, player in enumerate(players):
-        if player == user:
-            if i == 0:
-                return 'player1'
-            elif i == 1:
-                return 'player2'
-    return None
  
 async def use_item(room_group_name, user):
     game_info = await database_sync_to_async(get_game_info)(room_group_name)
