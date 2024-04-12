@@ -2,7 +2,7 @@
 
 ---
 
-Made by : Geonwule, Jikoo, Jonchoi, Wooshin
+Made by : Geonwule(geonwule), Jikoo(noeyiz), Jonchoi(jonnwon), Wooshin(cocomhwa)
 
 ---
 
