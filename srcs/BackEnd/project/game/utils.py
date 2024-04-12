@@ -104,6 +104,7 @@ def serialize_balls_info(balls):
             "x": ball.x,
             "y": ball.y,
             "radius": ball.radius,
+            "is_moving": ball.is_ball_moving,
         }
         serialized_balls.append(serialized_ball)
     return serialized_balls
