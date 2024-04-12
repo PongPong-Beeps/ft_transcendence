@@ -27,7 +27,7 @@ export default function Game($container, data) {
      const paddleColor = '#ffffff', pongColor = '#ffa939', attackBallColor = '#ff396e', backgroundColor = '#27522d';
      let playerData, playerArea, fixWidth, fixHeight, paddleWidth, itemRadius; // round_ready 때 받을 정보
      let currentKey = '', currentHeart = [0, 0];
-     let isPlaying = false;
+     let isPlaying = false, isMoving = false;
 
      const init = () => {
           const container = $container.querySelector('.game-canvas-container');
@@ -97,6 +97,7 @@ export default function Game($container, data) {
                let ballPos = { "x": adjustScale(ball.x, 'x'), "y": adjustScale(ball.y, 'y') };
                let radius = adjustScale(ball.radius, 'x');
                let color = (index === 0) ? pongColor : attackBallColor;
+               if (index === 0) isMoving = ball.is_moving;
                drawBall(ballPos, radius, color);
           });
           if (item) {
@@ -188,7 +189,13 @@ export default function Game($container, data) {
 
      const setupEventListener = () => {
           document.addEventListener('keydown', (event) => {
-               if (isPlaying === false || currentKey === event.code) return; // 같은 키 이벤트 여러 번 보내는 것 방지
+               if (isMoving === false) { // 공이 움직일 때만 이벤트 보내기
+                    currentKey = '';
+                    return;
+               }
+               if (isPlaying === false || currentKey === event.code) {  // 같은 키 이벤트 여러 번 보내는 것 방지
+                    return;
+               }
                currentKey = event.code;
                switch (event.code) {
                     case 'KeyW':
