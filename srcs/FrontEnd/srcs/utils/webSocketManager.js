@@ -4,7 +4,7 @@ export class WebSocketManager {
         this.messageHandlers = [];
         this.ws.onmessage = (event) => {
             if (event.data !== undefined) {
-                console.log("this is event data : ", event.data);
+                // console.log("this is event data : ", event.data);
                 const data = JSON.parse(event.data);
                 this.messageHandlers.forEach(handler => handler(data));
             }
