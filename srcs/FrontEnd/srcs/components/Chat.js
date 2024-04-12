@@ -10,6 +10,7 @@ export default function Chat($container, connWsManager) {
     if (hasUndefinedArgs($container, connWsManager))
         return;
     let myId = '';
+    let audio_button = new Audio("../../assets/sound/button.mp3");
     let isGameChat = false;
     let currentType, currentReceiver;
 
@@ -115,6 +116,7 @@ export default function Chat($container, connWsManager) {
 
         const chatToggleButton = document.querySelector('#chat-toggle-button');
         chatToggleButton.addEventListener('click', () => {
+            audio_button.play();
             if (currentType === "dm_chat") {
                 currentType = undefined;
                 currentReceiver = undefined;

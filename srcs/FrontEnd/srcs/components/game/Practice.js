@@ -2,6 +2,7 @@ import ExitConfirmationAlert from "../../pages/ExitConfirmationAlert.js";
 import fadeOutAudio from "../../utils/audio.js";
 
 export default function Practice($container, connWsManager) {
+    let audio_button = new Audio("../../assets/sound/button.mp3");
     let audio_pong = new Audio("../../../assets/sound/pong.mp3");
     let audio_out = new Audio("../../../assets/sound/out.mp3");
     let playerImage = new Image();
@@ -225,6 +226,7 @@ export default function Practice($container, connWsManager) {
         const gameBackButton = $container.querySelector('.game-back-btn');
         if (gameBackButton) {
             gameBackButton.addEventListener('click', () => {
+                audio_button.play();
                 new ExitConfirmationAlert($container, { "connWsManager": connWsManager });
             });
         }
@@ -233,6 +235,7 @@ export default function Practice($container, connWsManager) {
         if (gameModeButtonContainer) {
             gameModeButtonContainer.addEventListener('click', (event) => {
                 // 클릭된 요소가 게임 모드 버튼인지 확인
+                audio_button.play();
                 if (event.target.matches('#easy-btn') || event.target.matches('#hard-btn')) {
                     gameMode = event.target.matches('#easy-btn') ? 'easy' : 'hard';
                     $container.querySelectorAll('.game-mode-btn').forEach(btn => {

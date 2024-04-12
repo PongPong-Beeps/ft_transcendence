@@ -10,6 +10,7 @@ import ErrorPage from "../pages/ErrorPage.js";
  */
 export default function MyProfile($container, connWsManager) {
     let id;
+    let audio_button = new Audio("../../assets/sound/button.mp3");
     let [getNickname, setNickname] = useState("", this, 'renderNickname');
     let [getProfileImage, setProfileImage] = useState("", this, 'renderProfileImage');
 
@@ -31,6 +32,7 @@ export default function MyProfile($container, connWsManager) {
         const profileButton = $container.querySelector('#profile-btn');
         if (profileButton) {
             profileButton.addEventListener('click', () => {
+                audio_button.play();
                 new ProfileModal($container, connWsManager, id, id, true, setNickname, setProfileImage);
             });
         }

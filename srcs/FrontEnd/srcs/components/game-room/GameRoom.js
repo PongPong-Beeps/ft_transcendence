@@ -19,6 +19,7 @@ export default function GameRoom($container, wsManagers) {
         return;
     
     const { gameWsManager, connWsManager } = wsManagers; // 둘 다 무조건 있음 !
+    let audio_button = new Audio("../../assets/sound/button.mp3");
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
 
     const init = () => {
@@ -57,6 +58,7 @@ export default function GameRoom($container, wsManagers) {
 
     const setupEventListener = () => {
         $container.querySelector('.game-room-container').addEventListener('click', function(event) {
+            audio_button.play();
             if (event.target.closest('.game-room-back-btn')) {
                 new ExitConfirmationAlert($container, wsManagers);
             } else if (event.target.closest('.game-room-ready-btn')) {
