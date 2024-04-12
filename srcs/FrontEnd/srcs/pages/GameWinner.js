@@ -7,7 +7,8 @@ export default function GameWinner($container, gameData, wsManagers) {
     if (hasUndefinedArgs($container, gameData, wsManagers))
         return;
 
-    let bgm_room = new Audio("../../../assets/sound/bgm_room.mp3");
+    let audio_button = new Audio("../../assets/sound/button.mp3");
+    let bgm_win = new Audio("../../../assets/sound/bgm_win.mp3");
     const image = 'data:image/jpeg;base64,' + gameData.winner.image;
     const nickname = gameData.winner.nickname;
     const render = () => {
@@ -36,7 +37,8 @@ export default function GameWinner($container, gameData, wsManagers) {
         const moveButton = $container.querySelector('#move-button');
         if (moveButton) {
             moveButton.addEventListener('click', () => {
-                fadeOutAudio(bgm_room, 1000);
+                audio_button.play();
+                fadeOutAudio(bgm_win, 1000);
                 wsManagers.gameWsManager.ws.close();
                 navigate('lobby', wsManagers.connWsManager);
                 $container.querySelector('#page').style.display = 'none';
@@ -61,7 +63,8 @@ export default function GameWinner($container, gameData, wsManagers) {
         }
     }
 
-    bgm_room.play();
+    bgm_win.volume = 0.5;
+    bgm_win.play();
     importCss("assets/css/game-winner.css");
     render();
     setupEventListener();

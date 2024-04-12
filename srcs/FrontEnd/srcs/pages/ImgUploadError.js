@@ -1,6 +1,8 @@
 import { importCss } from "../utils/importCss.js";
 
 export default function ImgUploadError($container) {
+    let audio_button = new Audio("../../assets/sound/button.mp3");
+
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -35,6 +37,7 @@ export default function ImgUploadError($container) {
     const setupEventListener = () => {
         const errorBackgroundElement = $container.querySelector('#img-upload-error-background');
         if (errorBackgroundElement) {
+            audio_button.play();
             errorBackgroundElement.addEventListener('click', handleImgUploadErrorEvent);
         }
     };

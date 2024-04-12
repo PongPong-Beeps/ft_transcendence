@@ -8,6 +8,8 @@ import {navigate} from "../utils/navigate.js";
 export default function ExitConfirmationAlert($container, wsManagers) {
     const { gameWsManager, connWsManager } = wsManagers;
 
+    let audio_button = new Audio("../../assets/sound/button.mp3");
+
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -28,6 +30,7 @@ export default function ExitConfirmationAlert($container, wsManagers) {
 
     const setupEventListener = () => {
         $container.querySelector('#exit-confirmation-leave-btn').addEventListener('click', () => {
+            audio_button.play();
             if (gameWsManager)
                 gameWsManager.ws.close();
             document.dispatchEvent(new Event('leave-game'));
@@ -35,6 +38,7 @@ export default function ExitConfirmationAlert($container, wsManagers) {
         });
 
         $container.querySelector('#exit-confirmation-stay-btn').addEventListener('click', () => {
+            audio_button.play();
             $container.querySelector('#page').style.display = 'none';
         });
     }

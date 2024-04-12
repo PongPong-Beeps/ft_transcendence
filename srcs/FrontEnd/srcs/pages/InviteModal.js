@@ -16,6 +16,8 @@ import GameRoom from "../components/game-room/GameRoom.js";
  * @param { WebSocketManager } connWsManager
 */
 export default function InviteModal($container, sender, receiver, game_type, game_mode, sender_id, receiver_id, connWsManager) {
+    let audio_button = new Audio("../../assets/sound/button.mp3");
+
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -52,6 +54,7 @@ export default function InviteModal($container, sender, receiver, game_type, gam
 
     const setupEventListener = () => {
         $container.querySelector('#invite-modal-refuse-btn').addEventListener('click', () => {
+            audio_button.play();
             fetchWithAuth(`https://${BACKEND}/api/connect/invite/refuse/`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -69,6 +72,7 @@ export default function InviteModal($container, sender, receiver, game_type, gam
         });
 
         $container.querySelector('#invite-modal-accept-btn').addEventListener('click', () => {
+            audio_button.play();
             $container.querySelector('#page').style.display = 'none';
             const gameWs = new WebSocket(`wss://${BACKEND}/ws/game/?token=${getCookie('access_token')}&category=invite`);
             gameWs.onopen = function(event) {

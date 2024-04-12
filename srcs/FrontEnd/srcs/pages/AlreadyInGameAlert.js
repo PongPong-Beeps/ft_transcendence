@@ -1,6 +1,8 @@
 import {importCss} from "../utils/importCss.js";
 
 export default function AlreadyInGameAlert($container) {
+    let audio_button = new Audio("../../assets/sound/button.mp3");
+
     const render = () => {
         const page = $container.querySelector('#page');
         if (page) {
@@ -20,6 +22,7 @@ export default function AlreadyInGameAlert($container) {
 
     const setupEventListener = () => {
         $container.querySelector('#already-invite-ok-btn').addEventListener('click', () => {
+            audio_button.play();
             $container.querySelector('#page').style.display = 'none';
         });
     };

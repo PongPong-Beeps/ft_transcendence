@@ -12,6 +12,8 @@ import { BACKEND } from "../../api.js";
  */
 export default function GameSettings($container, connWsManager) {
 
+    let audio_button = new Audio("../../assets/sound/button.mp3");
+
     const typeOption = [
         { label: 'one_to_one', image: '../../../assets/image/one_to_one.png' },
         { label: 'tournament', image: '../../../assets/image/tournament.png' }
@@ -48,6 +50,7 @@ export default function GameSettings($container, connWsManager) {
         const practiceButton = $container.querySelector('#practice-btn');
         if (practiceButton) {
             practiceButton.addEventListener('click', () => {
+                audio_button.play();
                 navigate('practice', connWsManager);
             });
         }
@@ -57,6 +60,8 @@ export default function GameSettings($container, connWsManager) {
             gameSettingsOptionContainer.addEventListener('click', (event) => {
                 const target = event.target.closest('.game-settings-option-item');
                 if (!target) return;
+
+                audio_button.play();
 
                 const isSelected = target.getAttribute('data-selected') === 'true';
                 const option = target.getAttribute('data-option');
@@ -79,6 +84,9 @@ export default function GameSettings($container, connWsManager) {
             gameSettingsButtonContainer.addEventListener('click', (event) => {
                 const target = event.target.closest('.game-settings-button');
                 if (!target) return;
+
+                audio_button.play();
+
                 // 모든 옵션이 선택되었는지 확인
                 const selectedOptions = $container.querySelectorAll('.game-settings-option-item[data-selected="true"]');
                 if (selectedOptions.length < 2) {
@@ -89,6 +97,7 @@ export default function GameSettings($container, connWsManager) {
                 const category = target.dataset.label
                 const type = [...selectedOptions].find(option => option.dataset.option === "type").dataset.label;
                 const mode = [...selectedOptions].find(option => option.dataset.option === "mode").dataset.label;
+
                 // 웹 소켓 생성
                 const gameWs = new WebSocket(`wss://${BACKEND}/ws/game/?token=${getCookie('access_token')}&category=${category}&type=${type}&mode=${mode}`);
                 gameWs.onopen = function (event) {

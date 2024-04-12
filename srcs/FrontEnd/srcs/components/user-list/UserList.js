@@ -21,6 +21,7 @@ export default function UserList($container, connWsManager) {
     if(hasUndefinedArgs($container, connWsManager))
         return;
 
+    let audio_button = new Audio("../../assets/sound/button.mp3");
     let bgm_lobby = new Audio("../../../assets/sound/bgm_lobby.mp3");
 
     let id;
@@ -82,6 +83,7 @@ export default function UserList($container, connWsManager) {
     const setupEventListener = () => {
         const userListContainer = $container.querySelector('#user-list-container');
         userListContainer.addEventListener('click', (event) => {
+            audio_button.play();
             if (event.target.closest('.user-list-button')) {
                 handleUserListButtonClick(event);
             } else if (event.target.closest('.user-list-tab')) {

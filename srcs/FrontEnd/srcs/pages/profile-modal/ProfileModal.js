@@ -19,6 +19,7 @@ import FriendCell from "../../components/user-list/FriendCell.js";
  * @param { Function }setProfileImageFn
  */
 export default function ProfileModal($container, connWsManager, id, targetId, isMe, setNicknameFn = () => {}, setProfileImageFn = () => {}) {
+    let audio_button = new Audio("../../assets/sound/button.mp3");
     let [getHistory, setHistory] = useState([{}], this, 'renderHistory');
     let [getBlacklist, setBlacklist] = useState([{}], this, 'renderBlacklist');
     let [getInfo, setInfo] = useState({}, this, 'renderInfo');
@@ -138,6 +139,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
     const setupEventListener = () => {
         const profileModalContainer = $container.querySelector('#profile-modal-container');
         profileModalContainer.addEventListener('click', (event) => {
+            audio_button.play();
             if (event.target.closest('.profile-modal-tab-button')) {
                 handleProfileModalTabButtonClick(event);
             } else if (event.target.closest('#ok-btn')) {
