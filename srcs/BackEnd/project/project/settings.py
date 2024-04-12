@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['13.209.222.162', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['13.209.222.162', '43.203.81.178', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -72,7 +72,7 @@ SWAGGER_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=10),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=14),
     'SIGNING_KEY': SECRET_KEY,
     'ALGORITHM': 'HS256',
