@@ -146,7 +146,10 @@ export default function Game($container, data) {
           if (sound.item) audio_item.play();
           if (sound.b_up) audio_b_up.play();
           if (sound.b_add) audio_b_add.play();
-          if (sound.p_down) audio_p_down.play();
+          if (sound.p_down) {
+               audio_p_down.play()
+               currentKey = '';
+          };
      }
      
      const drawText = (text, clear = false) => {
