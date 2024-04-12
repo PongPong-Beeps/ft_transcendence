@@ -40,7 +40,7 @@ class Game(models.Model):
             self.round3.delete()
         super().delete(*args, **kwargs)
     
-    def is_player(self, client) : #지금 필요없는데, 필요하면 쓰면될듯?
+    def is_player(self, client) :
         status = self.players.filter(client=client).exists()
         if status :
             return True
@@ -56,15 +56,14 @@ class Game(models.Model):
             players_info[i]['ready'] = player.is_ready
         return players_info
     
-    def do_ready(self, client): #플레이어가 준비/준비해제
+    def do_ready(self, client): 
         player = self.players.get(client=client)
-        if player.is_ready == True: #준비 상태면, 준비해제하기로
+        if player.is_ready == True:
             player.is_ready = False
             player.save()
-        else: #준비해제 상태면, 준비하기로
+        else:
             player.is_ready = True 
             player.save()
-        #self.save()를 따로 안해도 ManyToMany로 이어져 있어서 players는 자동으로 업데이트 된다.
     
     def check_full(self):
         count_player = self.players.count()
@@ -87,20 +86,20 @@ class Game(models.Model):
                 self.is_full = False
                 self.save()
                 
-    def entry_player(self, client, channel_name): #플레이어 입장
+    def entry_player(self, client, channel_name):
         player = Player.objects.create(client=client, channel_name=channel_name)
         player.save()
         self.players.add(player)
-        self.check_full() #플레이어가 들어오면 게임의 is_full 상태도 변경
+        self.check_full()
         self.save()
 
-    def exit_player(self, channel_name): #플레이어 퇴장
+    def exit_player(self, channel_name):
         try :
             player = self.players.get(channel_name=channel_name)
-            player.delete() #player 객체 삭제하면 자동으로 players에서도 삭제됨
-            self.check_full() #플레이어가 나가면 게임의 is_full 상태도 변경
+            player.delete()
+            self.check_full()
             self.save()
-            if self.players.count() == 0: #플레이어가 없으면 게임 삭제
+            if self.players.count() == 0:
                 self.delete()
         except :
             print('player does not exist')
@@ -158,10 +157,10 @@ class Game(models.Model):
         return None
 
 class Paddle():
-    def __init__(self, player='player1'):
+    def __init__(self, player='player1', mode='default'):
         #패들 고정값
         self.width = float(os.getenv('PADDLE_WIDTH'))
-        self.height = float(os.getenv('PADDLE_HEIGHT'))
+        self.height = float(os.getenv('PADDLE_HEIGHT')) / 2 if mode == 'easy' else float(os.getenv('PADDLE_HEIGHT')) 
         self.speed = float(os.getenv('PADDLE_SPEED'))
         self.player_area = float(os.getenv('PADDLE_PLAYER_AREA'))
         #패들 가변값
@@ -211,7 +210,6 @@ class Ball:
         
         return dirX, dirY
 
-#Ball클래스 상속
 class Item:
     def __init__(self, to='random'):
         self.x = WIDTH / 2
@@ -237,44 +235,8 @@ class Sound:
         self.out = False
 
 class Round(models.Model):
-    is_roundEnded = models.BooleanField(default=False)
-        
-    sound = Sound()
-    
-    paddle_1 = Paddle()
-    paddle_2 = Paddle()
-    
-    balls = [ Ball() ]
-    
-    item = None
-        
-    slot_1 = Slot()
-    slot_2 = Slot()
-    
-    heart_1 = models.IntegerField(default=int(os.getenv('HEART_NUM')))
-    heart_2 = models.IntegerField(default=int(os.getenv('HEART_NUM')))
-    
+    is_roundEnded = models.BooleanField(default=False)            
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
-    
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
-    
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    def get_players(self):
-        players = []
-        if self.player1_id:
-            try:
-                player1 = User.objects.get(pk=self.player1_id)
-                players.append(player1)
-            except User.DoesNotExist:
-                print("Player1 does not exist.")
-        
-        if self.player2_id:
-            try:
-                player2 = User.objects.get(pk=self.player2_id)
-                players.append(player2)
-            except User.DoesNotExist:
-                print("Player2 does not exist.")
-        
-        return players
