@@ -192,18 +192,20 @@ class Ball:
 
     def get_random_direction(self, to='random'):
         # 20도에서 40도를 라디안으로 변환
+        add_min_angle = -40 * math.pi / 180
         min_angle = 20 * math.pi / 180
         max_angle = 40 * math.pi / 180
         
         # 랜덤 각도 생성
         angle = random.uniform(min_angle, max_angle)
+        add_angle = random.uniform(add_min_angle, max_angle)
         
         if to == 'player1':
-            dirX = -math.cos(angle)
-            dirY = -math.sin(angle)
+            dirX = -math.cos(add_angle)
+            dirY = math.sin(add_angle) * (1 if random.random() < 0.5 else -1)
         elif to == 'player2':
-            dirX = math.cos(angle)
-            dirY = -math.sin(angle)
+            dirX = math.cos(add_angle)
+            dirY = math.sin(add_angle) * (1 if random.random() < 0.5 else -1)
         else: #random
             dirX = math.cos(angle) * (1 if random.random() < 0.5 else -1)
             dirY = math.sin(angle) * (1 if random.random() < 0.5 else -1)

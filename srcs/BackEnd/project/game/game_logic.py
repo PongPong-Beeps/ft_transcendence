@@ -173,17 +173,17 @@ def update_item(game_info, players):
 
 def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:
-        winner = 'player_2'
-        loser = 'player_1'
+        winner = 'player2'
+        loser = 'player1'
     elif players[0]['heart'] > players[1]['heart']:
-        winner = 'player_1'
-        loser = 'player_2'
+        winner = 'player1'
+        loser = 'player2'
     else: #동점
         to = 'random'
         game_info['item'] = Item(to)
         return
     
-    to = random.choice(loser * int(os.getenv('ITEM_LOSER')) + winner * int(os.getenv('ITEM_WINNER')))
+    to = random.choice([loser] * int(os.getenv('ITEM_LOSER')) + [winner] * int(os.getenv('ITEM_WINNER')))
     game_info['item'] = Item(to)
 
 def adjust_ball_direction_on_paddle_contact(ball, nearest_paddle):
