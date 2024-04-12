@@ -10,6 +10,7 @@ export default function Chat($container, connWsManager) {
     if (hasUndefinedArgs($container, connWsManager))
         return;
     let myId = '';
+    let isGameChat = false;
     let currentType, currentReceiver;
 
     fetchWithAuth(`https://${BACKEND}/api/user/me`)
@@ -30,8 +31,25 @@ export default function Chat($container, connWsManager) {
         }
     });
 
+    document.addEventListener('enter-game', () => {
+        isGameChat = true;
+        updateChatToggleButton();
+    });
+    document.addEventListener('leave-game', () => {
+        isGameChat = false;
+        updateChatToggleButton();
+    });
+    
+    const updateChatToggleButton = () => {
+        const chatToggleButton = document.querySelector('#chat-toggle-button');
+        chatToggleButton.textContent = isGameChat ? "게임방채팅" : "전체채팅";
+    };
+
     function getChatType(data) {
         if (data.type === "all_chat") {
+            if (isGameChat) {
+                return "게임방";
+            }
             return "전체";
         } else if (data.type === "dm_chat") {
             return data.receiver ? "To" : "From";
@@ -43,7 +61,7 @@ export default function Chat($container, connWsManager) {
         const messageElement = document.createElement('p');
         const chatTypeElement = document.createElement('span');
         chatTypeElement.textContent = `[${chatType}]`;
-        chatTypeElement.style.color = chatType === "전체" ? '#D3E95A' : '#372073';
+        chatTypeElement.style.color = (chatType === "전체" || chatType === "게임방") ? '#D3E95A' : '#372073';
         messageElement.appendChild(chatTypeElement);
         messageElement.appendChild(document.createTextNode(` ${senderOrReceiver}: ${message}`));
         return messageElement;
@@ -76,7 +94,7 @@ export default function Chat($container, connWsManager) {
                         <div id="chat-messages"></div>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <button id="chat-toggle-button" class="btn btn-outline-secondary" type="button">전체채팅</button>
+                            <button id="chat-toggle-button" class="btn btn-outline-secondary" type="button">${isGameChat ? "게임방채팅" : "전체채팅"}</button>
                             </div>
                             <input type="text" id="message-input" class="form-control" placeholder="채팅 입력..">
                             <div class="input-group-append">
@@ -100,7 +118,7 @@ export default function Chat($container, connWsManager) {
             if (currentType === "dm_chat") {
                 currentType = undefined;
                 currentReceiver = undefined;
-                chatToggleButton.textContent = "전체채팅";
+                chatToggleButton.textContent = isGameChat ? "게임방채팅" : "전체채팅";
                 console.log("chatToggleButton clicked");
                 focusToMessageInput();
             }

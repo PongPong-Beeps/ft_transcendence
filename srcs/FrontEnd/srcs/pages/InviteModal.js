@@ -82,6 +82,7 @@ export default function InviteModal($container, sender, receiver, game_type, gam
                     const data = {"gameWsManager" : new WebSocketManager(gameWs), "connWsManager": connWsManager};
                     new GameRoom($container, data);
                     navigate('game-room', data); // 실제 url 이동, GameRoom 재렌더링은 하지 않음
+                    document.dispatchEvent(new CustomEvent('enter-game'));
                     gameWs.onclose = function (event) {
                         console.log("게임 웹 소켓 닫힘");
                     }

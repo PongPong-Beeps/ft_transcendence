@@ -94,6 +94,7 @@ export default function GameSettings($container, connWsManager) {
                 gameWs.onopen = function (event) {
                     console.log("게임 웹 소켓 생성 완료");
                     const wsManagers = { "gameWsManager": new WebSocketManager(gameWs), "connWsManager": connWsManager };
+                    document.dispatchEvent(new CustomEvent('enter-game'));
                     navigate('game-room', wsManagers);
                 }
                 gameWs.onclose = function (event) {
