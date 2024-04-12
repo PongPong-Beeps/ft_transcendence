@@ -1,6 +1,17 @@
+2024.2.13 ~ now
+
+---
+
+Made by : Geonwule, Jikoo, Jonchoi, Wooshin
+
+---
+
+
 ### Git commit message template 이 적용되지 않을 때
 아래의 명령어를 입력해서 정해진 템플릿을 깃 전역 커밋 템플릿으로 사용한다.
  - `git config --global commit.template .gitmessage.txt`
+
+---
 
 ### BackEnd (개발 환경에서 웹페이지 접속하는 방법)
 1. Root 디렉토리에 들어간다.
@@ -14,3 +25,5 @@
 4. 어드민 페이지 `http://127.0.0.1:8000/admin`
     - id = `admin`
     - pw = `1234`
+
+ ---
