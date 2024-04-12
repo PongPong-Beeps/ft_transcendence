@@ -29,7 +29,6 @@ export default function AuthPage($container) {
         console.log("[ sendAuthorizationCode ] provider : ", provider);
         const urlParams = new URLSearchParams(window.location.search);
         const authorization_code = urlParams.get('code');
-        console.log("[ sendAuthorizationCode ] 인증 코드 추출 : ", authorization_code);
 
         // 백엔드로 전송
         fetch(`https://${BACKEND}/api/login/${provider}/callback/`, {

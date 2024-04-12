@@ -80,7 +80,6 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
             body: formData,
         })
         .then(data => {
-            console.log('Success:', data);
             data.image = data.image ? 'data:image/jpeg;base64,' + data.image : "../../../assets/image/cruiser.gif";
             $container.querySelector('#profile-picture').src = data.image;
             setProfileImageFn(data.image);
@@ -172,7 +171,6 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
             body: JSON.stringify({ "id": targetId }),
         })
         .then(data => {
-            console.log(data);
             $container.querySelector('#add-friend-btn').innerHTML = innerText;
             connWsManager.sendMessage({ "type": "friend_list", "sender": id });
         })
@@ -191,7 +189,6 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
         .then(data => {
             $container.querySelector('#block-btn').innerHTML = '차단 해제';
             connWsManager.sendMessage({ "type": "friend_list", "sender": id });
-            console.log('Success:', data);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -211,7 +208,6 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
                 $container.querySelector('#block-btn').innerHTML = '차단';
                 connWsManager.sendMessage({ "type": "friend_list", "sender": id });
             }
-            console.log('Success:', data);
         })
         .catch(error => {
             console.error('Error:', error);

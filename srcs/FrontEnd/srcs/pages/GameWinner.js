@@ -40,6 +40,7 @@ export default function GameWinner($container, gameData, wsManagers) {
                 audio_button.play();
                 fadeOutAudio(bgm_win, 1000);
                 wsManagers.gameWsManager.ws.close();
+                document.dispatchEvent(new Event('leave-game'));
                 navigate('lobby', wsManagers.connWsManager);
                 $container.querySelector('#page').style.display = 'none';
                 const confettiElements = document.querySelectorAll('.confetti');
