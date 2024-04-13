@@ -88,6 +88,8 @@ def reset_sounds(game_id):
 
 async def get_my_player_index(game_id, user):
     game_info = await database_sync_to_async(get_game_info)(game_id)
+    if game_info == None:
+        return None
     if game_info['player1'] == user:
         return 0
     elif game_info['player2'] == user:
