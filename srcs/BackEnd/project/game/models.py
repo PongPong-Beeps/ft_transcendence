@@ -184,6 +184,10 @@ class Paddle():
         if self.p_up == True:
             
             self.height = int(os.getenv('PADDLE_HEIGHT')) * 2
+            # 애니메이션으로 한다면 위 코드 주석 후 아래 코드들 사용
+            # add_height = 6              #임시값
+            # self.height += add_height
+            # self.y -= add_height / 2
             
             if self.y + self.height > HEIGHT: #아래로 벗어날 때 
                 self.y = HEIGHT - self.height
