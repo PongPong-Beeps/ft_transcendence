@@ -153,10 +153,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         
     async def process_game_start(self, game):
         await database_sync_to_async(game.initialize_rounds)()
-        rounds_data = await asyncio.gather(
-            serialize_round_players(game.round1),
-            serialize_round_players(game.round2)
-        )
+        if game.type == 'tournament': #two_on_two
+            rounds_data = await serialize_round_players(game.round1, game.type)
+        else:
+            rounds_data = await asyncio.gather(
+                serialize_round_players(game.round1, game.type),
+                serialize_round_players(game.round2, game.type),
+            )
         game_info = {
             "type": "game_start",
             "game_type": game.type,
@@ -179,9 +182,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             print("next_round:", next_round) #test code
             if next_round:
                 print("round is started") #test code
-                await self.process_round_start(next_round)
-                await self.process_round_ing(next_round, game.mode, game.id)
-                winner = await self.process_round_end(next_round)
+                await self.process_round_start(next_round, game.type)
+                await self.process_round_ing(next_round, game.mode, game.id, game.type)
+                winner = await self.process_round_end(next_round, game.type)
                 await database_sync_to_async(update_match_history)(next_round, game)
                 print("round is end") #test code
                 await asyncio.sleep(5) #test code 
@@ -191,8 +194,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                 break
         print("game is End") #test code
 
-    async def process_round_start(self, round):
-        round_info = await serialize_round_players(round)
+    async def process_round_start(self, round, game_type):
+        round_info = await serialize_round_players(round, game_type)
         fixed_data = await serialize_fixed_data(round)
         round_ready_info = {
             "type": "round_ready",
@@ -207,7 +210,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_ready(self, event):
         await self.send(text_data=json.dumps(event))
 
-    async def process_round_ing(self, round, mode, game_id):
+    async def process_round_ing(self, round, mode, game_id, game_type):
         await asyncio.sleep(1)
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -233,7 +236,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_ing(self, event):
         await self.send(text_data=json.dumps(event))
         
-    async def process_round_end(self, round):
+    async def process_round_end(self, round, game_type):
         round_end_info = {
             "type": "round_end",
             "winner": await serialize_player(round.winner),

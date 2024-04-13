@@ -56,8 +56,8 @@ export default function Game($container, data) {
           const playerNicknameContainer = $container.querySelector('.game-player-nickname-container');
           if (playerNicknameContainer) {
                playerNicknameContainer.innerHTML = playerData
-                   .map(player => `<div>${player.nickname}</div>`)
-                   .join('');
+                    .map(player => `<div>${player.nickname}</div>`)
+                    .join('');
           }
           // 배경 캔버스
           backgroundCtx.fillStyle = backgroundColor;
@@ -88,7 +88,7 @@ export default function Game($container, data) {
           gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           players.forEach((player, index) => {
                let paddle = { "x": adjustScale(player.paddle.x, 'x'), "y": adjustScale(player.paddle.y, 'y'), "height": adjustScale(player.paddle.height, 'y') }
-               let playerPos = { "x" : (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2)};
+               let playerPos = { "x": (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2) };
                drawPlayerPaddle(paddle, playerData[index].image, playerPos);
                // 점수, 아이템
                drawItemHeart(index, player.item, player.heart);
@@ -117,7 +117,7 @@ export default function Game($container, data) {
           if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
                const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
                playerItemContainer.innerHTML = item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
-                   : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+                    : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
                if (item) currentKey = ''; // 아이템 갱신될 때 키 리셋
           }
 
@@ -151,7 +151,7 @@ export default function Game($container, data) {
                currentKey = '';
           };
      }
-     
+
      const drawText = (text, clear = false) => {
           gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           if (clear) return;
@@ -163,11 +163,11 @@ export default function Game($container, data) {
           const lines = text.split('\n');
           const lineHeight = gameCtx.measureText('M').width * 1.5; // Increase line height
           lines.forEach((line, i) => {
-              gameCtx.fillText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight);
-              gameCtx.strokeText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight); // Draw border
+               gameCtx.fillText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight);
+               gameCtx.strokeText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight); // Draw border
           });
-      };
-  
+     };
+
      const render = () => {
           const main = $container.querySelector('#main');
           if (!main) return;
@@ -229,15 +229,37 @@ export default function Game($container, data) {
                // 플레이어 정보 저장
                playerData = []; // 빈 배열로 초기화
                isPlaying = false;
-               roundData.player_data.map(player => {
-                    let image = new Image();
-                    image.src = player.image ? 'data:image/jpeg;base64,' + player.image : "../../../assets/image/cruiser.gif";
-                    playerData.push({ "nickname" : player.nickname, "image" : image });
-                    if (player.id === data.additionalData.id) {
-                         isPlaying = true;
-                    }
+               if (data.game_type === 'tournament') { //two_on_two
+                    roundData.player_data[0].map(player => {
+                         let image = new Image();
+                         image.src = player.image ? 'data:image/jpeg;base64,' + player.image : "../../../assets/image/cruiser.gif";
+                         playerData.push({ "nickname": player.nickname, "image": image });
+                         if (player.id === data.additionalData.id) {
+                              isPlaying = true;
+                         }
 
-               });
+                    });
+                    roundData.player_data[1].map(player => {
+                         let image = new Image();
+                         image.src = player.image ? 'data:image/jpeg;base64,' + player.image : "../../../assets/image/cruiser.gif";
+                         playerData.push({ "nickname": player.nickname, "image": image });
+                         if (player.id === data.additionalData.id) {
+                              isPlaying = true;
+                         }
+
+                    });
+               }
+               else {
+                    roundData.player_data.map(player => {
+                         let image = new Image();
+                         image.src = player.image ? 'data:image/jpeg;base64,' + player.image : "../../../assets/image/cruiser.gif";
+                         playerData.push({ "nickname": player.nickname, "image": image });
+                         if (player.id === data.additionalData.id) {
+                              isPlaying = true;
+                         }
+
+                    });
+               }
                // 변수 저장
                fixWidth = roundData.fix.canvas.width;
                fixHeight = roundData.fix.canvas.height;

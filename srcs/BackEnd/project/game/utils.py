@@ -19,12 +19,37 @@ async def serialize_player(player):
     }
     return serialized_player
 
-async def serialize_round_players(round):
+async def serialize_two_on_two_round_players(round):
+    team1_players = await database_sync_to_async(lambda: list(round.team1.all()))() if round.team1 else []
+    team2_players = await database_sync_to_async(lambda: list(round.team2.all()))() if round.team2 else []
+    
+    serialized_players = []
+    
+    serialized_team1_players = []
+    for player in team1_players:
+        serialized_player = await serialize_player(player)
+        serialized_team1_players.append(serialized_player)
+
+    serialized_team2_players = []
+    for player in team2_players:
+        serialized_player = await serialize_player(player)
+        serialized_team2_players.append(serialized_player)
+
+    serialized_players.append(serialized_team1_players)
+    serialized_players.append(serialized_team2_players)
+    
+    return serialized_players
+
+async def serialize_round_players(round, type):
     if not round:
         return None
 
+    if type == 'tournament': #two on two
+        return await serialize_two_on_two_round_players(round)
+        
     player1 = await database_sync_to_async(lambda: round.player1)() if round.player1 else None
     player2 = await database_sync_to_async(lambda: round.player2)() if round.player2 else None
+    
     
     serialized_players = []
     
