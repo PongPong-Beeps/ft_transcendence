@@ -233,8 +233,11 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_ing(self, event):
         user = self.scope['user']
         my_player_index = await get_my_player_index(self.room_group_name, user)
-        if my_player_index is not None:
+        if my_player_index is not None: #플레이어 본인만 노출
             event['players'][my_player_index]['item_info']['can_see'] = True
+        else: #관전자 둘다 노출
+            event['players'][0]['item_info']['can_see'] = True
+            event['players'][1]['item_info']['can_see'] = True
         await self.send(text_data=json.dumps(event))
         
     async def process_round_end(self, round):
