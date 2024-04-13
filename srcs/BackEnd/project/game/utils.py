@@ -64,7 +64,9 @@ def generate_round_info(round, game_id):
 
         round_info = {
             "type": "round_ing",
-            "players": [ serialize_player_info(players[0]), serialize_player_info(players[1]) ],
+            "players": [
+                serialize_player_info(player) for player in players
+            ],
             "balls": serialize_balls_info(game_info['balls']),
             "item": serialize_item_info(game_info['item']),
             "sound": serialize_sounds_info(game_info['sounds']),
@@ -84,6 +86,15 @@ def reset_sounds(game_id):
         setattr(sounds, attr, False)
     update_game_info(game_id, game_info)
 
+async def get_my_player_index(game_id, user):
+    game_info = await database_sync_to_async(get_game_info)(game_id)
+    if game_info['player1'] == user:
+        return 0
+    elif game_info['player2'] == user:
+        return 1
+    else:
+        return None
+
 def serialize_player_info(player):
     if not player:
         return None
@@ -92,7 +103,7 @@ def serialize_player_info(player):
             'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
             'heart': player['heart'],
             'item': player['slot'].status,
-            'item_info': { "type": player['slot'].item_type, "can_see" : True },
+            'item_info': { "type": player['slot'].item_type, "can_see" : False },
     }
     return serialized_player_info
 
