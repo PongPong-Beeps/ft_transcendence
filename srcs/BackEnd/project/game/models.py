@@ -167,17 +167,37 @@ class Paddle():
         self.x = self.player_area if player == 'player1' else WIDTH - self.width - self.player_area
         self.y = (HEIGHT / 2) - (self.height) / 2
         self.direction = 'stop'
+        self.p_up = False
         
     async def change_direction(self, key):
         self.direction = key
         
-    def move_paddle(self, canvas_height):
+    def move_paddle(self):
         if self.direction == 'stop':
             return
         elif self.direction == 'up':
             self.y = max(self.y - self.speed, 0)
         elif self.direction == 'down':
-            self.y = min(self.y + self.speed, canvas_height - self.height)
+            self.y = min(self.y + self.speed, HEIGHT - self.height)
+    
+    def use_paddle_heihgt_up(self):
+        if self.p_up == True:
+
+            self.height = int(os.getenv('PADDLE_HEIGHT')) * 2
+            # self.y -= int(os.getenv('PADDLE_HEIGHT'))
+            self.y -= abs(self.height / 2)            
+            
+            if self.y + abs(self.height) > HEIGHT: 
+                print("1")
+                print("self.y : ", self.y)
+                print("self.height : ", self.height)
+                self.y -= abs(self.height - HEIGHT)
+            elif self.y < 0:
+                print("2")
+                print("self.y : ", self.y)
+                print("self.height : ", self.height)
+                self.height += abs(self.y)
+                self.y = 0
 
 class Ball:
     def __init__(self, type='default', to='random'):
