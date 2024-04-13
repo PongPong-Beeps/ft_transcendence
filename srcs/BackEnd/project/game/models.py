@@ -6,6 +6,7 @@ from user.models import User
 import random
 import math
 import os
+from .ready_cache import set_all_ready_status, delete_all_ready_status
 
 WIDTH = int(os.getenv('WIDTH'))
 HEIGHT = int(os.getenv('HEIGHT'))
@@ -31,6 +32,10 @@ class Game(models.Model):
 
     is_full = models.BooleanField(default=False)
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        set_all_ready_status(self.id)
+    
     def delete(self, *args, **kwargs):
         if self.round1:
             self.round1.delete()
@@ -38,6 +43,7 @@ class Game(models.Model):
             self.round2.delete()
         if self.round3:
             self.round3.delete()
+        delete_all_ready_status(self.id)
         super().delete(*args, **kwargs)
     
     def is_player(self, client) :

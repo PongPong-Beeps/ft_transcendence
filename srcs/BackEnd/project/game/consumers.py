@@ -7,6 +7,7 @@ from .utils import serialize_player, serialize_round_players, serialize_fixed_da
 from .game_logic import update, set_ball_moving
 import asyncio
 from .cache import set_game_info, delete_game_info
+from .ready_cache import get_all_ready_status, update_all_ready_status
 from connect.cache import set_user_info
 from .connect import create_room, quick_start, sub_accept_invite
 
@@ -114,6 +115,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         client = await database_sync_to_async(Client.objects.get)(user=user)
         game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        all_ready_status = await database_sync_to_async(get_all_ready_status)(self.room_group_name)
+        if all_ready_status == None or all_ready_status:
+            return
     
         await database_sync_to_async(game.do_ready)(client)
         
@@ -125,6 +129,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if all_ready:
             print("All players are ready. Starting the game...")
             asyncio.create_task(self.process_game(game))
+            await database_sync_to_async(update_all_ready_status)(self.room_group_name)
         else:
             print("Not all players are ready.")
     

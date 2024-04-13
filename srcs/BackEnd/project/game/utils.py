@@ -84,6 +84,17 @@ def reset_sounds(game_id):
         setattr(sounds, attr, False)
     update_game_info(game_id, game_info)
 
+async def get_my_player_index(game_id, user):
+    game_info = await database_sync_to_async(get_game_info)(game_id)
+    if game_info == None:
+        return None
+    if game_info['player1'] == user:
+        return 0
+    elif game_info['player2'] == user:
+        return 1
+    else:
+        return None
+
 def serialize_player_info(player):
     if not player:
         return None
