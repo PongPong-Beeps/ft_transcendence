@@ -91,7 +91,8 @@ def serialize_player_info(player):
     serialized_player_info = {
             'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
             'heart': player['heart'],
-            'item': player['slot'].status
+            'item': player['slot'].status,
+            'item_info': { "type": player['slot'].item_type, "can_see" : True },
     }
     return serialized_player_info
 
@@ -195,7 +196,8 @@ async def use_item(room_group_name, user):
         return
     player_info['slot'].status = False #슬롯 비워주기
     
-    item_type = random.choice(["b_add"] * int(os.getenv('B_ADD')) + ["b_up"] * int(os.getenv('B_UP')) + ["p_down"] * int(os.getenv('P_DOWN')))
+    item_type = player_info['slot'].item_type
+    
     balls=game_info['balls']
     ball=balls[0]
     sounds = game_info['sounds']

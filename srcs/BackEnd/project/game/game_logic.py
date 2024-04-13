@@ -168,8 +168,12 @@ def update_item(game_info, players):
        and item.y - item.radius <= nearest_paddle.y + nearest_paddle.height\
        and item.y + item.radius >= nearest_paddle.y:
        sounds.item = True
-       players[idx]['slot'].status = True
        game_info['item'] = None
+       eat_item(players[idx]['slot'])
+
+def eat_item(slot):
+    slot.status = True
+    slot.item_type = random.choice(["b_add"] * int(os.getenv('B_ADD')) + ["b_up"] * int(os.getenv('B_UP')) + ["p_down"] * int(os.getenv('P_DOWN')))
 
 def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:
