@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Game, Player
 from channels.db import database_sync_to_async
 from connect.models import Client
-from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history, determine_winner, move_paddle, use_item
+from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history, determine_winner, move_paddle, use_item, get_my_player_index
 from .game_logic import update, set_ball_moving
 import asyncio
 from .cache import set_game_info, delete_game_info
@@ -231,6 +231,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"type": "round_start"}))
             
     async def round_ing(self, event):
+        user = self.scope['user']
+        my_player_index = await get_my_player_index(self.room_group_name, user)
+        if my_player_index is not None: #플레이어 본인만 노출
+            event['players'][my_player_index]['item_info']['can_see'] = True
+        else: #관전자 둘다 노출
+            event['players'][0]['item_info']['can_see'] = True
+            event['players'][1]['item_info']['can_see'] = True
         await self.send(text_data=json.dumps(event))
         
     async def process_round_end(self, round):

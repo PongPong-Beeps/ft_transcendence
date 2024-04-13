@@ -223,6 +223,7 @@ class Item:
 class Slot:
     def __init__(self):
         self.status = False
+        self.item_type = None
     
     def __str__(self):
         return str(self.status)

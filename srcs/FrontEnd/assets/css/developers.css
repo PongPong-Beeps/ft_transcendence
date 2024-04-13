@@ -7,6 +7,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-family: "DNF Bit Bit v2", serif;
+    font-size: 0.5em;
 }
 
 #developers-page-container

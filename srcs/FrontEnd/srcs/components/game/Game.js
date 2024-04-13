@@ -91,7 +91,7 @@ export default function Game($container, data) {
                let playerPos = { "x" : (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2)};
                drawPlayerPaddle(paddle, playerData[index].image, playerPos);
                // 점수, 아이템
-               drawItemHeart(index, player.item, player.heart);
+               drawItemHeart(index, player.item, player.heart, player.item_info);
           });
           balls.forEach((ball, index) => {
                let ballPos = { "x": adjustScale(ball.x, 'x'), "y": adjustScale(ball.y, 'y') };
@@ -113,15 +113,34 @@ export default function Game($container, data) {
           gameCtx.drawImage(playerImage, playerPos.x, playerPos.y, playerArea, playerArea);
      };
 
-     const drawItemHeart = (index, item, heart) => {
+     const drawItemHeart = (index, item, heart, item_info) => {
           if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
                const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
-               playerItemContainer.innerHTML = item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
-                   : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
-               if (item) currentKey = ''; // 아이템 갱신될 때 키 리셋
+               let itemImage = '';
+               if (item) {
+                    if (item_info.can_see) {
+                         switch (item_info.type) {
+                              case 'b_add':
+                                   itemImage = '<img src="../../../assets/image/b_add.png" style="height: 30px; margin: 0 5px;" />';
+                                   break;
+                              case 'b_up':
+                                   itemImage = '<img src="../../../assets/image/b_up.png" style="height: 30px; margin: 0 5px;" />';
+                                   break;
+                              case 'p_down':
+                                   itemImage = '<img src="../../../assets/image/p_down.png" style="height: 30px; margin: 0 5px;" />';
+                                   break;
+                         }
+                    } else {
+                         itemImage = '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />';
+                    }
+                    currentKey = ''; // 아이템 갱신될 때 키 리셋
+               } else {
+                    itemImage = '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+               }
+               playerItemContainer.innerHTML = itemImage;
           }
 
-          if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
+               if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
                currentHeart[index] = heart;
                let heartsHTML = '';
                for (let i = 0; i < heart; i++)
@@ -131,6 +150,25 @@ export default function Game($container, data) {
                currentKey = ''; // 하트 갱신될 때 키 리셋
           }
      }
+
+     // const drawItemHeart = (index, item, heart, item_info) => {
+     //      if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
+     //           const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
+     //           playerItemContainer.innerHTML = item ? '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />'
+     //               : '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+     //           if (item) currentKey = ''; // 아이템 갱신될 때 키 리셋
+     //      }
+
+     //      if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
+     //           currentHeart[index] = heart;
+     //           let heartsHTML = '';
+     //           for (let i = 0; i < heart; i++)
+     //                heartsHTML += '<img src="../../../assets/image/heart.png" style="height: 30px; margin: 0 5px;" />';
+     //           const playerHeartContainer = $container.querySelector(`#player${index + 1}-heart`);
+     //           playerHeartContainer.innerHTML = heartsHTML;
+     //           currentKey = ''; // 하트 갱신될 때 키 리셋
+     //      }
+     // }
 
      const drawBall = (ballPos, radius, color) => {
           gameCtx.beginPath();

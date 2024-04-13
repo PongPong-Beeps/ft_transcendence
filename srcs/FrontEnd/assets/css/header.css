@@ -39,13 +39,13 @@
 
 #guide-image {
     display: none;
-    width: 400px;
+    width: 540px;
     height: 220px;
     background-image: url('../../assets/image/guide.png');
     background-size: cover;
     position: absolute;
     top: 0;
-    left: -400px;
+    left: -540px;
     z-index: 999;
 }
 
