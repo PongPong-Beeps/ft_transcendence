@@ -31,6 +31,8 @@ export default function getDevelopersPage($container) {
                             https://uppbeat.io/t/aaron-paul-low/race-to-the-finish
                             License code: WB2YTMS7TMKEKNDB
                             </p>
+                            <a href="https://www.flaticon.com/kr/free-icons/" title="감소 아이콘">감소 아이콘 제작자: inkubators - Flaticon</a>
+                            <a href="https://www.flaticon.com/kr/free-icons/" title="속도 아이콘">속도 아이콘 제작자: Eucalyp - Flaticon</a>
                         </div>
                     </div>
                 </div>
