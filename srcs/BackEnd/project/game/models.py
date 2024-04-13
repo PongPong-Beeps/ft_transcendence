@@ -182,21 +182,12 @@ class Paddle():
     
     def use_paddle_heihgt_up(self):
         if self.p_up == True:
-
-            self.height = int(os.getenv('PADDLE_HEIGHT')) * 2
-            # self.y -= int(os.getenv('PADDLE_HEIGHT'))
-            self.y -= abs(self.height / 2)            
             
-            if self.y + abs(self.height) > HEIGHT: 
-                print("1")
-                print("self.y : ", self.y)
-                print("self.height : ", self.height)
-                self.y -= abs(self.height - HEIGHT)
-            elif self.y < 0:
-                print("2")
-                print("self.y : ", self.y)
-                print("self.height : ", self.height)
-                self.height += abs(self.y)
+            self.height = int(os.getenv('PADDLE_HEIGHT')) * 2
+            
+            if self.y + self.height > HEIGHT: #아래로 벗어날 때 
+                self.y = HEIGHT - self.height
+            elif self.y < 0: #위로 벗어날 때
                 self.y = 0
 
 class Ball:
