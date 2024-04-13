@@ -133,7 +133,7 @@ class Game(models.Model):
                 player2=players[1].client.user
             )
             self.round1 = round1
-        elif self.type == "tournament":
+        elif self.type == '':#"tournament":
             # 'tournament' 게임 타입의 경우 두 개의 Round 인스턴스 생성
             round1 = Round.objects.create(
                 player1=players[0].client.user, 
@@ -146,6 +146,12 @@ class Game(models.Model):
             self.round1 = round1
             self.round2 = round2
             self.round3 = Round.objects.create(player1=None, player2=None) #round1, round2 종료시 winner를 저장
+        elif self.type == "tournament":#'two_to_two':
+            round1 = Round.objects.create()
+            round1.team1.add(players[0].client.user, players[1].client.user)
+            round1.team2.add(players[2].client.user, players[3].client.user)
+            self.round1 = round1
+            
         self.is_gameRunning = True
         self.save()
     
@@ -240,5 +246,7 @@ class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)            
     player1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player1')
     player2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_player2')
+    team1 = models.ManyToManyField(User, related_name='team1', blank=True)
+    team2 = models.ManyToManyField(User, related_name='team2', blank=True)
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rounds_winner')
     created_at = models.DateTimeField(auto_now_add=True)
