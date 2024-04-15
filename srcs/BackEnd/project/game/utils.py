@@ -223,30 +223,18 @@ async def use_item(room_group_name, user):
         balls.append(Ball('add', target_player_key))
         sounds.b_add = True
     elif item_type == 'p_down': # 패들 height 줄이기 (상대방 패들)
-        # 상대 패들 늘리기 동안 패들 줄이기 방지
         paddle = target_player_info['paddle']
-        # if paddle.p_up == True:
-        #   pass
         paddle.height = paddle.height - (Paddle().height / 5 * 1) if paddle.height > Paddle().height / 5 * 1 else paddle.height
         sounds.p_down = True
-    elif item_type == 'p_up': # 패들 height 1초동안 늘리기 (내 패들)
+    elif item_type == 'p_up': # 패들 height 늘리기 (내 패들)
         paddle = player_info['paddle']
-        paddle.p_up = True
-        await database_sync_to_async(paddle_reset_after_count)(room_group_name, player_info, player_key)
+        paddle.height = paddle.height + (Paddle().height / 5 * 1) if paddle.height < Paddle().height * 1.5 else paddle.height
+        sounds.p_up = True
 
     await database_sync_to_async(update_game_info)(room_group_name, game_info)
     await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
     await database_sync_to_async(update_game_info)(room_group_name, target_player_info, target_player_key)
     print("item used")
-
-def paddle_reset_after_count(game_id, player_info, player_key, type='init'):
-    if type == 'init':
-        timer = threading.Timer(1, lambda: paddle_reset_after_count(game_id, player_info, player_key, 'start'))
-        timer.start()
-        print("p_up timer start")
-        return
-    player_info['paddle'].p_up = False #아이템 초기화
-    update_game_info(game_id, player_info, player_key)
 
 async def move_paddle(room_group_name, user, direction):
     game_info = await database_sync_to_async(get_game_info)(room_group_name)

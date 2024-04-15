@@ -88,7 +88,6 @@ def update(round, mode, game_id):
     # 패들 위치 업데이트
     for paddle in paddles:
         paddle.move_paddle()
-        paddle.use_paddle_heihgt_up()
     
     for i, ball in enumerate(balls.copy()): #인덱스때문에 복사본 사용
         if i == 0 and ball.is_ball_moving == False: #기본 공 안움직이면 업데이트 안함

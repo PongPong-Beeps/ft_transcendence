@@ -129,6 +129,9 @@ export default function Game($container, data) {
                               case 'p_down':
                                    itemImage = '<img src="../../../assets/image/p_down.png" style="height: 30px; margin: 0 5px;" />';
                                    break;
+                              case 'p_up':
+                                   itemImage = '<img src="../../../assets/image/p_up.png" style="height: 30px; margin: 0 5px;" />';
+                                   break;
                          }
                     } else {
                          itemImage = '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />';
