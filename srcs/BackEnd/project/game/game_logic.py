@@ -103,6 +103,14 @@ def update(round, mode, game_id):
 
         ball_type = 'basic' if i == 0 else 'additional'
 
+        #쉴드 충돌 검사
+        if players[0]['shield'] or players[1]['shield']:
+            for i, player in enumerate(players):
+                if player['shield']:
+                    status = operate_shield(i, player, balls, ball, ball_type, sounds)
+                    if status:
+                        continue
+                
         #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
         if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2\
             or ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
@@ -135,6 +143,21 @@ def update(round, mode, game_id):
     update_game_info(game_id, game_info)
     update_game_info(game_id, players[0], 'player1')
     update_game_info(game_id, players[1], 'player2')
+
+def operate_shield(i, player, balls, ball, ball_type, sounds):
+    if (i == 0 and ball.x - ball.radius <= Paddle().player_area + (Paddle().width / 2) + int(os.getenv('SHIELD_WIDTH')))\
+        or (i == 1 and ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2 - int(os.getenv('SHIELD_WIDTH'))):
+        paddle = player['paddle']
+        if ball_type == 'basic':
+            ball.dirX = -ball.dirX
+            ball.x += ball.dirX * abs(paddle.width - abs(paddle.x - ball.x)) #볼이 패들을 타는 버그 방지
+            adjust_ball_direction_on_paddle_contact(ball, paddle)
+        elif ball_type == 'additional':
+            if ball in balls:
+                balls.remove(ball)
+        sounds.shield = True
+        return True
+    return False
 
 def update_item(game_info, players):
     if game_info['item'] == None and random.random() < 0.5: # 10% 확률로 아이템 생성
@@ -178,6 +201,7 @@ def eat_item(slot):
         + ["b_up"] * int(os.getenv('B_UP'))\
         + ["p_down"] * int(os.getenv('P_DOWN'))\
         + ["p_up"] * int(os.getenv('P_UP'))\
+        + ["shield"] * int(os.getenv('SHIELD'))\
     )
 
 def generate_item(game_info, players):
