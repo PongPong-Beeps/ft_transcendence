@@ -25,7 +25,7 @@ export default function Game($container, data) {
      let backgroundCanvas, backgroundCtx, gameCanvas, gameCtx;
      let itemImage = new Image();
      const paddleColor = '#ffffff', pongColor = '#ffa939', attackBallColor = '#ff396e', backgroundColor = '#27522d';
-     let playerData, playerArea, fixWidth, fixHeight, paddleWidth, itemRadius; // round_ready 때 받을 정보
+     let playerData, playerArea, fixWidth, fixHeight, paddleWidth, itemRadius, shieldArea; // round_ready 때 받을 정보
      let currentKey = '', currentHeart = [0, 0];
      let isPlaying = false, isMoving = false;
 
@@ -56,8 +56,8 @@ export default function Game($container, data) {
           const playerNicknameContainer = $container.querySelector('.game-player-nickname-container');
           if (playerNicknameContainer) {
                playerNicknameContainer.innerHTML = playerData
-                   .map(player => `<div>${player.nickname}</div>`)
-                   .join('');
+                    .map(player => `<div>${player.nickname}</div>`)
+                    .join('');
           }
           // 배경 캔버스
           backgroundCtx.fillStyle = backgroundColor;
@@ -92,6 +92,7 @@ export default function Game($container, data) {
                drawPlayerPaddle(paddle, playerData[index].image, playerPos);
                // 점수, 아이템
                drawItemHeart(index, player.item, player.heart, player.item_info);
+               drawShield(player.item_info.shield, index, paddle);
           });
           balls.forEach((ball, index) => {
                let ballPos = { "x": adjustScale(ball.x, 'x'), "y": adjustScale(ball.y, 'y') };
@@ -106,6 +107,17 @@ export default function Game($container, data) {
                gameCtx.drawImage(itemImage, itemPos.x - itemRadius, itemPos.y - itemRadius, itemRadius * 2, itemRadius * 2);
           }
      }
+
+     const drawShield = (isShield, playerIndex, paddle) => {
+          if (isShield === false) return;
+          gameCtx.fillStyle = '#1ecbe1';
+          if (playerIndex === 0)
+               gameCtx.fillRect(paddle.x + paddleWidth, 0, shieldArea, gameCanvas.height);
+               // gameCtx.drawImage(playerImage, paddle.x + paddleWidth, 0, shieldArea, gameCanvas.height);
+          else
+               gameCtx.fillRect(paddle.x - paddleWidth, 0, shieldArea, gameCanvas.height);
+               // gameCtx.drawImage(playerImage, paddle.x - paddleWidth, 0, shieldArea, gameCanvas.height);
+     };
 
      const drawPlayerPaddle = (paddle, playerImage, playerPos) => {
           gameCtx.fillStyle = paddleColor;
@@ -132,6 +144,9 @@ export default function Game($container, data) {
                               case 'p_up':
                                    itemImage = '<img src="../../../assets/image/p_up.png" style="height: 30px; margin: 0 5px;" />';
                                    break;
+                              case 'shield':
+                                   itemImage = '<img src="../../../assets/image/shield.png" style="height: 30px; margin: 0 5px;" />';
+                                   break;
                          }
                     } else {
                          itemImage = '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />';
@@ -143,7 +158,7 @@ export default function Game($container, data) {
                playerItemContainer.innerHTML = itemImage;
           }
 
-               if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
+          if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
                currentHeart[index] = heart;
                let heartsHTML = '';
                for (let i = 0; i < heart; i++)
@@ -192,7 +207,7 @@ export default function Game($container, data) {
                currentKey = '';
           };
      }
-     
+
      const drawText = (text, clear = false) => {
           gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           if (clear) return;
@@ -204,11 +219,11 @@ export default function Game($container, data) {
           const lines = text.split('\n');
           const lineHeight = gameCtx.measureText('M').width * 1.5; // Increase line height
           lines.forEach((line, i) => {
-              gameCtx.fillText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight);
-              gameCtx.strokeText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight); // Draw border
+               gameCtx.fillText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight);
+               gameCtx.strokeText(line, gameCanvas.width / 2, gameCanvas.height / 2 + i * lineHeight); // Draw border
           });
-      };
-  
+     };
+
      const render = () => {
           const main = $container.querySelector('#main');
           if (!main) return;
@@ -285,6 +300,7 @@ export default function Game($container, data) {
                playerArea = adjustScale(roundData.fix.player_area, 'x');
                paddleWidth = adjustScale(roundData.fix.paddle_width, 'x');
                itemRadius = adjustScale(roundData.fix.item_radius, 'x');
+               shieldArea = adjustScale(roundData.fix.shield_area, 'x');
                // 배경 그리기
                drawBackground();
                drawText("곧 게임이 시작됩니다");

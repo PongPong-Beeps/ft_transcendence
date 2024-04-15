@@ -20,6 +20,7 @@ def set_game_info(game_id, mode, round):
             "paddle": Paddle(player, mode),
             "heart": int(os.getenv('HEART_NUM')),
             "slot": Slot(),
+            "shield": False,
         }
         cache.set(str(game_id) + player, player_info)
     

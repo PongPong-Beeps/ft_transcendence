@@ -52,6 +52,8 @@ async def serialize_fixed_data(round):
         }
     fixed_data["paddle_width"] = Paddle().width
     fixed_data["item_radius"] = Item().radius
+    fixed_data["shield_area"] = int(os.getenv('SHIELD_AREA'))
+    fixed_data["shield_area"] = int(os.getenv('SHIELD_AREA'))
     
     return fixed_data
 
@@ -82,7 +84,8 @@ def generate_round_info(round, game_id):
 def reset_sounds(game_id):
     game_info = get_game_info(game_id)
     sounds = game_info['sounds']
-    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out']
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate']
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate']
     for attr in sound_attributes:
         setattr(sounds, attr, False)
     update_game_info(game_id, game_info)
@@ -103,10 +106,18 @@ def serialize_player_info(player):
         return None
     paddle = player['paddle']
     serialized_player_info = {
-            'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
-            'heart': player['heart'],
-            'item': player['slot'].status,
-            'item_info': { "type": player['slot'].item_type, "can_see" : False },
+        'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
+        'heart': player['heart'],
+        'item': player['slot'].status,
+        'item_info': { "type": player['slot'].item_type, "can_see" : False, 'shield': player['shield'] },
+        'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
+        'heart': player['heart'],
+        'item': player['slot'].status,
+        'item_info': { 
+            "type": player['slot'].item_type, 
+            "can_see" : False, 
+            'shield': player['shield']
+        },
     }
     return serialized_player_info
 
@@ -143,6 +154,8 @@ def serialize_sounds_info(sounds):
         'b_up': sounds.b_up,
         'p_down': sounds.p_down,
         'out': sounds.out,
+        'p_up': sounds.p_up,
+        'shield': sounds.shield,
     }
     return serialized_sounds
 
@@ -230,11 +243,27 @@ async def use_item(room_group_name, user):
         paddle = player_info['paddle']
         paddle.height = paddle.height + (Paddle().height / 5 * 1) if paddle.height < Paddle().height * 1.5 else paddle.height
         sounds.p_up = True
+    elif item_type == 'shield': # 쉴드
+        player_info['shield'] = True
+        sounds.shield = True
+        await database_sync_to_async(shield_reset_after_seconds)(room_group_name, player_key)
 
     await database_sync_to_async(update_game_info)(room_group_name, game_info)
     await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
     await database_sync_to_async(update_game_info)(room_group_name, target_player_info, target_player_key)
     print("item used")
+
+def shield_reset_after_seconds(game_id, player_key, type='init'):
+    if type == 'init':
+        timer = threading.Timer(1, lambda: shield_reset_after_seconds(game_id, player_key, 'start'))
+        timer.start()
+        print("shield timer start")
+        return
+    player_info = get_game_info(game_id, player_key)
+    if player_info == None:
+        return
+    player_info['shield'] = False
+    update_game_info(game_id, player_info, player_key)
 
 async def move_paddle(room_group_name, user, direction):
     game_info = await database_sync_to_async(get_game_info)(room_group_name)
