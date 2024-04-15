@@ -127,7 +127,7 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
                 const cell = $container.querySelector(`[data-id="${blacklist.id}"]`);
                 if (cell) {
                     cell.querySelector('.unblock-btn').addEventListener('click', (event) => {
-                        event.stopPropagation();
+                        // event.stopPropagation();
                         handleUnBlockButtonClick(blacklist.id);
                     });
                 }
@@ -203,7 +203,10 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
         })
         .then(data => {
             if (isMe)
+            {
                 updateBlacklist();
+                connWsManager.sendMessage({ "type": "friend_list", "sender": id });
+            }
             else {
                 $container.querySelector('#block-btn').innerHTML = '차단';
                 connWsManager.sendMessage({ "type": "friend_list", "sender": id });
