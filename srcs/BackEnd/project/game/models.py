@@ -237,6 +237,8 @@ class Sound:
         self.b_up = False #ball 속도 증가
         self.p_down = False #paddle 길이 감소
         self.p_up = False #paddle 길이 증가
+        self.shield = False
+        self.shield_operate = False
         self.out = False
 
 class Round(models.Model):
