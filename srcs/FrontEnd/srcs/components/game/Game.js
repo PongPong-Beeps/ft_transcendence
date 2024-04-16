@@ -88,10 +88,10 @@ export default function Game($container, data) {
           gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
           players.forEach((player, index) => {
                let paddle = { "x": adjustScale(player.paddle.x, 'x'), "y": adjustScale(player.paddle.y, 'y'), "height": adjustScale(player.paddle.height, 'y') }
-               let playerPos = { "x" : (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2)};
+               let playerPos = { "x": (index === 0) ? paddle.x - playerArea : paddle.x + paddleWidth, "y": paddle.y + (paddle.height / 2) - (playerArea / 2) };
                drawPlayerPaddle(paddle, playerData[index].image, playerPos);
                // 점수, 아이템
-               drawItemHeart(index, player.item, player.heart, player.item_info);
+               drawItemHeart(index, player.items, player.heart, player.item_info);
                drawShield(player.item_info.shield, index, paddle);
           });
           balls.forEach((ball, index) => {
@@ -113,10 +113,10 @@ export default function Game($container, data) {
           gameCtx.fillStyle = '#1ecbe1';
           if (playerIndex === 0)
                gameCtx.fillRect(paddle.x + paddleWidth, 0, shieldArea, gameCanvas.height);
-               // gameCtx.drawImage(playerImage, paddle.x + paddleWidth, 0, shieldArea, gameCanvas.height);
+          // gameCtx.drawImage(playerImage, paddle.x + paddleWidth, 0, shieldArea, gameCanvas.height);
           else
                gameCtx.fillRect(paddle.x - paddleWidth, 0, shieldArea, gameCanvas.height);
-               // gameCtx.drawImage(playerImage, paddle.x - paddleWidth, 0, shieldArea, gameCanvas.height);
+          // gameCtx.drawImage(playerImage, paddle.x - paddleWidth, 0, shieldArea, gameCanvas.height);
      };
 
      const drawPlayerPaddle = (paddle, playerImage, playerPos) => {
@@ -125,39 +125,43 @@ export default function Game($container, data) {
           gameCtx.drawImage(playerImage, playerPos.x, playerPos.y, playerArea, playerArea);
      };
 
-     const drawItemHeart = (index, item, heart, item_info) => {
+     const drawItemHeart = (index, items, heart, item_info) => {
           if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
                const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
-               let itemImage = '';
-               if (item) {
-                    if (item_info.can_see) {
-                         switch (item_info.type) {
-                              case 'b_add':
-                                   itemImage = '<img src="../../../assets/image/b_add.png" style="height: 30px; margin: 0 5px;" />';
-                                   break;
-                              case 'b_up':
-                                   itemImage = '<img src="../../../assets/image/b_up.png" style="height: 30px; margin: 0 5px;" />';
-                                   break;
-                              case 'p_down':
-                                   itemImage = '<img src="../../../assets/image/p_down.png" style="height: 30px; margin: 0 5px;" />';
-                                   break;
-                              case 'p_up':
-                                   itemImage = '<img src="../../../assets/image/p_up.png" style="height: 30px; margin: 0 5px;" />';
-                                   break;
-                              case 'shield':
-                                   itemImage = '<img src="../../../assets/image/shield.png" style="height: 30px; margin: 0 5px;" />';
-                                   break;
+               let itemImages = '';
+               items.forEach(item => {
+                    let itemImage = '';
+                    if (item.status) {
+                         if (item_info.can_see) {
+                              switch (item.type) {
+                                   case 'b_add':
+                                        itemImage = '<img src="../../../assets/image/b_add.png" style="height: 30px; margin: 0 5px;" />';
+                                        break;
+                                   case 'b_up':
+                                        itemImage = '<img src="../../../assets/image/b_up.png" style="height: 30px; margin: 0 5px;" />';
+                                        break;
+                                   case 'p_down':
+                                        itemImage = '<img src="../../../assets/image/p_down.png" style="height: 30px; margin: 0 5px;" />';
+                                        break;
+                                   case 'p_up':
+                                        itemImage = '<img src="../../../assets/image/p_up.png" style="height: 30px; margin: 0 5px;" />';
+                                        break;
+                                   case 'shield':
+                                        itemImage = '<img src="../../../assets/image/shield.png" style="height: 30px; margin: 0 5px;" />';
+                                        break;
+                              }
+                         } else {
+                              itemImage = '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />';
                          }
+                         itemImages += itemImage;
+                         currentKey = ''; // 아이템 갱신될 때 키 리셋
                     } else {
-                         itemImage = '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />';
+                         itemImage = '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+                         itemImages += itemImage;
                     }
-                    currentKey = ''; // 아이템 갱신될 때 키 리셋
-               } else {
-                    itemImage = '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
-               }
-               playerItemContainer.innerHTML = itemImage;
-          }
-
+                    playerItemContainer.innerHTML = itemImages;
+               });
+         }
           if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
                currentHeart[index] = heart;
                let heartsHTML = '';
@@ -288,7 +292,7 @@ export default function Game($container, data) {
                roundData.player_data.map(player => {
                     let image = new Image();
                     image.src = player.image ? 'data:image/jpeg;base64,' + player.image : "../../../assets/image/cruiser.gif";
-                    playerData.push({ "nickname" : player.nickname, "image" : image });
+                    playerData.push({ "nickname": player.nickname, "image": image });
                     if (player.id === data.additionalData.id) {
                          isPlaying = true;
                     }
