@@ -171,13 +171,14 @@ class Paddle():
     async def change_direction(self, key):
         self.direction = key
         
-    def move_paddle(self, canvas_height):
+    def move_paddle(self):
         if self.direction == 'stop':
             return
         elif self.direction == 'up':
             self.y = max(self.y - self.speed, 0)
         elif self.direction == 'down':
-            self.y = min(self.y + self.speed, canvas_height - self.height)
+            self.y = min(self.y + self.speed, HEIGHT - self.height)
+
 
 class Ball:
     def __init__(self, type='default', to='random'):
@@ -235,6 +236,9 @@ class Sound:
         self.b_add = False #ball 추가
         self.b_up = False #ball 속도 증가
         self.p_down = False #paddle 길이 감소
+        self.p_up = False #paddle 길이 증가
+        self.shield = False
+        self.shield_operate = False
         self.out = False
 
 class Round(models.Model):

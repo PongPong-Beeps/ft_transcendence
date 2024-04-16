@@ -87,7 +87,7 @@ def update(round, mode, game_id):
     paddles = [ players[0]['paddle'], players[1]['paddle'] ]
     # 패들 위치 업데이트
     for paddle in paddles:
-        paddle.move_paddle(HEIGHT)
+        paddle.move_paddle()
     
     for i, ball in enumerate(balls.copy()): #인덱스때문에 복사본 사용
         if i == 0 and ball.is_ball_moving == False: #기본 공 안움직이면 업데이트 안함
@@ -103,6 +103,12 @@ def update(round, mode, game_id):
 
         ball_type = 'basic' if i == 0 else 'additional'
 
+        #쉴드 충돌 검사
+        if players[0]['shield'] or players[1]['shield']:
+            for i, player in enumerate(players):
+                if player['shield']:
+                    operate_shield(i, player, balls, ball, ball_type, sounds)
+                
         #공이 왼쪽 또는 오른쪽끝에 도달했을때 점수 처리
         if ball.x - ball.radius <= Paddle().player_area + Paddle().width / 2\
             or ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2:
@@ -135,6 +141,19 @@ def update(round, mode, game_id):
     update_game_info(game_id, game_info)
     update_game_info(game_id, players[0], 'player1')
     update_game_info(game_id, players[1], 'player2')
+
+def operate_shield(i, player, balls, ball, ball_type, sounds):
+    if (i == 0 and ball.x - ball.radius <= Paddle().player_area + (Paddle().width / 2) + int(os.getenv('SHIELD_AREA')))\
+        or (i == 1 and ball.x + ball.radius >= WIDTH - Paddle().player_area - Paddle().width / 2 - int(os.getenv('SHIELD_AREA'))):
+        paddle = player['paddle']
+        if ball_type == 'basic':
+            ball.dirX = -ball.dirX
+            ball.x += ball.dirX * abs(paddle.width - abs(paddle.x - ball.x)) #볼이 패들을 타는 버그 방지
+            adjust_ball_direction_on_paddle_contact(ball, paddle)
+        elif ball_type == 'additional':
+            if ball in balls:
+                balls.remove(ball)
+        sounds.shield = True
 
 def update_item(game_info, players):
     if game_info['item'] == None and random.random() < 0.5: # 10% 확률로 아이템 생성
@@ -173,7 +192,13 @@ def update_item(game_info, players):
 
 def eat_item(slot):
     slot.status = True
-    slot.item_type = random.choice(["b_add"] * int(os.getenv('B_ADD')) + ["b_up"] * int(os.getenv('B_UP')) + ["p_down"] * int(os.getenv('P_DOWN')))
+    slot.item_type = random.choice(
+        ["b_add"] * int(os.getenv('B_ADD'))\
+        + ["b_up"] * int(os.getenv('B_UP'))\
+        + ["p_down"] * int(os.getenv('P_DOWN'))\
+        + ["p_up"] * int(os.getenv('P_UP'))\
+        + ["shield"] * int(os.getenv('SHIELD'))\
+    )
 
 def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:
