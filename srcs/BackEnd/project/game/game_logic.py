@@ -1,5 +1,5 @@
 import threading
-from .models import Paddle, Item, Ball
+from .models import Paddle, Item, Ball, Slot
 import random
 import math
 import os
@@ -190,7 +190,8 @@ def update_item(game_info, players):
        game_info['item'] = None
        eat_item(players[idx]['slot'])
 
-def eat_item(slot):
+def eat_item(player_slot):
+    slot = Slot()
     slot.status = True
     slot.item_type = random.choice(
         ["b_add"] * int(os.getenv('B_ADD'))\
@@ -199,6 +200,9 @@ def eat_item(slot):
         + ["p_up"] * int(os.getenv('P_UP'))\
         + ["shield"] * int(os.getenv('SHIELD'))\
     )
+    if len(player_slot) >= 2:
+        player_slot.pop(0)
+    player_slot.append(slot)
 
 def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:
