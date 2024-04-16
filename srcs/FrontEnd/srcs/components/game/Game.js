@@ -129,34 +129,36 @@ export default function Game($container, data) {
           if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
                const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
                let itemImages = '';
-               items.forEach(item => {
+               items.forEach((item, idx) => {
                     let itemImage = '';
+                    let itemHeight = '30px';
+                    if (idx === 0) itemHeight = '40px';
                     if (item.status) {
                          if (item_info.can_see) {
                               switch (item.type) {
                                    case 'b_add':
-                                        itemImage = '<img src="../../../assets/image/b_add.png" style="height: 30px; margin: 0 5px;" />';
+                                        itemImage = `<img src="../../../assets/image/b_add.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                                         break;
                                    case 'b_up':
-                                        itemImage = '<img src="../../../assets/image/b_up.png" style="height: 30px; margin: 0 5px;" />';
+                                        itemImage = `<img src="../../../assets/image/b_up.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                                         break;
                                    case 'p_down':
-                                        itemImage = '<img src="../../../assets/image/p_down.png" style="height: 30px; margin: 0 5px;" />';
+                                        itemImage = `<img src="../../../assets/image/p_down.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                                         break;
                                    case 'p_up':
-                                        itemImage = '<img src="../../../assets/image/p_up.png" style="height: 30px; margin: 0 5px;" />';
+                                        itemImage = `<img src="../../../assets/image/p_up.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                                         break;
                                    case 'shield':
-                                        itemImage = '<img src="../../../assets/image/shield.png" style="height: 30px; margin: 0 5px;" />';
+                                        itemImage = `<img src="../../../assets/image/shield.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                                         break;
                               }
                          } else {
-                              itemImage = '<img src="../../../assets/image/item-on.png" style="height: 30px; margin: 0 5px;" />';
+                              itemImage = `<img src="../../../assets/image/item-on.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                          }
                          itemImages += itemImage;
                          currentKey = ''; // 아이템 갱신될 때 키 리셋
                     } else {
-                         itemImage = '<img src="../../../assets/image/item-off.png" style="height: 30px; margin: 0 5px;" />';
+                         itemImage = `<img src="../../../assets/image/item-off.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                          itemImages += itemImage;
                     }
                     playerItemContainer.innerHTML = itemImages;

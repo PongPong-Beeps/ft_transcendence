@@ -1,5 +1,5 @@
 import threading
-from .models import Paddle, Item, Ball
+from .models import Paddle, Item, Ball, Slot
 import random
 import math
 import os
@@ -26,8 +26,8 @@ def reset_game_objects(game_id, game_info, mode, players):
     balls = game_info['balls']
     
     #아이템 슬롯 초기화
-    players[0]['slot'].status = False
-    players[1]['slot'].status = False
+    players[0]['slot'].clear()
+    players[1]['slot'].clear()
     
     #패들 위치, 크기 초기화
     paddles = [ players[0]['paddle'], players[1]['paddle'] ]
@@ -190,7 +190,8 @@ def update_item(game_info, players):
        game_info['item'] = None
        eat_item(players[idx]['slot'])
 
-def eat_item(slot):
+def eat_item(player_slot):
+    slot = Slot()
     slot.status = True
     slot.item_type = random.choice(
         ["b_add"] * int(os.getenv('B_ADD'))\
@@ -199,6 +200,9 @@ def eat_item(slot):
         + ["p_up"] * int(os.getenv('P_UP'))\
         + ["shield"] * int(os.getenv('SHIELD'))\
     )
+    if len(player_slot) >= 2:
+        player_slot.pop()
+    player_slot.append(slot)
 
 def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:

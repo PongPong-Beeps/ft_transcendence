@@ -103,12 +103,27 @@ def serialize_player_info(player):
     if not player:
         return None
     paddle = player['paddle']
+    slots = player['slot']
+    items=[]
+    for slot in reversed(slots):
+        item = {
+            "status": True,
+            "type": slot.item_type
+        }
+        items.append(item)
+        
+    if len(items) < 2:
+        for _ in range(2 - len(items)):
+            items.append({
+                "status": False,
+                "type": None
+            })
+    
     serialized_player_info = {
         'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
         'heart': player['heart'],
-        'item': player['slot'].status,
+        'items': [ items[0], items[1] ],
         'item_info': { 
-            "type": player['slot'].item_type, 
             "can_see" : False, 
             'shield': player['shield']
         },
@@ -212,12 +227,19 @@ async def use_item(room_group_name, user):
     if player_info == None or target_player_info == None or game_info['balls'][0].is_ball_moving == False:
         return
     
-    if player_info['slot'].status == False:
+    # if player_info['slot'].status == False:
+    #     print(player_key, " : don't have item")
+    #     return
+    # player_info['slot'].status = False #슬롯 비워주기
+    
+    slots = player_info['slot']
+    if len(slots) == 0:
         print(player_key, " : don't have item")
         return
-    player_info['slot'].status = False #슬롯 비워주기
+    slot = slots[-1] # top
+    slots.pop()
     
-    item_type = player_info['slot'].item_type
+    item_type = slot.item_type
     
     balls=game_info['balls']
     ball=balls[0]
