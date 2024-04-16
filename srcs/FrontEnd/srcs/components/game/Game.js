@@ -58,6 +58,8 @@ export default function Game($container, data) {
                playerNicknameContainer.innerHTML = playerData
                     .map(player => `<div>${player.nickname}</div>`)
                     .join('');
+                    .map(player => `<div>${player.nickname}</div>`)
+                    .join('');
           }
           // 배경 캔버스
           backgroundCtx.fillStyle = backgroundColor;

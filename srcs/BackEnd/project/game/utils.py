@@ -53,7 +53,6 @@ async def serialize_fixed_data(round):
     fixed_data["paddle_width"] = Paddle().width
     fixed_data["item_radius"] = Item().radius
     fixed_data["shield_area"] = int(os.getenv('SHIELD_AREA'))
-    fixed_data["shield_area"] = int(os.getenv('SHIELD_AREA'))
     
     return fixed_data
 
@@ -85,7 +84,6 @@ def reset_sounds(game_id):
     game_info = get_game_info(game_id)
     sounds = game_info['sounds']
     sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate']
-    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate']
     for attr in sound_attributes:
         setattr(sounds, attr, False)
     update_game_info(game_id, game_info)
@@ -106,10 +104,6 @@ def serialize_player_info(player):
         return None
     paddle = player['paddle']
     serialized_player_info = {
-        'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
-        'heart': player['heart'],
-        'item': player['slot'].status,
-        'item_info': { "type": player['slot'].item_type, "can_see" : False, 'shield': player['shield'] },
         'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
         'heart': player['heart'],
         'item': player['slot'].status,
