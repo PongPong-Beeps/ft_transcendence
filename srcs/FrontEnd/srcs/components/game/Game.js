@@ -275,6 +275,10 @@ export default function Game($container, data) {
                     case 'ShiftRight':
                          gameWsManager.sendMessage({ "type": "item" });
                          break;
+                    case 'ControlLeft':
+                    case 'ControlRight':
+                         gameWsManager.sendMessage({ "type": "slot_change" });
+                         break
                }
           });
 
