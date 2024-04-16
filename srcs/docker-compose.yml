@@ -5,7 +5,7 @@ services:
     image: postgres:latest
     container_name: db
     env_file:
-      - ./.env
+      - ../env/.env
     volumes:
       - ./BackEnd/database:/var/lib/postgresql/data
     restart: on-failure
@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./.env
+      - ../env/.env
     tty: true
     stdin_open: true
     volumes:
@@ -37,3 +37,5 @@ services:
     restart: on-failure
     volumes:
       - ./FrontEnd:/var/www/html
+      - ../env/ssl/certs:/etc/ssl/certs
+      - ../env/ssl/private:/etc/ssl/private
