@@ -20,10 +20,14 @@ fclean: clean
 	docker system prune --volumes --all --force
 
 delete:
-	@printf "Are you sure to delete? 'y' to continue, any other input will stop/skip.\n"; \
-	read -n1 answer; \
-	echo ""; \
-	if [ "$$answer" = "y" ]; then \
+	@printf "Are you sure to delete? 'y' to continue, any other input will stop/skip.\n"
+	@if [ "$(shell uname)" = "Darwin" ]; then \
+		read -p "" -n 1 answer; \
+	else \
+		read -n 1 answer; \
+	fi
+	@echo ""
+	@if [ "$$answer" = "y" ]; then \
 		printf "\033[33mdelete\033[0m DB_VOLUME [ ]"; \
 		rm -rf $(DB_VOLUME); \
 		printf "\r\033[33mdelete\033[0m DB_VOLUME [\033[32m✔\033[0m]\n"; \
