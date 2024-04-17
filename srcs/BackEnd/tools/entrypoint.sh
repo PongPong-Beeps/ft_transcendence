@@ -8,6 +8,8 @@ python3 manage.py migrate
 
 echo "from django.contrib.auth.models import User; User.objects.filter(username='$SUPERUSER_USERNAME').exists() or User.objects.create_superuser('$SUPERUSER_USERNAME', '$SUPERUSER_EMAIL', '$SUPERUSER_PASSWORD')" | python manage.py shell
 
+python manage.py delete_game_models
+python manage.py delete_connect_models
 python manage.py runserver 0.0.0.0:8000
 
 daphne -b 0.0.0.0 -p 8000 project.asgi:application
