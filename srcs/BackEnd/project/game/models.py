@@ -68,7 +68,7 @@ class Game(models.Model):
             player.is_ready = True 
             player.save()
     
-    def check_full(self):
+    def check_full_and_delete_game(self):
         count_player = self.players.count()
         count_observer = self.observers.count()
         if count_player + count_observer == 0:
@@ -109,8 +109,8 @@ class Game(models.Model):
             if (self.type == 'one_to_one' and self.players.count() < 2)\
                 or (self.type == 'tournament' and self.players.count() < 4):
                 self.observers.remove(player)
-                self.players.add(player)        
-        self.check_full()
+                self.players.add(player)
+        self.check_full_and_delete_game()
         self.save()
                 
     def entry_player(self, client, channel_name):
@@ -120,19 +120,24 @@ class Game(models.Model):
             self.observers.add(player)
         else:
             self.players.add(player)
-        self.check_full()
+        self.check_full_and_delete_game()
         self.save()
 
     def exit_player(self, channel_name):
         try :
             player = self.players.get(channel_name=channel_name)
             player.delete()
-            self.check_full()
-            self.save()
-            if self.players.count() == 0:
-                self.delete()
+            self.check_full_and_delete_game()
         except :
             print('player does not exist')
+            try:
+                observer = self.observers.get(channel_name=channel_name)
+                observer.delete()
+                self.check_full_and_delete_game()
+            except :
+                print('observer does not exist')
+                return
+                
             
     def all_players_ready(self):
         if self.can_start_game:
