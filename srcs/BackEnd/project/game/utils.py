@@ -83,7 +83,7 @@ def generate_round_info(round, game_id):
 def reset_sounds(game_id):
     game_info = get_game_info(game_id)
     sounds = game_info['sounds']
-    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate']
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate', 'h_up']
     for attr in sound_attributes:
         setattr(sounds, attr, False)
     update_game_info(game_id, game_info)
@@ -165,6 +165,8 @@ def serialize_sounds_info(sounds):
         'out': sounds.out,
         'p_up': sounds.p_up,
         'shield': sounds.shield,
+        'shield_operate': sounds.shield_operate,
+        'h_up': sounds.h_up,
     }
     return serialized_sounds
 
@@ -263,7 +265,11 @@ async def use_item(room_group_name, user):
         player_info['shield'] = True
         sounds.shield = True
         await database_sync_to_async(shield_reset_after_seconds)(room_group_name, player_key)
-
+    elif item_type == 'h_up': # 목숨 추가
+        heart = player_info['heart']
+        player_info['heart'] = heart + 1 if heart < int(os.getenv('HEART_NUM')) else heart #목숨 최댓값(어차피 아이템 먹을때 2개 이하일때만 해당 아이템이 뜸)
+        sounds.h_up = True
+        
     await database_sync_to_async(update_game_info)(room_group_name, game_info)
     await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
     await database_sync_to_async(update_game_info)(room_group_name, target_player_info, target_player_key)

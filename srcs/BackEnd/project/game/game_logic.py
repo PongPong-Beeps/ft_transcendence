@@ -188,17 +188,19 @@ def update_item(game_info, players):
        and item.y + item.radius >= nearest_paddle.y:
        sounds.item = True
        game_info['item'] = None
-       eat_item(players[idx]['slot'])
+       eat_item(players[idx]['slot'], players[idx]['heart'])
 
-def eat_item(player_slot):
+def eat_item(player_slot, player_heart_num):
     slot = Slot()
     slot.status = True
+    heart_percent = int(os.getenv('HEART_UP') if player_heart_num <= 2 else 0) #목숨 2개 이하인 사람에게만 일정확률로 하트 아이템 드랍
     slot.item_type = random.choice(
         ["b_add"] * int(os.getenv('B_ADD'))\
         + ["b_up"] * int(os.getenv('B_UP'))\
         + ["p_down"] * int(os.getenv('P_DOWN'))\
         + ["p_up"] * int(os.getenv('P_UP'))\
         + ["shield"] * int(os.getenv('SHIELD'))\
+        + ["h_up"] * heart_percent\
     )
     if len(player_slot) >= 2:
         player_slot.pop()

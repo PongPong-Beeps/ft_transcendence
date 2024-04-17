@@ -156,6 +156,9 @@ export default function Game($container, data) {
                                    case 'shield':
                                         itemImage = `<img src="../../../assets/image/shield.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                                         break;
+                                   case 'h_up':
+                                        itemImage = `<img src="../../../assets/image/help.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
+                                        break;
                               }
                          } else {
                               itemImage = `<img src="../../../assets/image/item-on.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
