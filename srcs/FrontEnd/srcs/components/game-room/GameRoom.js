@@ -22,6 +22,8 @@ export default function GameRoom($container, wsManagers) {
     let audio_button = new Audio("../../assets/sound/button.mp3");
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
     let num_observer = 0;
+    let observe_btn_message = "관전하기";
+    let userNickname = "";
 
     const init = () => {
         $container.querySelectorAll('.invite-btn').forEach(button => {
@@ -39,7 +41,7 @@ export default function GameRoom($container, wsManagers) {
                     <div class="game-room-title">게임방</div>
                     <div class="game-room-observer-count">관전중인 인원: ${num_observer}</div>
                     <div class="game-room-observer-toggle">
-                        <button class="game-room-observer-toggle-btn green-btn non-outline-btn">관전하기</button>
+                        <button class="game-room-observer-toggle-btn green-btn non-outline-btn">${observe_btn_message}</button>
                     </div>
                     <div class="game-room-detail"></div>
                 </div>
@@ -88,6 +90,20 @@ export default function GameRoom($container, wsManagers) {
         if (data.type === "game_status") {
             // $container.querySelector('#page').style.display = 'none';
             const gameRoomDetail = $container.querySelector('.game-room-detail');
+            fetchWithAuth(`https://${BACKEND}/api/user/me/`)
+                .then(userMeData => {
+                    userNickname = userMeData.nickname;
+                })
+                .catch(error => {
+                    console.error("게임 컴포넌트에서 user/me 실패");
+                    new ErrorPage($container, error.status);
+                });
+            let userInGame = data.players.some(player => player.nickname === userNickname);
+            observe_btn_message = userInGame ? "관전하기" : "게임참가";
+            const observerMessage = $container.querySelector('.game-room-observer-toggle-btn');
+            if (observerMessage) {
+                observerMessage.textContent = `${observe_btn_message}`;
+            }
             if (data.num_observers != undefined) {
                 num_observer = data.num_observers;
                 const observerCount = $container.querySelector('.game-room-observer-count');
