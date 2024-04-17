@@ -127,12 +127,17 @@ export default function Game($container, data) {
 
      const drawItemHeart = (index, items, heart, item_info) => {
           if (data.game_mode === 'hard') { // 아이템 모드일 때만 슬롯 표시
-               const playerItemContainer = $container.querySelector(`#player${index + 1}-item`);
-               let itemImages = '';
+               const playerItemMainContainer = $container.querySelector(`#player${index + 1}-itemMain`);
+               const playerItemSubContainer = $container.querySelector(`#player${index + 1}-itemSub`);
                items.forEach((item, idx) => {
                     let itemImage = '';
                     let itemHeight = '30px';
-                    if (idx === 0) itemHeight = '40px';
+                    let playerItemContainer = playerItemSubContainer;
+                    if (idx === 0) 
+                    {
+                         playerItemContainer = playerItemMainContainer;
+                         itemHeight = '40px';
+                    }
                     if (item.status) {
                          if (item_info.can_see) {
                               switch (item.type) {
@@ -155,13 +160,11 @@ export default function Game($container, data) {
                          } else {
                               itemImage = `<img src="../../../assets/image/item-on.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
                          }
-                         itemImages += itemImage;
                          currentKey = ''; // 아이템 갱신될 때 키 리셋
                     } else {
                          itemImage = `<img src="../../../assets/image/item-off.png" style="height: ${itemHeight}; margin: 0 5px;" />`;
-                         itemImages += itemImage;
                     }
-                    playerItemContainer.innerHTML = itemImages;
+                    playerItemContainer.innerHTML = itemImage;
                });
          }
           if (heart !== currentHeart[index]) { // 하트 갱신될 때만 그리기
@@ -238,10 +241,12 @@ export default function Game($container, data) {
               <div class="game-info-container">
                   <div class="game-player-nickname-container"></div>
                       <div class="game-player-info-container">
-                          <div id="player1-item"></div>
+                          <div id="player1-itemSub"></div>
+                          <div id="player1-itemMain"></div>
                           <div id="player1-heart"></div>
                           <div id="player2-heart"></div>
-                          <div id="player2-item""></div>
+                          <div id="player2-itemMain"></div>
+                          <div id="player2-itemSub"></div>
                       </div>
                   </div>
                   <div class="game-canvas-container">
@@ -277,6 +282,8 @@ export default function Game($container, data) {
                          break;
                     case 'ControlLeft':
                     case 'ControlRight':
+                    case 'AltLeft':
+                    case 'AltRight':
                          gameWsManager.sendMessage({ "type": "slot_change" });
                          break
                }
