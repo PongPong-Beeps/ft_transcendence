@@ -104,17 +104,18 @@ class Game(models.Model):
             and self.observers.count() < 4:
             self.players.remove(player)
             self.observers.add(player)
-        elif self.observers.filter(channel_name=channel_name).exists()\
-            and self.players.count() < 4:
-            self.observers.remove(player)
-            self.players.add(player)        
+        elif self.observers.filter(channel_name=channel_name).exists():
+            if (self.type == 'one_to_one' and self.players.count() < 2)\
+                or (self.type == 'tournament' and self.players.count() < 4):
+                self.observers.remove(player)
+                self.players.add(player)        
         self.check_full()
         self.save()
                 
     def entry_player(self, client, channel_name):
         player = Player.objects.create(client=client, channel_name=channel_name)
         player.save()
-        if self.is_full:
+        if self.can_start_game:
             self.observers.add(player)
         else:
             self.players.add(player)
