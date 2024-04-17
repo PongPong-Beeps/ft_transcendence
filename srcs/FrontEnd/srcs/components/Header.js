@@ -16,6 +16,10 @@ export default function Header($container, connWsManager) {
                 <div id="header-container">
                     <img src="../../assets/image/logo.png" alt="logo">
                     <div id="header-button-container">
+                        <button id="bug-report-btn" class="non-outline-btn">
+                            <span id="bug-report-icon"></span>
+                            버그리포팅
+                        </button>
                         <button id="help-btn" class="non-outline-btn">
                             <span id="help-icon"></span>
                             <div id="guide-image"></div>
@@ -25,8 +29,37 @@ export default function Header($container, connWsManager) {
                         </button>
                     </div>
                 </div>
+                <div id="bug-report-modal" class="modal">
+                    <div class="modal-content">
+                        <textarea id="bug-report-text" placeholder="버그 리포팅 내용을 입력하세요."></textarea>
+                        <button id="bug-report-submit-btn">제출</button>
+                    </div>
+                </div>
             `;
         }
+        
+        const bugReportBtn = $container.querySelector('#bug-report-btn');
+        const bugReportModal = $container.querySelector('#bug-report-modal');
+        const bugReportText = $container.querySelector('#bug-report-text');
+        const bugReportSubmitBtn = $container.querySelector('#bug-report-submit-btn');
+
+        bugReportBtn.addEventListener('click', () => {
+            bugReportModal.style.display = 'block';
+        });
+
+        bugReportSubmitBtn.addEventListener('click', () => {
+            const report = bugReportText.value;
+            if (report) {
+                fetchWithAuth(`https://${BACKEND}/api/bug_report/`, {
+                method: 'POST',
+                body: JSON.stringify({ "content": report }),
+                })
+                bugReportModal.style.display = 'none';
+                bugReportText.value = '';
+            } else {
+                alert('버그 리포팅 내용을 입력하세요.');
+            }
+        });
     }
 
     const setupEventListener = () => {
