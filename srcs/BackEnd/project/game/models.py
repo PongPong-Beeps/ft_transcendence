@@ -197,7 +197,7 @@ class Paddle():
     def __init__(self, player='player1', mode='default'):
         #패들 고정값
         self.width = float(os.getenv('PADDLE_WIDTH'))
-        self.height = float(os.getenv('PADDLE_HEIGHT')) / 2 if mode == 'easy' else float(os.getenv('PADDLE_HEIGHT')) 
+        self.height = float(os.getenv('PADDLE_HEIGHT')) / 1.5 if mode == 'easy' else float(os.getenv('PADDLE_HEIGHT')) 
         self.speed = float(os.getenv('PADDLE_SPEED'))
         self.player_area = float(os.getenv('PADDLE_PLAYER_AREA'))
         #패들 가변값
@@ -226,7 +226,7 @@ class Ball:
         
         #볼 고정값
         self.radius = float(os.getenv('BALL_RADIUS')) * 1.5 if type == 'add' else float(os.getenv('BALL_RADIUS'))
-        self.speed = float(os.getenv('BALL_SPEED')) * 2 if type == 'easy' else float(os.getenv('BALL_SPEED')) / 1.5 if type =='add' else float(os.getenv('BALL_SPEED'))
+        self.speed = float(os.getenv('BALL_SPEED')) * 1.2 if type == 'easy' else float(os.getenv('BALL_SPEED')) / 1.5 if type =='add' else float(os.getenv('BALL_SPEED'))
 
     def get_random_direction(self, to='random'):
         # 20도에서 40도를 라디안으로 변환
