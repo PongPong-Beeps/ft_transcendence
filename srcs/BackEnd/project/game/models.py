@@ -50,9 +50,10 @@ class Game(models.Model):
             return False
         
     def get_players_info(self):
-        players_info = [{'nickname': '', 'image': '', 'ready': ''} for _ in range(4)]
+        players_info = [{'id':'', 'nickname': '', 'image': '', 'ready': ''} for _ in range(4)]
         for i, player in enumerate(self.players.all().order_by('created_at').order_by('created_at')):
             user = player.client.user
+            players_info[i]['id'] = user.id
             players_info[i]['nickname'] = user.nickname
             players_info[i]['image'] = get_image(user)
             players_info[i]['ready'] = player.is_ready

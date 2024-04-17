@@ -23,11 +23,19 @@ export default function GameRoom($container, wsManagers) {
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
     let num_observer = 0;
     let observe_btn_message = "관전하기";
-    let userNickname = "";
+    let myId = 0;
 
     const init = () => {
         $container.querySelectorAll('.invite-btn').forEach(button => {
             button.style.display = 'block';
+        });
+        fetchWithAuth(`https://${BACKEND}/api/user/me/`)
+                .then(userMeData => {
+                    myId = userMeData.id;
+                })
+                .catch(error => {
+                    console.error("게임 컴포넌트에서 user/me 실패");
+                    new ErrorPage($container, error.status);
         });
     }
 
@@ -90,15 +98,7 @@ export default function GameRoom($container, wsManagers) {
         if (data.type === "game_status") {
             // $container.querySelector('#page').style.display = 'none';
             const gameRoomDetail = $container.querySelector('.game-room-detail');
-            fetchWithAuth(`https://${BACKEND}/api/user/me/`)
-                .then(userMeData => {
-                    userNickname = userMeData.nickname;
-                })
-                .catch(error => {
-                    console.error("게임 컴포넌트에서 user/me 실패");
-                    new ErrorPage($container, error.status);
-                });
-            let userInGame = data.players.some(player => player.nickname === userNickname);
+            let userInGame = data.players.some(player => player.id === myId);
             observe_btn_message = userInGame ? "관전하기" : "게임참가";
             const observerMessage = $container.querySelector('.game-room-observer-toggle-btn');
             if (observerMessage) {
