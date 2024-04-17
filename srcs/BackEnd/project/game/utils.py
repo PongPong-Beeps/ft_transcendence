@@ -105,7 +105,7 @@ def serialize_player_info(player):
     paddle = player['paddle']
     slots = player['slot']
     items=[]
-    for slot in slots:
+    for slot in reversed(slots):
         item = {
             "status": True,
             "type": slot.item_type
@@ -122,7 +122,7 @@ def serialize_player_info(player):
     serialized_player_info = {
         'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
         'heart': player['heart'],
-        'items': items,
+        'items': [ items[0], items[1] ],
         'item_info': { 
             "can_see" : False, 
             'shield': player['shield']
@@ -236,7 +236,7 @@ async def use_item(room_group_name, user):
     if len(slots) == 0:
         print(player_key, " : don't have item")
         return
-    slot = slots[0]
+    slot = slots[-1] # top
     slots.pop()
     
     item_type = slot.item_type
@@ -301,4 +301,28 @@ async def move_paddle(room_group_name, user, direction):
     
     await player_info['paddle'].change_direction(direction)
     await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
-    print(player_key, " paddle moved ", player_info['paddle'].direction) #test code
+    print(player_key, " paddle moved ", player_info['paddle'].direction) #test 
+    
+async def slot_change(room_group_name, user):
+    game_info = await database_sync_to_async(get_game_info)(room_group_name)
+    if game_info == None:
+        return
+    
+    player_key = None
+    if game_info['player1'].id == user.id:
+        player_key = 'player1'
+    elif game_info['player2'].id == user.id:
+        player_key = 'player2'
+    
+    player_info = await database_sync_to_async(get_game_info)(room_group_name, player_key)    
+    if player_info == None or game_info['balls'][0].is_ball_moving == False:
+        return
+    
+    slots = player_info['slot']
+    if len(slots) < 2:
+        print(player_key, ": have item under 2")
+        return
+    
+    #swap
+    slots[0], slots[1] = slots[1], slots[0]
+    await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)

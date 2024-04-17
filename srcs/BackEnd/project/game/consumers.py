@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Game, Player
 from channels.db import database_sync_to_async
 from connect.models import Client
-from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history, determine_winner, move_paddle, use_item, get_my_player_index
+from .utils import serialize_player, serialize_round_players, serialize_fixed_data, generate_round_info, update_match_history, determine_winner, move_paddle, use_item, get_my_player_index, slot_change
 from .game_logic import update, set_ball_moving
 import asyncio
 from .cache import set_game_info, delete_game_info
@@ -109,6 +109,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(move_paddle(self.room_group_name, self.scope['user'], direction))
         elif type == 'item':
             asyncio.create_task(use_item(self.room_group_name, self.scope['user']))
+        elif type == 'slot_change':
+            asyncio.create_task(slot_change(self.room_group_name, self.scope['user']))
             
     async def ready(self, event):
         user = self.scope['user']
