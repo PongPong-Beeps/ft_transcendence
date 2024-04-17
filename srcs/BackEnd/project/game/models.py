@@ -24,12 +24,14 @@ class Game(models.Model):
     type = models.CharField(max_length=20) #one_to_one or "tournament"
     mode = models.CharField(max_length=20) #easy or hard
     players = models.ManyToManyField(Player, related_name='player_as_game')
+    observers = models.ManyToManyField(Player, related_name='observer_as_game')
     
     round1 = models.ForeignKey('Round', on_delete=models.SET_NULL, null=True, blank=True, related_name='game_round1')
     round2 = models.ForeignKey('Round', on_delete=models.SET_NULL, null=True, blank=True, related_name='game_round2')
     round3 = models.ForeignKey('Round', on_delete=models.SET_NULL, null=True, blank=True, related_name='game_round3')
 
     is_full = models.BooleanField(default=False)
+    can_start_game = models.BooleanField(default=False)
     
     def delete(self, *args, **kwargs):
         if self.round1:
@@ -67,29 +69,55 @@ class Game(models.Model):
     
     def check_full(self):
         count_player = self.players.count()
+        count_observer = self.observers.count()
+        if count_player + count_observer == 0:
+            self.delete()
+            return
         if self.type == 'one_to_one':
             if count_player == 2:
-                self.is_full = True
-                self.save()
+                self.can_start_game = True
             elif count_player == 1:
-                self.is_full = False
-                self.save()
-            elif count_player == 0:
-                self.delete()
-        else : #'tournament':
-            if count_player == 4:
+                self.can_start_game = False
+            if count_player + count_observer == 6:
                 self.is_full = True
-                self.save()
-            elif count_player == 0:
-                self.delete()
             else:
                 self.is_full = False
-                self.save()
+        else : #'tournament':
+            if count_player == 4:
+                self.can_start_game = True
+            elif count_player < 4:
+                self.can_start_game = False
+            if count_player + count_observer == 8:
+                self.is_full = True
+            else:
+                self.is_full = False
+        self.save()
+            
+    
+    def change_player_type(self, channel_name):
+        try:
+            player = Player.objects.get(channel_name=channel_name)
+        except Exception as e:
+            print(e)
+            return
+        if self.players.filter(channel_name=channel_name).exists()\
+            and self.observers.count() < 4:
+            self.players.remove(player)
+            self.observers.add(player)
+        elif self.observers.filter(channel_name=channel_name).exists()\
+            and self.players.count() < 4:
+            self.observers.remove(player)
+            self.players.add(player)        
+        self.check_full()
+        self.save()
                 
     def entry_player(self, client, channel_name):
         player = Player.objects.create(client=client, channel_name=channel_name)
         player.save()
-        self.players.add(player)
+        if self.is_full:
+            self.observers.add(player)
+        else:
+            self.players.add(player)
         self.check_full()
         self.save()
 
@@ -105,12 +133,14 @@ class Game(models.Model):
             print('player does not exist')
             
     def all_players_ready(self):
-        if self.is_full:
+        if self.can_start_game:
             if all(player.is_ready for player in self.players.all()):
                 for player in self.players.all():
                     player.is_ready = False
                     player.save()
                 return True
+            else:
+                return False
         else:
             return False
     

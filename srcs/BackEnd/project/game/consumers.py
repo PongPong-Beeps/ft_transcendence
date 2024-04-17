@@ -96,7 +96,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         type = text_data_json["type"]
         
-        if type == 'ready':
+        if type == 'observe_or_play':
+            await self.channel_layer.send(
+                self.channel_name, {"type": "observe_or_play"}
+            )
+        elif type == 'ready':
             await self.channel_layer.send(
                 self.channel_name, {"type": "ready"}
             )
@@ -111,6 +115,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(use_item(self.room_group_name, self.scope['user']))
         elif type == 'slot_change':
             asyncio.create_task(slot_change(self.room_group_name, self.scope['user']))
+    
+    async def observe_or_play(self, event):
+        game = await database_sync_to_async(Game.objects.get)(id=self.room_group_name)
+        await database_sync_to_async(game.change_player_type)(self.channel_name)
+        await self.channel_layer.group_send(
+                self.room_group_name, {"type": "game_status"}
+            )
             
     async def ready(self, event):
         user = self.scope['user']
@@ -141,6 +152,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             "players" : players_info,
             'room_group_name': self.room_group_name,
             'is_full': game.is_full,
+            'num_observers': await database_sync_to_async(game.observers.count)(),
         }        
         try:
             await self.send(text_data=json.dumps(text_data))
