@@ -128,6 +128,8 @@ def update(round, mode, game_id):
             and ball.x + ball.radius >= nearest_paddle.x\
             and ball.y - ball.radius <= nearest_paddle.y + nearest_paddle.height\
             and ball.y + ball.radius >= nearest_paddle.y:
+            if mode == 'easy':
+                ball.speed += 0.25
             if ball_type == 'basic':
                 ball.dirX = -ball.dirX
                 ball.x += ball.dirX * abs(nearest_paddle.width - abs(nearest_paddle.x - ball.x)) #볼이 패들을 타는 버그 방지
