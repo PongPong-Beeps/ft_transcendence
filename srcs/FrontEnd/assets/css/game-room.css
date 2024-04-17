@@ -18,6 +18,11 @@
     padding: 20px;
 }
 
+.game-room-observer-toggle-btn {
+    border: 5px solid;
+    border-radius: 0.5vw;
+}
+
 .game-room-back-btn {
     border: none;
     background-color: transparent;

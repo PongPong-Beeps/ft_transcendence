@@ -9,7 +9,7 @@ async def create_room(client, type, mode, channel_name):
     return str(game.id)
 
 async def quick_start(client, type, mode, channel_name):
-    game_queryset = await database_sync_to_async(Game.objects.filter)(type=type, mode=mode, is_full=False)
+    game_queryset = await database_sync_to_async(Game.objects.filter)(type=type, mode=mode, can_start_game=False)
     game = await database_sync_to_async(game_queryset.first)()
     if game and game.is_gameRunning == False:
         await database_sync_to_async(game.entry_player)(client, channel_name)

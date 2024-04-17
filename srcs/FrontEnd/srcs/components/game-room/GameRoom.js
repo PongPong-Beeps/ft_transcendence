@@ -21,10 +21,21 @@ export default function GameRoom($container, wsManagers) {
     const { gameWsManager, connWsManager } = wsManagers; // 둘 다 무조건 있음 !
     let audio_button = new Audio("../../assets/sound/button.mp3");
     let [getPlayers, setPlayers] = useState([], this, 'renderPlayers');
+    let num_observer = 0;
+    let observe_btn_message = "관전하기";
+    let myId = 0;
 
     const init = () => {
         $container.querySelectorAll('.invite-btn').forEach(button => {
             button.style.display = 'block';
+        });
+        fetchWithAuth(`https://${BACKEND}/api/user/me/`)
+                .then(userMeData => {
+                    myId = userMeData.id;
+                })
+                .catch(error => {
+                    console.error("게임 컴포넌트에서 user/me 실패");
+                    new ErrorPage($container, error.status);
         });
     }
 
@@ -36,6 +47,10 @@ export default function GameRoom($container, wsManagers) {
                 <div class="game-room-title-container">
                     <button class="game-room-back-btn non-outline-btn"><</button>
                     <div class="game-room-title">게임방</div>
+                    <div class="game-room-observer-count">관전중인 인원: ${num_observer}</div>
+                    <div class="game-room-observer-toggle">
+                        <button class="game-room-observer-toggle-btn green-btn non-outline-btn">${observe_btn_message}</button>
+                    </div>
                     <div class="game-room-detail"></div>
                 </div>
                 <div class="game-room-player-container">
@@ -63,6 +78,8 @@ export default function GameRoom($container, wsManagers) {
                 new ExitConfirmationAlert($container, wsManagers);
             } else if (event.target.closest('.game-room-ready-btn')) {
                 gameWsManager.sendMessage({ "type" : "ready" });
+            } else if (event.target.closest('.game-room-observer-toggle-btn')) {
+                gameWsManager.sendMessage({ "type" : "observe_or_play" });
             }
         });
         document.addEventListener('inviteUser', (event) => {
@@ -81,6 +98,19 @@ export default function GameRoom($container, wsManagers) {
         if (data.type === "game_status") {
             // $container.querySelector('#page').style.display = 'none';
             const gameRoomDetail = $container.querySelector('.game-room-detail');
+            let userInGame = data.players.some(player => player.id === myId);
+            observe_btn_message = userInGame ? "관전하기" : "게임참가";
+            const observerMessage = $container.querySelector('.game-room-observer-toggle-btn');
+            if (observerMessage) {
+                observerMessage.textContent = `${observe_btn_message}`;
+            }
+            if (data.num_observers != undefined) {
+                num_observer = data.num_observers;
+                const observerCount = $container.querySelector('.game-room-observer-count');
+                if (observerCount) {
+                    observerCount.textContent = `관전중인 인원: ${num_observer}`;
+                }
+            }
             if (gameRoomDetail) {
                 gameRoomDetail.innerHTML = `
                     타입:<img style="height: 30px" src="../../../assets/image/${data.game_type}.png" alt="type">  
