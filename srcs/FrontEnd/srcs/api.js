@@ -1,6 +1,6 @@
 import getCookie from "./utils/cookie.js";
 
-export const BACKEND = 'pongpong-beeps.site';
+export const BACKEND = '127.0.0.1';
 
 async function refreshToken() {
     const refreshTokenResponse = await fetch(`https://${BACKEND}/api/token/refresh/`, {

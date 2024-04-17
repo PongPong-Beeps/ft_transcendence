@@ -231,15 +231,16 @@ class Slot:
 
 class Sound:
     def __init__(self):
-        self.pong = False
-        self.item = False
+        self.pong = False #벽튕길때
+        self.item = False #아이템 획득시
         self.b_add = False #ball 추가
         self.b_up = False #ball 속도 증가
         self.p_down = False #paddle 길이 감소
+        self.out = False #공 나감
         self.p_up = False #paddle 길이 증가
-        self.shield = False
-        self.shield_operate = False
-        self.out = False
+        self.shield = False #쉴드 사용
+        self.shield_operate = False #쉴드 작동
+        self.h_up = False #목숨 증가
 
 class Round(models.Model):
     is_roundEnded = models.BooleanField(default=False)            

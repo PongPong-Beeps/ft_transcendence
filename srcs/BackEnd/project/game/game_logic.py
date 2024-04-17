@@ -1,5 +1,5 @@
 import threading
-from .models import Paddle, Item, Ball
+from .models import Paddle, Item, Ball, Slot
 import random
 import math
 import os
@@ -26,8 +26,8 @@ def reset_game_objects(game_id, game_info, mode, players):
     balls = game_info['balls']
     
     #아이템 슬롯 초기화
-    players[0]['slot'].status = False
-    players[1]['slot'].status = False
+    players[0]['slot'].clear()
+    players[1]['slot'].clear()
     
     #패들 위치, 크기 초기화
     paddles = [ players[0]['paddle'], players[1]['paddle'] ]
@@ -188,17 +188,23 @@ def update_item(game_info, players):
        and item.y + item.radius >= nearest_paddle.y:
        sounds.item = True
        game_info['item'] = None
-       eat_item(players[idx]['slot'])
+       eat_item(players[idx]['slot'], players[idx]['heart'])
 
-def eat_item(slot):
+def eat_item(player_slot, player_heart_num):
+    slot = Slot()
     slot.status = True
+    heart_percent = int(os.getenv('HEART_UP') if player_heart_num <= 2 else 0) #목숨 2개 이하인 사람에게만 일정확률로 하트 아이템 드랍
     slot.item_type = random.choice(
         ["b_add"] * int(os.getenv('B_ADD'))\
         + ["b_up"] * int(os.getenv('B_UP'))\
         + ["p_down"] * int(os.getenv('P_DOWN'))\
         + ["p_up"] * int(os.getenv('P_UP'))\
         + ["shield"] * int(os.getenv('SHIELD'))\
+        + ["h_up"] * heart_percent\
     )
+    if len(player_slot) >= 2:
+        player_slot.pop()
+    player_slot.append(slot)
 
 def generate_item(game_info, players):
     if players[0]['heart'] < players[1]['heart']:

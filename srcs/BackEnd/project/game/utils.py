@@ -83,7 +83,7 @@ def generate_round_info(round, game_id):
 def reset_sounds(game_id):
     game_info = get_game_info(game_id)
     sounds = game_info['sounds']
-    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate']
+    sound_attributes = ['pong', 'item', 'b_add', 'b_up', 'p_down', 'out', 'p_up', 'shield', 'shield_operate', 'h_up']
     for attr in sound_attributes:
         setattr(sounds, attr, False)
     update_game_info(game_id, game_info)
@@ -103,12 +103,27 @@ def serialize_player_info(player):
     if not player:
         return None
     paddle = player['paddle']
+    slots = player['slot']
+    items=[]
+    for slot in reversed(slots):
+        item = {
+            "status": True,
+            "type": slot.item_type
+        }
+        items.append(item)
+        
+    if len(items) < 2:
+        for _ in range(2 - len(items)):
+            items.append({
+                "status": False,
+                "type": None
+            })
+    
     serialized_player_info = {
         'paddle': {"x": paddle.x, "y": paddle.y, "height": paddle.height},
         'heart': player['heart'],
-        'item': player['slot'].status,
+        'items': [ items[0], items[1] ],
         'item_info': { 
-            "type": player['slot'].item_type, 
             "can_see" : False, 
             'shield': player['shield']
         },
@@ -150,6 +165,8 @@ def serialize_sounds_info(sounds):
         'out': sounds.out,
         'p_up': sounds.p_up,
         'shield': sounds.shield,
+        'shield_operate': sounds.shield_operate,
+        'h_up': sounds.h_up,
     }
     return serialized_sounds
 
@@ -212,12 +229,19 @@ async def use_item(room_group_name, user):
     if player_info == None or target_player_info == None or game_info['balls'][0].is_ball_moving == False:
         return
     
-    if player_info['slot'].status == False:
+    # if player_info['slot'].status == False:
+    #     print(player_key, " : don't have item")
+    #     return
+    # player_info['slot'].status = False #슬롯 비워주기
+    
+    slots = player_info['slot']
+    if len(slots) == 0:
         print(player_key, " : don't have item")
         return
-    player_info['slot'].status = False #슬롯 비워주기
+    slot = slots[-1] # top
+    slots.pop()
     
-    item_type = player_info['slot'].item_type
+    item_type = slot.item_type
     
     balls=game_info['balls']
     ball=balls[0]
@@ -241,7 +265,11 @@ async def use_item(room_group_name, user):
         player_info['shield'] = True
         sounds.shield = True
         await database_sync_to_async(shield_reset_after_seconds)(room_group_name, player_key)
-
+    elif item_type == 'h_up': # 목숨 추가
+        heart = player_info['heart']
+        player_info['heart'] = heart + 1 if heart < int(os.getenv('HEART_NUM')) else heart #목숨 최댓값(어차피 아이템 먹을때 2개 이하일때만 해당 아이템이 뜸)
+        sounds.h_up = True
+        
     await database_sync_to_async(update_game_info)(room_group_name, game_info)
     await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
     await database_sync_to_async(update_game_info)(room_group_name, target_player_info, target_player_key)
@@ -279,4 +307,28 @@ async def move_paddle(room_group_name, user, direction):
     
     await player_info['paddle'].change_direction(direction)
     await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
-    print(player_key, " paddle moved ", player_info['paddle'].direction) #test code
+    print(player_key, " paddle moved ", player_info['paddle'].direction) #test 
+    
+async def slot_change(room_group_name, user):
+    game_info = await database_sync_to_async(get_game_info)(room_group_name)
+    if game_info == None:
+        return
+    
+    player_key = None
+    if game_info['player1'].id == user.id:
+        player_key = 'player1'
+    elif game_info['player2'].id == user.id:
+        player_key = 'player2'
+    
+    player_info = await database_sync_to_async(get_game_info)(room_group_name, player_key)    
+    if player_info == None or game_info['balls'][0].is_ball_moving == False:
+        return
+    
+    slots = player_info['slot']
+    if len(slots) < 2:
+        print(player_key, ": have item under 2")
+        return
+    
+    #swap
+    slots[0], slots[1] = slots[1], slots[0]
+    await database_sync_to_async(update_game_info)(room_group_name, player_info, player_key)
