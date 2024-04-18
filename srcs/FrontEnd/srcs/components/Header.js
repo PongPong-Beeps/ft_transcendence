@@ -16,6 +16,9 @@ export default function Header($container, connWsManager) {
                 <div id="header-container">
                     <img src="../../assets/image/logo.png" alt="logo">
                     <div id="header-button-container">
+                        <button id="bug-report-btn" class="non-outline-btn">
+                            <span id="bug-report-icon"></span>
+                        </button>
                         <button id="help-btn" class="non-outline-btn">
                             <span id="help-icon"></span>
                             <div id="guide-image"></div>
@@ -55,6 +58,24 @@ export default function Header($container, connWsManager) {
                 const clickPosition = event.offsetX;
                 if (clickPosition > totalWidth * 0.9) {
                     new getDevelopersPage($container);
+                }
+            });
+        }
+        const bugReportBtn = $container.querySelector('#bug-report-btn');
+        if (bugReportBtn) {
+            bugReportBtn.addEventListener('click', async (event) => {
+                const bugReportMsg = prompt("발생한 버그의 내용을 작성해주세요.");
+                if (bugReportMsg) {
+                    try {
+                        await fetchWithAuth(`https://${BACKEND}/api/bug_report/`, {
+                            method: 'POST',
+                            body: JSON.stringify({ "content": bugReportMsg }),
+                        });
+                        alert("성공적으로 버그 내용을 제출하였습니다.");
+                    } catch (error) {
+                        console.error("[ bug report ] " + error.message);
+                        alert(`버그 내용 제출에 실패하였습니다. 에러: ${error.message}`);
+                    }
                 }
             });
         }

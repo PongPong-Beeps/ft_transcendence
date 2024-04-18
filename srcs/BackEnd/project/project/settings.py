@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['13.209.222.162', '43.203.81.178', '127.0.0.1', 'localhost', 'p
 
 INSTALLED_APPS = [
     'corsheaders',	#cors
+    'bug_report',
     'user',
     'channels',
 	'daphne',
