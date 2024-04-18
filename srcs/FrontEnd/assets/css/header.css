@@ -16,13 +16,21 @@
     gap: 20px;
 }
 
-#help-btn, #logout-btn {
+#bug-report-btn, #help-btn, #logout-btn {
     height: 80%;
     background-color: transparent;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#bug-report-icon {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    background-image: url('../../assets/image/bug.png');
+    background-size: cover;
 }
 
 #help-btn {

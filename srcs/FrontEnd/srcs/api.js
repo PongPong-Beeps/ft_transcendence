@@ -54,7 +54,12 @@ export async function fetchWithAuth(url, options = {}) {
         throw error;
     }
 
-    return await response.json();
+    // 응답이 JSON 형식인지 확인 후 파싱, 아니면 상태 코드 반환
+    if (response.headers.get('content-type')?.includes('application/json')) {
+        return await response.json();
+    } else {
+        return response.status;
+    }
 }
 
 export async function fetchWithAuthFormData(url, options = {}) {
