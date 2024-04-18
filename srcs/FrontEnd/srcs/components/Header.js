@@ -3,6 +3,7 @@ import { BACKEND, fetchWithAuth } from "../api.js";
 import ErrorPage from "../pages/ErrorPage.js";
 import { navigate } from "../utils/navigate.js";
 import getDevelopersPage from "../pages/developersPage.js";
+import getPatchNotePage from "../pages/PatchNote.js";
 
 /**
  * @param { HTMLElement } $container
@@ -16,6 +17,9 @@ export default function Header($container, connWsManager) {
                 <div id="header-container">
                     <img src="../../assets/image/logo.png" alt="logo">
                     <div id="header-button-container">
+                        <button id="version-btn" class="non-outline-btn">
+                            <span id="version">v2.0.0</span>
+                        </button>
                         <button id="bug-report-btn" class="non-outline-btn">
                             <span id="bug-report-icon"></span>
                         </button>
@@ -59,6 +63,12 @@ export default function Header($container, connWsManager) {
                 if (clickPosition > totalWidth * 0.9) {
                     new getDevelopersPage($container);
                 }
+            });
+        }
+        const versionBtn = $container.querySelector('#version-btn');
+        if (versionBtn) {
+            versionBtn.addEventListener('click', () => {
+                new getPatchNotePage($container);
             });
         }
         const bugReportBtn = $container.querySelector('#bug-report-btn');
