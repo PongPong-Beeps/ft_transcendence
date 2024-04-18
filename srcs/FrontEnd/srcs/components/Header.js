@@ -4,12 +4,18 @@ import ErrorPage from "../pages/ErrorPage.js";
 import { navigate } from "../utils/navigate.js";
 import getDevelopersPage from "../pages/developersPage.js";
 import getPatchNotePage from "../pages/PatchNote.js";
-
+import hasUndefinedArgs from "../utils/hasUndefinedArgs.js";
+import getNoticePage from "../pages/NoticePage.js";
 /**
  * @param { HTMLElement } $container
  * @param { WebSocketManager } connWsManager
  */
 export default function Header($container, connWsManager) {
+    if (hasUndefinedArgs($container, connWsManager))
+    {
+        console.error(connWsManager, " [ Header ] args are not defined");
+        return;
+    }
     const render = () => {
         const header = $container.querySelector('#header');
         if (header) {
@@ -89,8 +95,36 @@ export default function Header($container, connWsManager) {
                 }
             });
         }
-    }
 
+        const noticeBtn = $container.querySelector('#help-btn');
+        if (noticeBtn) {
+            noticeBtn.addEventListener('click', async (event) => {
+                connWsManager.sendMessage({ "type": "check_admin" });
+                console.log("check_admin 메시지를 보냈습니다.");
+                connWsManager.addMessageHandler(function (response) {
+                    // const response = JSON.parse(event.data);
+                    if ( response.type === 'check_admin' && response.status === 2000) {
+                        const content = prompt("공지할 내용을 입력해주세요");
+                        if (content) {
+                            let msgObject = { "type": "notice", "content": content };
+                            connWsManager.sendMessage(msgObject);
+                        }
+                    } else if (response.status === 4000) {
+                        // status가 4000일 때의 처리를 여기에 작성하세요.
+                        console.log("관리자가 아닙니다.");
+                    }
+                });
+            });
+        }
+
+    }
+    connWsManager.addMessageHandler(function (noticeData) {
+        if (noticeData.type === "notice") {
+            // alert(noticeData.content);
+            new getNoticePage($container, noticeData.content);
+        }
+    });
+    
     importCss("assets/css/header.css");
     render();
     setupEventListener();
