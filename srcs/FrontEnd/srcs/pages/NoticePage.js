@@ -5,34 +5,22 @@ import { importCss } from "../utils/importCss.js";
  */
 export default function getNoticePage($container, content) {
     const render = () => {
-        const page = $container.querySelector('#page');
+        const page = $container.querySelector('#notice');
         if (page) {
             console.log(content);
-            page.innerHTML = `
-                <div id="notice-note-page-background">
-                    <div id="notice-note-page-container">
-                        <h1>Notice Notes</h1>
-                        <div>${content}</div>
-                    </div>
+            if (content === "stop") {
+                page.innerHTML = "";
+            }
+            else {
+                page.innerHTML = `
+                <div id="notice">
+                    <span>${content}</span>
                 </div>
             `;
-            // page.style.display = 'block';
+            }
         }
     }
 
-    // const setupEventListener = () => {
-    //     const renderedImage = $container.querySelector('#notice-note-page-background');
-    //     if (renderedImage) {
-    //         renderedImage.addEventListener('click', () => {
-    //             const page = $container.querySelector('#page');
-    //             if (page) {
-    //                 page.style.display = 'none';
-    //             }
-    //         });
-    //     }
-    // }
-
-    // importCss("assets/css/notice-notes.css");
+    importCss("assets/css/notice.css");
     render();
-    // setupEventListener();
 }

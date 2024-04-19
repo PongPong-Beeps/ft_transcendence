@@ -100,27 +100,32 @@ export default function Header($container, connWsManager) {
         if (noticeBtn) {
             noticeBtn.addEventListener('click', async (event) => {
                 connWsManager.sendMessage({ "type": "check_admin" });
-                console.log("check_admin 메시지를 보냈습니다.");
-                connWsManager.addMessageHandler(function (response) {
-                    // const response = JSON.parse(event.data);
-                    if ( response.type === 'check_admin' && response.status === 2000) {
-                        const content = prompt("공지할 내용을 입력해주세요");
-                        if (content) {
-                            let msgObject = { "type": "notice", "content": content };
-                            connWsManager.sendMessage(msgObject);
-                        }
-                    } else if (response.status === 4000) {
-                        // status가 4000일 때의 처리를 여기에 작성하세요.
-                        console.log("관리자가 아닙니다.");
-                    }
-                });
             });
         }
 
     }
+
+    connWsManager.addMessageHandler(function (response) {
+        if ( response.type === 'check_admin' && response.status === 2000) {
+            const content = prompt("공지할 내용을 입력해주세요");
+            if (content) {
+                let msgObject = { "type": "notice", "content": content };
+                if (content === "stop")
+                    msgObject = { "type": "notice", "content": "" };
+                connWsManager.sendMessage(msgObject);
+            }
+            else
+                return;
+        } else if (response.status === 4000) {
+            // status가 4000일 때의 처리를 여기에 작성하세요.
+            console.log("관리자가 아닙니다.");
+        }
+    });
+
     connWsManager.addMessageHandler(function (noticeData) {
         if (noticeData.type === "notice") {
             // alert(noticeData.content);
+            console.log("notice hadnler ", noticeData.content);
             new getNoticePage($container, noticeData.content);
         }
     });
