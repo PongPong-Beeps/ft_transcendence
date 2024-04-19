@@ -8,6 +8,7 @@ from game.models import Game
 from .cache import set_user_info, get_user_info, delete_user_info
 from django.core.cache import cache
 import os
+from .utils import serialize_bug_report, check_reported_three_times
 
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -94,7 +95,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             )
         elif type == 'check_admin':
             await self.channel_layer.send(
-                self.channel_name, {"type": "check_admin"}
+                self.channel_name, {"type": "check_admin", "content": text_data_json["content"]}
             )
         elif type == 'notice':
             cache.set("notice", text_data_json['content'])
@@ -112,13 +113,20 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 "type": "check_admin",
                 "status": 2000,
-                "message" : "admin",
+                "content" : event["content"],
+                "message": await database_sync_to_async(serialize_bug_report)(event["content"]),
+            }))
+        elif event["content"] == "bug_report" and await database_sync_to_async(check_reported_three_times)(user):
+            await self.send(text_data=json.dumps({
+                "type": "check_admin",
+                "content" : "bug_report",
+                "status": 4001,
             }))
         else:
             await self.send(text_data=json.dumps({
                 "type": "check_admin",
                 "status": 4000,
-                "message" : "not admin",
+                "content" : event["content"],
             }))
     
     async def notice(self, event):
