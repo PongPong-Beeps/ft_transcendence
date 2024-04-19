@@ -1,0 +1,25 @@
+/* assets/css/notice.css */
+#notice {
+    background-color: rgba(0, 0, 0, 0.1); /* 배경색을 옅은 검정색으로 설정 */
+    color: black; /* 글자색을 검정색으로 설정 */
+    width: 100%; /* 너비를 100%로 설정 */
+    height: 25px; /* 높이를 30px로 설정 */
+    white-space: nowrap; /* 텍스트가 줄바꿈 없이 한 줄로 표시되도록 설정 */
+    overflow: hidden; /* 너비를 초과하는 내용은 숨김 */
+    position: relative; /* position 속성을 relative로 설정 */
+}
+
+#notice span {
+    position: absolute; /* position 속성을 absolute로 설정 */
+    font-family: "DNF Bit Bit v2", serif;
+    width: 100%; /* 너비를 100%로 설정 */
+    height: 100%; /* 높이를 100%로 설정 */
+    top: 0; /* 상단 위치를 0으로 설정 */
+    left: 0; /* 왼쪽 위치를 0으로 설정 */
+    animation: marquee 15s linear infinite; /* 애니메이션 설정 */
+}
+
+@keyframes marquee {
+    0% { left: 100%; } /* 애니메이션 시작 시점에서는 오른쪽 끝에서 시작 */
+    100% { left: -100%; } /* 애니메이션 종료 시점에서는 왼쪽 끝으로 이동 */
+}

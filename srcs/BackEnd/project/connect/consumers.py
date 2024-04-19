@@ -7,6 +7,7 @@ from user.models import User
 from game.models import Game
 from .cache import set_user_info, get_user_info, delete_user_info
 from django.core.cache import cache
+import os
 
 class ConnectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -41,6 +42,12 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         )
         await database_sync_to_async(set_user_info)(user, None)
         
+        notice = cache.get("notice")
+        if notice:
+            await self.send(text_data=json.dumps(
+                {"type": "notice", "content": notice }
+            ))
+        
     async def disconnect(self, close_code):
         user = self.scope['user']        
         await self.remove_clinet_and_invitation(user)
@@ -68,25 +75,56 @@ class ConnectConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         type = text_data_json["type"]
-        sender = text_data_json["sender"]
         
         if type == 'friend_list':
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "friend_list", "sender": sender}
+                self.room_group_name, {"type": "friend_list", "sender": text_data_json["sender"]}
             )
         elif type == 'all_chat':
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "all_chat", "sender": sender, "message": text_data_json["message"]}
+                self.room_group_name, {"type": "all_chat", "sender": text_data_json["sender"], "message": text_data_json["message"]}
             )
         elif type == 'dm_chat':
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "dm_chat", "sender": sender, "receiver": text_data_json["receiver"] ,"message": text_data_json["message"]}
+                self.room_group_name, {"type": "dm_chat", "sender": text_data_json["sender"], "receiver": text_data_json["receiver"] ,"message": text_data_json["message"]}
             )
         elif type == 'invite':
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "invited", "sender": sender, "receiver": text_data_json["receiver"]}
+                self.room_group_name, {"type": "invited", "sender": text_data_json["sender"], "receiver": text_data_json["receiver"]}
             )
+        elif type == 'check_admin':
+            await self.channel_layer.send(
+                self.channel_name, {"type": "check_admin"}
+            )
+        elif type == 'notice':
+            cache.set("notice", text_data_json['content'])
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "notice", "content": text_data_json["content"]}
+            )
+            
+    async def check_admin(self, event):
+        user = self.scope['user']
+        email = user.email
+        if email == os.getenv('ADMIN_1')\
+            or email == os.getenv('ADMIN_2')\
+            or email == os.getenv('ADMIN_3')\
+            or email == os.getenv('ADMIN_4'):
+            await self.send(text_data=json.dumps({
+                "type": "check_admin",
+                "status": 2000,
+                "message" : "admin",
+            }))
+        else:
+            await self.send(text_data=json.dumps({
+                "type": "check_admin",
+                "status": 4000,
+                "message" : "not admin",
+            }))
     
+    async def notice(self, event):
+        print("notice event: ", event)
+        await self.send(text_data=json.dumps(event))
+            
     async def invited(self, event):
         user = self.scope['user']
         sender_id = event['sender']
