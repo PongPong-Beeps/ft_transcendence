@@ -42,6 +42,12 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         )
         await database_sync_to_async(set_user_info)(user, None)
         
+        notice = cache.get("notice")
+        if notice:
+            await self.send(text_data=json.dumps(
+                {"type": "notice", "content": notice }
+            ))
+        
     async def disconnect(self, close_code):
         user = self.scope['user']        
         await self.remove_clinet_and_invitation(user)
@@ -91,6 +97,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                 self.channel_name, {"type": "check_admin"}
             )
         elif type == 'notice':
+            cache.set("notice", text_data_json['content'])
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "notice", "content": text_data_json["content"]}
             )
@@ -115,6 +122,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             }))
     
     async def notice(self, event):
+        print("notice event: ", event)
         await self.send(text_data=json.dumps(event))
             
     async def invited(self, event):
