@@ -6,6 +6,8 @@ import getDevelopersPage from "../pages/developersPage.js";
 import getPatchNotePage from "../pages/PatchNote.js";
 import hasUndefinedArgs from "../utils/hasUndefinedArgs.js";
 import getNoticePage from "../pages/NoticePage.js";
+import getBugReportPage from "../pages/BugReport.js";
+
 /**
  * @param { HTMLElement } $container
  * @param { WebSocketManager } connWsManager
@@ -80,33 +82,45 @@ export default function Header($container, connWsManager) {
         const bugReportBtn = $container.querySelector('#bug-report-btn');
         if (bugReportBtn) {
             bugReportBtn.addEventListener('click', async (event) => {
-                const bugReportMsg = prompt("발생한 버그의 내용을 작성해주세요.");
-                if (bugReportMsg) {
-                    try {
-                        await fetchWithAuth(`https://${BACKEND}/api/bug_report/`, {
-                            method: 'POST',
-                            body: JSON.stringify({ "content": bugReportMsg }),
-                        });
-                        alert("성공적으로 버그 내용을 제출하였습니다.");
-                    } catch (error) {
-                        console.error("[ bug report ] " + error.message);
-                        alert(`버그 내용 제출에 실패하였습니다. 에러: ${error.message}`);
-                    }
-                }
+                connWsManager.sendMessage({ "type": "check_admin", "content": "bug_report" });
             });
         }
 
         const noticeBtn = $container.querySelector('#help-btn');
         if (noticeBtn) {
             noticeBtn.addEventListener('click', async (event) => {
-                connWsManager.sendMessage({ "type": "check_admin" });
+                connWsManager.sendMessage({ "type": "check_admin", "content": "notice" });
             });
         }
 
     }
 
     connWsManager.addMessageHandler(function (response) {
-        if ( response.type === 'check_admin' && response.status === 2000) {
+        if (response.type === 'check_admin' && response.status === 2000 && response.content === "bug_report") {
+            new getBugReportPage($container, response.message);
+        } 
+        else if (response.content === "bug_report" && response.status === 4000) {
+            const bugReportMsg = prompt("발생한 버그의 내용을 작성해주세요.\n버그리포팅은 3회까지 가능합니다.\n관리자 확인 후 리포팅 횟수는 초기화됩니다.");
+            if (bugReportMsg) {
+                try {
+                    fetchWithAuth(`https://${BACKEND}/api/bug_report/`, {
+                        method: 'POST',
+                        body: JSON.stringify({ "content": bugReportMsg }),
+                    });
+                    alert("성공적으로 버그 내용을 제출하였습니다.");
+                } catch (error) {
+                    console.error("[ bug report ] " + error.message);
+                    alert(`버그 내용 제출에 실패하였습니다. 에러: ${error.message}`);
+                }
+            }
+        }
+        else if (response.content === "bug_report" && response.status === 4001) {
+            alert("버그리포팅을 3회 이상 시도하셨습니다. 관리자 확인 후 리포팅 가능합니다.");
+        }
+    });
+
+    connWsManager.addMessageHandler(function (response) {
+        if (response.type === 'check_admin' && response.status === 2000 && response.content === "notice") {
             const content = prompt("공지할 내용을 입력해주세요");
             if (content) {
                 let msgObject = { "type": "notice", "content": content };
@@ -116,7 +130,7 @@ export default function Header($container, connWsManager) {
             }
             else
                 return;
-        } else if (response.status === 4000) {
+        } else if (response.content === "notice" && response.status === 4000) {
             // status가 4000일 때의 처리를 여기에 작성하세요.
             console.log("관리자가 아닙니다.");
         }
@@ -125,11 +139,10 @@ export default function Header($container, connWsManager) {
     connWsManager.addMessageHandler(function (noticeData) {
         if (noticeData.type === "notice") {
             // alert(noticeData.content);
-            console.log("notice hadnler ", noticeData.content);
             new getNoticePage($container, noticeData.content);
         }
     });
-    
+
     importCss("assets/css/header.css");
     render();
     setupEventListener();
