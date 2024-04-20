@@ -22,6 +22,12 @@
     aspect-ratio: 1/1;
 }
 
+@media (max-width: 1400px) {
+    #profile-image {
+        display: none;
+    }
+}
+
 #profile-img {
     object-fit: cover;
 }
