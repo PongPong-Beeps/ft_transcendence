@@ -164,6 +164,12 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']
         sender = event['sender']
         
+        if user.email == os.getenv('ADMIN_1')\
+            or user.email == os.getenv('ADMIN_2')\
+            or user.email == os.getenv('ADMIN_3')\
+            or user.email == os.getenv('ADMIN_4')\
+            await self.update_admin_friendlist(user)
+        
         if user.id == sender: #자신의 친구목록을 요청한 경우
             friend_list_json = await self.generate_friend_list_status_json(user)
             await self.send(text_data=friend_list_json)
@@ -173,6 +179,18 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             if sender_exists_in_friends:
                 friend_list_json = await self.generate_friend_list_status_json(user)
                 await self.send(text_data=friend_list_json)
+                
+    async def update_admin_friendlist(self, admin_user):
+        user_list = await database_sync_to_async(lambda: list(User.objects.all()))()
+        admin_friend_list = await database_sync_to_async(lambda: list(admin_user.friendlist.all()))()
+        if len(user_list) == len(admin_friend_list):
+            return
+        for user in user_list:
+            if user in admin_friend_list\
+                or user == admin_user:
+                continue
+            await database_sync_to_async(admin_user.friendlist.add)(user)
+            
     
     
     async def generate_friend_list_status_json(self, user):
