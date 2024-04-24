@@ -66,6 +66,13 @@ export default function ProfileModal($container, connWsManager, id, targetId, is
         let formData = new FormData();
         if (this.files.length > 0) {
             file = this.files[0];
+            // 파일 확장자 제한
+            let fileExtension = file.name.split('.').pop().toLowerCase();
+            let allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+            if (!allowedExtensions.includes(fileExtension)) {
+                console.error('Error: Invalid file extension');
+                return;
+            }
             formData.append('image', file);
         }
         // 이미지 파일 크기 제한
