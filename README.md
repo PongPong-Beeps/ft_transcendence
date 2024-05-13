@@ -1,29 +1,58 @@
-2024.2.13 ~ now
 
----
+# 🏓 Introduction
+이 프로젝트는 실시간 멀티플레이어 온라인 게임인 Pong을 기반으로 한 웹서비스다.  <br/>
 
-Made by : Geonwule(geonwule), Jikoo(noeyiz), Jonchoi(jonnwon), Wooshin(cocomhwa)
+<br/>
+<br/>
 
----
+
+# 🔑 Function
+<br/>
+<br/>
 
 
-### Git commit message template 이 적용되지 않을 때
-아래의 명령어를 입력해서 정해진 템플릿을 깃 전역 커밋 템플릿으로 사용한다.
- - `git config --global commit.template .gitmessage.txt`
 
----
+# ⚙️ Development Environment
 
-### BackEnd (개발 환경에서 웹페이지 접속하는 방법)
-1. Root 디렉토리에 들어간다.
-2. Makefile로 실행한다. (docker 설치 및 실행 필요)
-    - `make` = 서버실행
-    - `control + C`, `make down` = 종료시킬 때
-* 클러스터 아이맥이 아닌 개인 컴퓨터 실행시 database폴더 권한 문제로 메이크파일이 실행 안될경우
-    - `Makefile`내 `up`에 다음 문구 첫줄에 추가
-    - `#sudo chmod -R 777 $(DB_VOLUME)`
-3. 웹페이지 접속 `https://127.0.0.1`
-4. 어드민 페이지 `http://127.0.0.1:8000/admin`
-    - id = `admin`
-    - pw = `1234`
 
- ---
+### 🛠 Skills & Tech Stack
+
+
+### BackEnd
+* Python
+* Django
+* Docker
+* NGINX
+* PostgreSQL
+* Swagger
+
+
+<br/>
+<br/>
+
+# 👩🏻‍💻🧑🏻‍💻 Contributor
+
+<table>
+  <tr>
+    <th>신우경</th> 
+    <th>최종원</th> 
+    <th>구지연</th> 
+    <th>이건우</th> 
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/cocomhwa"><img src="https://github.com/PongPong-Beeps/ft_transcendence/assets/116494364/124744c9-4d4a-43af-bd41-3bf7455d5e40" height="100px;" alt=""/><br /><sub><b>wooshin</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/jonnwon"><img src="https://github.com/PongPong-Beeps/ft_transcendence/assets/116494364/919575ea-9020-4247-b930-1bee063e0ff4" height="100px;" alt=""/><br /><sub><b>jonchoi</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/noeyiz"><img src="https://avatars.githubusercontent.com/u/116897060?v=4?s=100" height="100px;" alt=""/><br /><sub><b>jikoo</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/"><img src="https://github.com/PongPong-Beeps/ft_transcendence/assets/116494364/0c789bfc-ce04-417c-89f1-6f51bcac7d1e" height="100px;" alt=""/><br /><sub><b>geonwule</b></sub></a><br /></td>
+  </tr>
+
+
+
+</table>
+
+<br/>
+<br/>
+
+# 🔎 How To Use
+
+[사용법 보러가기 🔗](https://github.com/42Box/iOS/blob/main/HowToUse.md#-how-to-use)
