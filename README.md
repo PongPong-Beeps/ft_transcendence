@@ -17,8 +17,7 @@
 <br/>
 
 # 🏭 Architecture
-
-<img width="1500" alt="image" src="https://github.com/PongPong-Beeps/ft_transcendence/assets/117799441/6fff8d02-afc1-4cbc-a761-5607f4a5d854">
+<img width="1500" alt="image" src="https://github.com/PongPong-Beeps/ft_transcendence/assets/117799441/48011952-31a4-44e9-b9f2-d676a842559f">
 
 <br/>
 <br/>
