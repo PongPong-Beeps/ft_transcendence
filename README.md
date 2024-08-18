@@ -1,7 +1,9 @@
 # 🏓 Introduction
-이 프로젝트는 실시간 멀티플레이어 온라인 게임인 Pong을 기반으로 한 웹서비스다.
+이 프로젝트는 실시간 멀티 플레이가 가능한 PingPong 웹게임 개발 프로젝트입니다.
 <br/>
 <br/>
+[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=0gX66gC-LUU)
+
 
 # 🎮 Preview
 
